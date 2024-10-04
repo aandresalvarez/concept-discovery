@@ -87,9 +87,9 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   };
 
   return (
-    <div className="flex space-x-4 mb-4">
+    <div className="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4 mb-4">
       <Select onValueChange={handleLanguageChange} value={selectedLanguage}>
-        <SelectTrigger className="w-[180px] hover:shadow-md transition-shadow duration-300">
+        <SelectTrigger className="w-full sm:w-[180px] hover:shadow-md transition-shadow duration-300">
           <SelectValue placeholder="Select Language" />
         </SelectTrigger>
         <SelectContent>
@@ -101,11 +101,11 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
         </SelectContent>
       </Select>
       {selectedLanguage === "custom" && (
-        <div className="relative hover:shadow-lg transition-shadow duration-300">
+        <div className="relative w-full sm:w-auto flex-grow">
           <Input
             type="text"
             placeholder="Enter your language"
-            className="pl-10 pr-4 py-2 w-full rounded-full"
+            className="pl-10 pr-4 py-2 w-full rounded-full border-2 border-gray-300"
             value={customLanguage}
             onChange={(e) => {
               setCustomLanguage(e.target.value);
@@ -113,7 +113,7 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
             }}
           />
           <Search
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground cursor-pointer"
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground"
             size={20}
           />
         </div>
@@ -130,22 +130,20 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
   };
 
   return (
-    <div className="relative mb-4 w-full hover:shadow-lg transition-shadow duration-300 rounded-full">
-      <div className="relative hover:shadow-lg transition-shadow duration-300 rounded-full">
-        <Input
-          type="text"
-          placeholder="Search medical term"
-          className="pl-10 pr-4 py-2 w-full rounded-full"
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-        />
-        <Search
-          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground cursor-pointer"
-          size={20}
-          onClick={handleSearch}
-        />
-      </div>
+    <div className="relative mb-4 w-full">
+      <Input
+        type="text"
+        placeholder="Search medical term"
+        className="pl-10 pr-4 py-2 w-full rounded-full border-2 border-gray-300"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+      />
+      <Search
+        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground cursor-pointer"
+        size={20}
+        onClick={handleSearch}
+      />
     </div>
   );
 };
@@ -155,24 +153,27 @@ const Disambiguation: React.FC<DisambiguationProps> = ({
   onSelect,
 }) => {
   return (
-    <div>
+    <div className="mb-8">
       <h2 className="text-xl font-bold mb-4">Disambiguation</h2>
-      {options.map((option, index) => (
-        <Card
-          key={index}
-          className="mb-4 hover:bg-accent hover:text-accent-foreground cursor-pointer"
-          onClick={() => onSelect(option)}
-        >
-          <CardContent className="p-4">
-            <h3 className="text-lg font-semibold">{option.term}</h3>
-            <p className="text-base mt-2">
-              <strong>Definition:</strong> {option.definition}
-              <br />
-              <strong>Category:</strong> {option.category}
-            </p>
-          </CardContent>
-        </Card>
-      ))}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {options.map((option, index) => (
+          <Card
+            key={index}
+            className="hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors duration-200"
+            onClick={() => onSelect(option)}
+          >
+            <CardContent className="p-4">
+              <h3 className="text-lg font-semibold mb-2">{option.term}</h3>
+              <p className="text-sm">
+                <strong>Definition:</strong> {option.definition}
+              </p>
+              <p className="text-sm mt-1">
+                <strong>Category:</strong> {option.category}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 };
@@ -182,19 +183,19 @@ const SynonymList: React.FC<SynonymListProps> = ({
   onSynonymClick,
 }) => {
   return (
-    <div>
+    <div className="mb-8">
       <h2 className="text-xl font-bold mb-4">Synonyms</h2>
-      <ul className="mb-4">
+      <div className="flex flex-wrap gap-2">
         {synonyms.map((synonym, index) => (
-          <li
+          <button
             key={index}
-            className="p-2 hover:bg-accent hover:text-accent-foreground cursor-pointer"
+            className="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-sm hover:bg-accent hover:text-accent-foreground transition-colors duration-200"
             onClick={() => onSynonymClick(synonym)}
           >
             {synonym}
-          </li>
+          </button>
         ))}
-      </ul>
+      </div>
     </div>
   );
 };
@@ -203,7 +204,7 @@ const MedicalConceptsTable: React.FC<MedicalConceptsTableProps> = ({
   concepts,
 }) => {
   return (
-    <div>
+    <div className="mb-8 overflow-x-auto">
       <h2 className="text-xl font-bold mb-4">Medical Concepts</h2>
       <Table>
         <TableHeader>
@@ -266,7 +267,6 @@ const MainContainer: React.FC = () => {
         setTimeout(() => {
           clearInterval(progressInterval);
           setProgress(100);
-          // Use the term in the simulated response
           resolve({
             disambiguation: [
               {
@@ -283,14 +283,14 @@ const MainContainer: React.FC = () => {
             synonyms: [term, `${term} synonym 1`, `${term} synonym 2`],
             concepts: [
               {
-                id: 1000000 + term.length, // Just for simulation
+                id: 1000000 + term.length,
                 name: term,
                 domain: "Observation",
                 vocabulary: "SNOMED",
                 standard: "Standard",
               },
               {
-                id: 2000000 + term.length, // Just for simulation
+                id: 2000000 + term.length,
                 name: `${term} related concept`,
                 domain: "Measurement",
                 vocabulary: "LOINC",
@@ -321,11 +321,13 @@ const MainContainer: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <header className="bg-primary text-primary-foreground p-4 shadow-md">
-        <h1 className="text-2xl font-bold">Medical Concept Discovery</h1>
+        <div className="container mx-auto">
+          <h1 className="text-2xl font-bold">Medical Concept Discovery</h1>
+        </div>
       </header>
 
-      <main className="flex-1 flex items-center justify-center p-4">
-        <AnimatePresence>
+      <main className="flex-1 container mx-auto px-4 py-8">
+        <AnimatePresence mode="wait">
           {!hasSearched ? (
             <motion.div
               key="centered-search"
@@ -333,12 +335,12 @@ const MainContainer: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
-              className="flex flex-col w-full max-w-4xl"
+              className="flex flex-col items-center justify-center h-full"
             >
               <h2 className="text-3xl font-bold mb-8 text-center">
                 Search in any language
               </h2>
-              <div className="w-full">
+              <div className="w-full max-w-2xl">
                 <LanguageSelector onLanguageChange={handleLanguageChange} />
                 <SearchBox onSearch={handleSearch} />
               </div>
@@ -356,37 +358,38 @@ const MainContainer: React.FC = () => {
               </div>
 
               {loading && <Progress value={progress} className="mb-4" />}
-              {error && <p className="text-destructive">{error}</p>}
+              {error && <p className="text-destructive mb-4">{error}</p>}
 
               {searchResults && (
-                <>
-                  <Disambiguation
-                    options={searchResults.disambiguation}
-                    onSelect={handleDisambiguationSelect}
-                  />
-                  <SynonymList
-                    synonyms={searchResults.synonyms}
-                    onSynonymClick={handleSynonymClick}
-                  />
-                  <MedicalConceptsTable concepts={searchResults.concepts} />
-                </>
-              )}
-
-              {searchResults && (
-                <div className="mt-8">
-                  <h2 className="text-xl font-bold mb-4">Recommendation</h2>
-                  <p>
-                    We recommend exploring the concept "Cold" with ID 4224149 as
-                    the standard concept. Verify in Athena:
-                    <a
-                      href="https://athena.ohdsi.org/search-terms/terms/4224149"
-                      className="text-primary hover:underline ml-1"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      https://athena.ohdsi.org/search-terms/terms/4224149
-                    </a>
-                  </p>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div>
+                    <Disambiguation
+                      options={searchResults.disambiguation}
+                      onSelect={handleDisambiguationSelect}
+                    />
+                    <SynonymList
+                      synonyms={searchResults.synonyms}
+                      onSynonymClick={handleSynonymClick}
+                    />
+                  </div>
+                  <div>
+                    <MedicalConceptsTable concepts={searchResults.concepts} />
+                    <div className="mt-8">
+                      <h2 className="text-xl font-bold mb-4">Recommendation</h2>
+                      <p className="text-sm">
+                        We recommend exploring the concept "Cold" with ID
+                        4224149 as the standard concept. Verify in Athena:
+                      </p>
+                      <a
+                        href="https://athena.ohdsi.org/search-terms/terms/4224149"
+                        className="text-primary hover:underline text-sm break-all"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        https://athena.ohdsi.org/search-terms/terms/4224149
+                      </a>
+                    </div>
+                  </div>
                 </div>
               )}
             </motion.div>
@@ -394,8 +397,10 @@ const MainContainer: React.FC = () => {
         </AnimatePresence>
       </main>
 
-      <footer className="p-4 bg-background text-foreground text-center">
-        <p>© 2024 Medical Concept Discovery Tool</p>
+      <footer className="bg-background text-foreground p-4 text-center">
+        <div className="container mx-auto">
+          <p className="text-sm">© 2024 Medical Concept Discovery Tool</p>
+        </div>
       </footer>
     </div>
   );
