@@ -326,7 +326,7 @@ const MainContainer: React.FC = () => {
         </div>
       </header>
 
-      <main className="flex-1 container mx-auto px-4 py-8">
+      <main className="flex-1 container mx-auto px-4 py-8 flex flex-col">
         <AnimatePresence mode="wait">
           {!hasSearched ? (
             <motion.div
@@ -335,7 +335,7 @@ const MainContainer: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
-              className="flex flex-col items-center justify-center h-full"
+              className="flex flex-col items-center justify-center flex-grow"
             >
               <h2 className="text-3xl font-bold mb-8 text-center">
                 Search in any language
@@ -351,6 +351,7 @@ const MainContainer: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
+              className="w-full"
             >
               <div className="mb-8">
                 <LanguageSelector onLanguageChange={handleLanguageChange} />
