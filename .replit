@@ -1,0 +1,34 @@
+# .replit file
+
+# Default run command (development mode)
+run = "bash run_dev.sh"
+
+# Modules
+modules = ["nodejs-20:v20-20230623-f4a2d2a", "python-3.11:v18-20230807-322e88b"]
+
+# Hidden files/directories
+hidden = [".pythonlibs", "frontend/node_modules", "frontend/dist"]
+
+# Nix configuration
+[nix]
+channel = "stable-24_05"
+
+# Deployment configuration
+[deployment]
+run = "bash run_prod.sh"
+deploymentTarget = "cloudrun"
+
+[[ports]]
+localPort = 8000
+externalPort = 80
+
+[[ports]]
+localPort = 8001
+externalPort = 3000
+
+# Commands
+[commands]
+dev = "bash run_dev.sh"
+prod = "bash run_prod.sh"
+install = "pip install -r requirements.txt && cd frontend && npm install"
+build = "cd frontend && npm run build"

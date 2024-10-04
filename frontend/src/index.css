@@ -1,0 +1,61 @@
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:wght@400;600;700&family=Roboto:wght@400;700&family=Roboto+Condensed:wght@400;700&family=Roboto+Mono&family=Roboto+Slab:wght@400;700&display=swap');
+
+/* Then in your Tailwind config or CSS */
+body {
+  font-family: 'Source Sans 3', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Source Serif 4', serif;
+}
+
+/* Use Roboto families for specific elements as needed */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 36 9% 22%; /* Stanford Black #2E2D29 */
+    --card: 0 0% 100%;
+    --card-foreground: 36 9% 22%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 36 9% 22%;
+    --primary: 0 85% 32%; /* Stanford Cardinal Red #8C1515 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 95%; /* Light grey */
+    --secondary-foreground: 0 85% 32%;
+    --muted: 0 0% 96%; /* Stanford 10% Black #EAEAEA */
+    --muted-foreground: 210 4% 34%; /* Stanford Cool Grey #53565A */
+    --accent: 184 70% 29%; /* Stanford Lagunita #007C92 */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 65% 50%; /* Keeping original destructive color */
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 91%; /* Stanford 20% Black #D5D5D4 */
+    --input: 0 0% 91%;
+    --ring: 0 85% 32%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 0 85% 32%; /* Stanford Cardinal Red #8C1515 */
+    --foreground: 0 0% 100%;
+    --card: 0 85% 32%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 85% 32%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 85% 32%;
+    --secondary: 36 9% 22%; /* Stanford Black #2E2D29 */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 210 4% 34%; /* Stanford Cool Grey #53565A */
+    --muted-foreground: 0 0% 70%;
+    --accent: 184 70% 29%; /* Stanford Lagunita #007C92 */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 45% 40%; /* Keeping original destructive color */
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 4% 34%; /* Stanford Cool Grey #53565A */
+    --input: 210 4% 34%;
+    --ring: 0 0% 80%;
+  }
+}
