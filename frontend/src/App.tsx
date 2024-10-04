@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Search } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -66,6 +67,14 @@ interface SearchResults {
 const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   onLanguageChange,
 }) => {
+  const languageOptions = [
+    { value: "en", label: "English" },
+    { value: "es", label: "Español" },
+    { value: "fr", label: "Français" },
+    { value: "de", label: "Deutsch" },
+    { value: "custom", label: "Custom" },
+  ];
+
   const [customLanguage, setCustomLanguage] = useState<string>("");
   const [selectedLanguage, setSelectedLanguage] = useState<string>("");
 
@@ -80,28 +89,34 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   return (
     <div className="flex space-x-4 mb-4">
       <Select onValueChange={handleLanguageChange} value={selectedLanguage}>
-        <SelectTrigger className="w-[180px]">
+        <SelectTrigger className="w-[180px] hover:shadow-md transition-shadow duration-300">
           <SelectValue placeholder="Select Language" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="en">English</SelectItem>
-          <SelectItem value="es">Español</SelectItem>
-          <SelectItem value="fr">Français</SelectItem>
-          <SelectItem value="de">Deutsch</SelectItem>
-          <SelectItem value="custom">Custom</SelectItem>
+          {languageOptions.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
       {selectedLanguage === "custom" && (
-        <Input
-          type="text"
-          placeholder="Enter your language"
-          value={customLanguage}
-          onChange={(e) => {
-            setCustomLanguage(e.target.value);
-            onLanguageChange(e.target.value);
-          }}
-          className="w-[200px]"
-        />
+        <div className="relative hover:shadow-lg transition-shadow duration-300">
+          <Input
+            type="text"
+            placeholder="Enter your language"
+            className="pl-10 pr-4 py-2 w-full rounded-full"
+            value={customLanguage}
+            onChange={(e) => {
+              setCustomLanguage(e.target.value);
+              onLanguageChange(e.target.value);
+            }}
+          />
+          <Search
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground cursor-pointer"
+            size={20}
+          />
+        </div>
       )}
     </div>
   );
@@ -115,20 +130,22 @@ const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
   };
 
   return (
-    <div className="relative mb-4">
-      <Input
-        type="text"
-        placeholder="Search medical term"
-        className="pl-10 pr-4 py-2 w-full rounded-full"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-      />
-      <Search
-        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground cursor-pointer"
-        size={20}
-        onClick={handleSearch}
-      />
+    <div className="relative mb-4 w-full hover:shadow-lg transition-shadow duration-300 rounded-full">
+      <div className="relative hover:shadow-lg transition-shadow duration-300 rounded-full">
+        <Input
+          type="text"
+          placeholder="Search medical term"
+          className="pl-10 pr-4 py-2 w-full rounded-full"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+        />
+        <Search
+          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground cursor-pointer"
+          size={20}
+          onClick={handleSearch}
+        />
+      </div>
     </div>
   );
 };
@@ -223,6 +240,7 @@ const MainContainer: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
 
   useEffect(() => {
     setHasSearched(false);
@@ -236,10 +254,18 @@ const MainContainer: React.FC = () => {
   const handleSearch = async (term: string) => {
     setLoading(true);
     setError(null);
+    setProgress(0);
+
+    const progressInterval = setInterval(() => {
+      setProgress((prev) => (prev >= 90 ? 90 : prev + 10));
+    }, 100);
+
     try {
       // Simulated API call
       const response: SearchResults = await new Promise((resolve) => {
         setTimeout(() => {
+          clearInterval(progressInterval);
+          setProgress(100);
           // Use the term in the simulated response
           resolve({
             disambiguation: [
@@ -279,6 +305,7 @@ const MainContainer: React.FC = () => {
     } catch (err) {
       setError("An error occurred while fetching results. Please try again.");
     } finally {
+      clearInterval(progressInterval);
       setLoading(false);
     }
   };
@@ -297,7 +324,7 @@ const MainContainer: React.FC = () => {
         <h1 className="text-2xl font-bold">Medical Concept Discovery</h1>
       </header>
 
-      <main className="flex-1 p-4 max-w-4xl mx-auto">
+      <main className="flex-1 flex items-center justify-center p-4">
         <AnimatePresence>
           {!hasSearched ? (
             <motion.div
@@ -306,12 +333,12 @@ const MainContainer: React.FC = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
-              className="flex flex-col items-center justify-center h-full"
+              className="flex flex-col w-full max-w-4xl"
             >
-              <h2 className="text-3xl font-bold mb-8">
+              <h2 className="text-3xl font-bold mb-8 text-center">
                 Search in any language
               </h2>
-              <div className="w-full max-w-md">
+              <div className="w-full">
                 <LanguageSelector onLanguageChange={handleLanguageChange} />
                 <SearchBox onSearch={handleSearch} />
               </div>
@@ -328,7 +355,7 @@ const MainContainer: React.FC = () => {
                 <SearchBox onSearch={handleSearch} />
               </div>
 
-              {loading && <p>Loading...</p>}
+              {loading && <Progress value={progress} className="mb-4" />}
               {error && <p className="text-destructive">{error}</p>}
 
               {searchResults && (
