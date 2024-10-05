@@ -61,19 +61,27 @@ export default tseslint.config(
       "name": "frontend",
       "version": "0.0.0",
       "dependencies": {
+        "@radix-ui/react-dialog": "^1.1.2",
+        "@radix-ui/react-progress": "^1.1.0",
+        "@radix-ui/react-select": "^2.1.2",
         "@radix-ui/react-slot": "^1.1.0",
+        "@radix-ui/react-tabs": "^1.1.1",
         "class-variance-authority": "^0.7.0",
         "clsx": "^2.1.1",
+        "framer-motion": "^11.11.1",
+        "lodash.debounce": "^4.0.8",
         "lucide-react": "^0.447.0",
         "react": "^18.3.1",
         "react-dom": "^18.3.1",
         "tailwind-merge": "^2.5.3",
-        "tailwindcss-animate": "^1.0.7"
+        "tailwindcss-animate": "^1.0.7",
+        "vaul": "^1.0.0"
       },
       "devDependencies": {
         "@eslint/js": "^9.9.0",
         "@shadcn/ui": "^0.0.4",
         "@types/axios": "^0.14.0",
+        "@types/lodash.debounce": "^4.0.9",
         "@types/node": "^22.7.4",
         "@types/react": "^18.3.11",
         "@types/react-dom": "^18.3.0",
@@ -953,6 +961,44 @@ export default tseslint.config(
         "node": "^18.18.0 || ^20.9.0 || >=21.1.0"
       }
     },
+    "node_modules/@floating-ui/core": {
+      "version": "1.6.8",
+      "resolved": "https://registry.npmjs.org/@floating-ui/core/-/core-1.6.8.tgz",
+      "integrity": "sha512-7XJ9cPU+yI2QeLS+FCSlqNFZJq8arvswefkZrYI1yQBbftw6FyrZOxYSh+9S7z7TpeWlRt9zJ5IhM1WIL334jA==",
+      "license": "MIT",
+      "dependencies": {
+        "@floating-ui/utils": "^0.2.8"
+      }
+    },
+    "node_modules/@floating-ui/dom": {
+      "version": "1.6.11",
+      "resolved": "https://registry.npmjs.org/@floating-ui/dom/-/dom-1.6.11.tgz",
+      "integrity": "sha512-qkMCxSR24v2vGkhYDo/UzxfJN3D4syqSjyuTFz6C7XcpU1pASPRieNI0Kj5VP3/503mOfYiGY891ugBX1GlABQ==",
+      "license": "MIT",
+      "dependencies": {
+        "@floating-ui/core": "^1.6.0",
+        "@floating-ui/utils": "^0.2.8"
+      }
+    },
+    "node_modules/@floating-ui/react-dom": {
+      "version": "2.1.2",
+      "resolved": "https://registry.npmjs.org/@floating-ui/react-dom/-/react-dom-2.1.2.tgz",
+      "integrity": "sha512-06okr5cgPzMNBy+Ycse2A6udMi4bqwW/zgBF/rwjcNqWkyr82Mcg8b0vjX8OJpZFy/FKjJmw6wV7t44kK6kW7A==",
+      "license": "MIT",
+      "dependencies": {
+        "@floating-ui/dom": "^1.0.0"
+      },
+      "peerDependencies": {
+        "react": ">=16.8.0",
+        "react-dom": ">=16.8.0"
+      }
+    },
+    "node_modules/@floating-ui/utils": {
+      "version": "0.2.8",
+      "resolved": "https://registry.npmjs.org/@floating-ui/utils/-/utils-0.2.8.tgz",
+      "integrity": "sha512-kym7SodPp8/wloecOpcmSnWJsK7M0E5Wg8UcFA+uO4B9s5d0ywXOEro/8HM9x0rW+TljRzul/14UYz3TleT3ig==",
+      "license": "MIT"
+    },
     "node_modules/@humanwhocodes/module-importer": {
       "version": "1.0.1",
       "resolved": "https://registry.npmjs.org/@humanwhocodes/module-importer/-/module-importer-1.0.1.tgz",
@@ -1118,6 +1164,82 @@ export default tseslint.config(
         "node": ">=14"
       }
     },
+    "node_modules/@radix-ui/number": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/number/-/number-1.1.0.tgz",
+      "integrity": "sha512-V3gRzhVNU1ldS5XhAPTom1fOIo4ccrjjJgmE+LI2h/WaFpHmx0MQApT+KZHnx8abG6Avtfcz4WoEciMnpFT3HQ==",
+      "license": "MIT"
+    },
+    "node_modules/@radix-ui/primitive": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/primitive/-/primitive-1.1.0.tgz",
+      "integrity": "sha512-4Z8dn6Upk0qk4P74xBhZ6Hd/w0mPEzOOLxy4xiPXOXqjF7jZS0VAKk7/x/H6FyY2zCkYJqePf1G5KmkmNJ4RBA==",
+      "license": "MIT"
+    },
+    "node_modules/@radix-ui/react-arrow": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-arrow/-/react-arrow-1.1.0.tgz",
+      "integrity": "sha512-FmlW1rCg7hBpEBwFbjHwCW6AmWLQM6g/v0Sn8XbP9NvmSZ2San1FpQeyPtufzOMSIx7Y4dzjlHoifhp+7NkZhw==",
+      "license": "MIT",
+      "dependencies": {
+        "@radix-ui/react-primitive": "2.0.0"
+      },
+      "peerDependencies": {
+        "@types/react": "*",
+        "@types/react-dom": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+        "react-dom": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        },
+        "@types/react-dom": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-collection": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-collection/-/react-collection-1.1.0.tgz",
+      "integrity": "sha512-GZsZslMJEyo1VKm5L1ZJY8tGDxZNPAoUeQUIbKeJfoi7Q4kmig5AsgLMYYuyYbfjd8fBmFORAIwYAkXMnXZgZw==",
+      "license": "MIT",
+      "dependencies": {
+        "@radix-ui/react-compose-refs": "1.1.0",
+        "@radix-ui/react-context": "1.1.0",
+        "@radix-ui/react-primitive": "2.0.0",
+        "@radix-ui/react-slot": "1.1.0"
+      },
+      "peerDependencies": {
+        "@types/react": "*",
+        "@types/react-dom": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+        "react-dom": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        },
+        "@types/react-dom": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-collection/node_modules/@radix-ui/react-context": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-context/-/react-context-1.1.0.tgz",
+      "integrity": "sha512-OKrckBy+sMEgYM/sMmqmErVn0kZqrHPJze+Ql3DzYsDDp0hl0L62nx/2122/Bvps1qz645jlcu2tD9lrRSdf8A==",
+      "license": "MIT",
+      "peerDependencies": {
+        "@types/react": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
     "node_modules/@radix-ui/react-compose-refs": {
       "version": "1.1.0",
       "resolved": "https://registry.npmjs.org/@radix-ui/react-compose-refs/-/react-compose-refs-1.1.0.tgz",
@@ -1129,6 +1251,403 @@ export default tseslint.config(
       },
       "peerDependenciesMeta": {
         "@types/react": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-context": {
+      "version": "1.1.1",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-context/-/react-context-1.1.1.tgz",
+      "integrity": "sha512-UASk9zi+crv9WteK/NU4PLvOoL3OuE6BWVKNF6hPRBtYBDXQ2u5iu3O59zUlJiTVvkyuycnqrztsHVJwcK9K+Q==",
+      "license": "MIT",
+      "peerDependencies": {
+        "@types/react": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-dialog": {
+      "version": "1.1.2",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-dialog/-/react-dialog-1.1.2.tgz",
+      "integrity": "sha512-Yj4dZtqa2o+kG61fzB0H2qUvmwBA2oyQroGLyNtBj1beo1khoQ3q1a2AO8rrQYjd8256CO9+N8L9tvsS+bnIyA==",
+      "license": "MIT",
+      "dependencies": {
+        "@radix-ui/primitive": "1.1.0",
+        "@radix-ui/react-compose-refs": "1.1.0",
+        "@radix-ui/react-context": "1.1.1",
+        "@radix-ui/react-dismissable-layer": "1.1.1",
+        "@radix-ui/react-focus-guards": "1.1.1",
+        "@radix-ui/react-focus-scope": "1.1.0",
+        "@radix-ui/react-id": "1.1.0",
+        "@radix-ui/react-portal": "1.1.2",
+        "@radix-ui/react-presence": "1.1.1",
+        "@radix-ui/react-primitive": "2.0.0",
+        "@radix-ui/react-slot": "1.1.0",
+        "@radix-ui/react-use-controllable-state": "1.1.0",
+        "aria-hidden": "^1.1.1",
+        "react-remove-scroll": "2.6.0"
+      },
+      "peerDependencies": {
+        "@types/react": "*",
+        "@types/react-dom": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+        "react-dom": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        },
+        "@types/react-dom": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-direction": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-direction/-/react-direction-1.1.0.tgz",
+      "integrity": "sha512-BUuBvgThEiAXh2DWu93XsT+a3aWrGqolGlqqw5VU1kG7p/ZH2cuDlM1sRLNnY3QcBS69UIz2mcKhMxDsdewhjg==",
+      "license": "MIT",
+      "peerDependencies": {
+        "@types/react": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-dismissable-layer": {
+      "version": "1.1.1",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-dismissable-layer/-/react-dismissable-layer-1.1.1.tgz",
+      "integrity": "sha512-QSxg29lfr/xcev6kSz7MAlmDnzbP1eI/Dwn3Tp1ip0KT5CUELsxkekFEMVBEoykI3oV39hKT4TKZzBNMbcTZYQ==",
+      "license": "MIT",
+      "dependencies": {
+        "@radix-ui/primitive": "1.1.0",
+        "@radix-ui/react-compose-refs": "1.1.0",
+        "@radix-ui/react-primitive": "2.0.0",
+        "@radix-ui/react-use-callback-ref": "1.1.0",
+        "@radix-ui/react-use-escape-keydown": "1.1.0"
+      },
+      "peerDependencies": {
+        "@types/react": "*",
+        "@types/react-dom": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+        "react-dom": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        },
+        "@types/react-dom": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-focus-guards": {
+      "version": "1.1.1",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-focus-guards/-/react-focus-guards-1.1.1.tgz",
+      "integrity": "sha512-pSIwfrT1a6sIoDASCSpFwOasEwKTZWDw/iBdtnqKO7v6FeOzYJ7U53cPzYFVR3geGGXgVHaH+CdngrrAzqUGxg==",
+      "license": "MIT",
+      "peerDependencies": {
+        "@types/react": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-focus-scope": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-focus-scope/-/react-focus-scope-1.1.0.tgz",
+      "integrity": "sha512-200UD8zylvEyL8Bx+z76RJnASR2gRMuxlgFCPAe/Q/679a/r0eK3MBVYMb7vZODZcffZBdob1EGnky78xmVvcA==",
+      "license": "MIT",
+      "dependencies": {
+        "@radix-ui/react-compose-refs": "1.1.0",
+        "@radix-ui/react-primitive": "2.0.0",
+        "@radix-ui/react-use-callback-ref": "1.1.0"
+      },
+      "peerDependencies": {
+        "@types/react": "*",
+        "@types/react-dom": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+        "react-dom": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        },
+        "@types/react-dom": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-id": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-id/-/react-id-1.1.0.tgz",
+      "integrity": "sha512-EJUrI8yYh7WOjNOqpoJaf1jlFIH2LvtgAl+YcFqNCa+4hj64ZXmPkAKOFs/ukjz3byN6bdb/AVUqHkI8/uWWMA==",
+      "license": "MIT",
+      "dependencies": {
+        "@radix-ui/react-use-layout-effect": "1.1.0"
+      },
+      "peerDependencies": {
+        "@types/react": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-popper": {
+      "version": "1.2.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-popper/-/react-popper-1.2.0.tgz",
+      "integrity": "sha512-ZnRMshKF43aBxVWPWvbj21+7TQCvhuULWJ4gNIKYpRlQt5xGRhLx66tMp8pya2UkGHTSlhpXwmjqltDYHhw7Vg==",
+      "license": "MIT",
+      "dependencies": {
+        "@floating-ui/react-dom": "^2.0.0",
+        "@radix-ui/react-arrow": "1.1.0",
+        "@radix-ui/react-compose-refs": "1.1.0",
+        "@radix-ui/react-context": "1.1.0",
+        "@radix-ui/react-primitive": "2.0.0",
+        "@radix-ui/react-use-callback-ref": "1.1.0",
+        "@radix-ui/react-use-layout-effect": "1.1.0",
+        "@radix-ui/react-use-rect": "1.1.0",
+        "@radix-ui/react-use-size": "1.1.0",
+        "@radix-ui/rect": "1.1.0"
+      },
+      "peerDependencies": {
+        "@types/react": "*",
+        "@types/react-dom": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+        "react-dom": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        },
+        "@types/react-dom": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-popper/node_modules/@radix-ui/react-context": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-context/-/react-context-1.1.0.tgz",
+      "integrity": "sha512-OKrckBy+sMEgYM/sMmqmErVn0kZqrHPJze+Ql3DzYsDDp0hl0L62nx/2122/Bvps1qz645jlcu2tD9lrRSdf8A==",
+      "license": "MIT",
+      "peerDependencies": {
+        "@types/react": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-portal": {
+      "version": "1.1.2",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-portal/-/react-portal-1.1.2.tgz",
+      "integrity": "sha512-WeDYLGPxJb/5EGBoedyJbT0MpoULmwnIPMJMSldkuiMsBAv7N1cRdsTWZWht9vpPOiN3qyiGAtbK2is47/uMFg==",
+      "license": "MIT",
+      "dependencies": {
+        "@radix-ui/react-primitive": "2.0.0",
+        "@radix-ui/react-use-layout-effect": "1.1.0"
+      },
+      "peerDependencies": {
+        "@types/react": "*",
+        "@types/react-dom": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+        "react-dom": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        },
+        "@types/react-dom": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-presence": {
+      "version": "1.1.1",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-presence/-/react-presence-1.1.1.tgz",
+      "integrity": "sha512-IeFXVi4YS1K0wVZzXNrbaaUvIJ3qdY+/Ih4eHFhWA9SwGR9UDX7Ck8abvL57C4cv3wwMvUE0OG69Qc3NCcTe/A==",
+      "license": "MIT",
+      "dependencies": {
+        "@radix-ui/react-compose-refs": "1.1.0",
+        "@radix-ui/react-use-layout-effect": "1.1.0"
+      },
+      "peerDependencies": {
+        "@types/react": "*",
+        "@types/react-dom": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+        "react-dom": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        },
+        "@types/react-dom": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-primitive": {
+      "version": "2.0.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-primitive/-/react-primitive-2.0.0.tgz",
+      "integrity": "sha512-ZSpFm0/uHa8zTvKBDjLFWLo8dkr4MBsiDLz0g3gMUwqgLHz9rTaRRGYDgvZPtBJgYCBKXkS9fzmoySgr8CO6Cw==",
+      "license": "MIT",
+      "dependencies": {
+        "@radix-ui/react-slot": "1.1.0"
+      },
+      "peerDependencies": {
+        "@types/react": "*",
+        "@types/react-dom": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+        "react-dom": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        },
+        "@types/react-dom": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-progress": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-progress/-/react-progress-1.1.0.tgz",
+      "integrity": "sha512-aSzvnYpP725CROcxAOEBVZZSIQVQdHgBr2QQFKySsaD14u8dNT0batuXI+AAGDdAHfXH8rbnHmjYFqVJ21KkRg==",
+      "license": "MIT",
+      "dependencies": {
+        "@radix-ui/react-context": "1.1.0",
+        "@radix-ui/react-primitive": "2.0.0"
+      },
+      "peerDependencies": {
+        "@types/react": "*",
+        "@types/react-dom": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+        "react-dom": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        },
+        "@types/react-dom": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-progress/node_modules/@radix-ui/react-context": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-context/-/react-context-1.1.0.tgz",
+      "integrity": "sha512-OKrckBy+sMEgYM/sMmqmErVn0kZqrHPJze+Ql3DzYsDDp0hl0L62nx/2122/Bvps1qz645jlcu2tD9lrRSdf8A==",
+      "license": "MIT",
+      "peerDependencies": {
+        "@types/react": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-roving-focus": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-roving-focus/-/react-roving-focus-1.1.0.tgz",
+      "integrity": "sha512-EA6AMGeq9AEeQDeSH0aZgG198qkfHSbvWTf1HvoDmOB5bBG/qTxjYMWUKMnYiV6J/iP/J8MEFSuB2zRU2n7ODA==",
+      "license": "MIT",
+      "dependencies": {
+        "@radix-ui/primitive": "1.1.0",
+        "@radix-ui/react-collection": "1.1.0",
+        "@radix-ui/react-compose-refs": "1.1.0",
+        "@radix-ui/react-context": "1.1.0",
+        "@radix-ui/react-direction": "1.1.0",
+        "@radix-ui/react-id": "1.1.0",
+        "@radix-ui/react-primitive": "2.0.0",
+        "@radix-ui/react-use-callback-ref": "1.1.0",
+        "@radix-ui/react-use-controllable-state": "1.1.0"
+      },
+      "peerDependencies": {
+        "@types/react": "*",
+        "@types/react-dom": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+        "react-dom": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        },
+        "@types/react-dom": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-roving-focus/node_modules/@radix-ui/react-context": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-context/-/react-context-1.1.0.tgz",
+      "integrity": "sha512-OKrckBy+sMEgYM/sMmqmErVn0kZqrHPJze+Ql3DzYsDDp0hl0L62nx/2122/Bvps1qz645jlcu2tD9lrRSdf8A==",
+      "license": "MIT",
+      "peerDependencies": {
+        "@types/react": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-select": {
+      "version": "2.1.2",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-select/-/react-select-2.1.2.tgz",
+      "integrity": "sha512-rZJtWmorC7dFRi0owDmoijm6nSJH1tVw64QGiNIZ9PNLyBDtG+iAq+XGsya052At4BfarzY/Dhv9wrrUr6IMZA==",
+      "license": "MIT",
+      "dependencies": {
+        "@radix-ui/number": "1.1.0",
+        "@radix-ui/primitive": "1.1.0",
+        "@radix-ui/react-collection": "1.1.0",
+        "@radix-ui/react-compose-refs": "1.1.0",
+        "@radix-ui/react-context": "1.1.1",
+        "@radix-ui/react-direction": "1.1.0",
+        "@radix-ui/react-dismissable-layer": "1.1.1",
+        "@radix-ui/react-focus-guards": "1.1.1",
+        "@radix-ui/react-focus-scope": "1.1.0",
+        "@radix-ui/react-id": "1.1.0",
+        "@radix-ui/react-popper": "1.2.0",
+        "@radix-ui/react-portal": "1.1.2",
+        "@radix-ui/react-primitive": "2.0.0",
+        "@radix-ui/react-slot": "1.1.0",
+        "@radix-ui/react-use-callback-ref": "1.1.0",
+        "@radix-ui/react-use-controllable-state": "1.1.0",
+        "@radix-ui/react-use-layout-effect": "1.1.0",
+        "@radix-ui/react-use-previous": "1.1.0",
+        "@radix-ui/react-visually-hidden": "1.1.0",
+        "aria-hidden": "^1.1.1",
+        "react-remove-scroll": "2.6.0"
+      },
+      "peerDependencies": {
+        "@types/react": "*",
+        "@types/react-dom": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+        "react-dom": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        },
+        "@types/react-dom": {
           "optional": true
         }
       }
@@ -1150,6 +1669,182 @@ export default tseslint.config(
           "optional": true
         }
       }
+    },
+    "node_modules/@radix-ui/react-tabs": {
+      "version": "1.1.1",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-tabs/-/react-tabs-1.1.1.tgz",
+      "integrity": "sha512-3GBUDmP2DvzmtYLMsHmpA1GtR46ZDZ+OreXM/N+kkQJOPIgytFWWTfDQmBQKBvaFS0Vno0FktdbVzN28KGrMdw==",
+      "license": "MIT",
+      "dependencies": {
+        "@radix-ui/primitive": "1.1.0",
+        "@radix-ui/react-context": "1.1.1",
+        "@radix-ui/react-direction": "1.1.0",
+        "@radix-ui/react-id": "1.1.0",
+        "@radix-ui/react-presence": "1.1.1",
+        "@radix-ui/react-primitive": "2.0.0",
+        "@radix-ui/react-roving-focus": "1.1.0",
+        "@radix-ui/react-use-controllable-state": "1.1.0"
+      },
+      "peerDependencies": {
+        "@types/react": "*",
+        "@types/react-dom": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+        "react-dom": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        },
+        "@types/react-dom": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-use-callback-ref": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-use-callback-ref/-/react-use-callback-ref-1.1.0.tgz",
+      "integrity": "sha512-CasTfvsy+frcFkbXtSJ2Zu9JHpN8TYKxkgJGWbjiZhFivxaeW7rMeZt7QELGVLaYVfFMsKHjb7Ak0nMEe+2Vfw==",
+      "license": "MIT",
+      "peerDependencies": {
+        "@types/react": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-use-controllable-state": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-use-controllable-state/-/react-use-controllable-state-1.1.0.tgz",
+      "integrity": "sha512-MtfMVJiSr2NjzS0Aa90NPTnvTSg6C/JLCV7ma0W6+OMV78vd8OyRpID+Ng9LxzsPbLeuBnWBA1Nq30AtBIDChw==",
+      "license": "MIT",
+      "dependencies": {
+        "@radix-ui/react-use-callback-ref": "1.1.0"
+      },
+      "peerDependencies": {
+        "@types/react": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-use-escape-keydown": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-use-escape-keydown/-/react-use-escape-keydown-1.1.0.tgz",
+      "integrity": "sha512-L7vwWlR1kTTQ3oh7g1O0CBF3YCyyTj8NmhLR+phShpyA50HCfBFKVJTpshm9PzLiKmehsrQzTYTpX9HvmC9rhw==",
+      "license": "MIT",
+      "dependencies": {
+        "@radix-ui/react-use-callback-ref": "1.1.0"
+      },
+      "peerDependencies": {
+        "@types/react": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-use-layout-effect": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-use-layout-effect/-/react-use-layout-effect-1.1.0.tgz",
+      "integrity": "sha512-+FPE0rOdziWSrH9athwI1R0HDVbWlEhd+FR+aSDk4uWGmSJ9Z54sdZVDQPZAinJhJXwfT+qnj969mCsT2gfm5w==",
+      "license": "MIT",
+      "peerDependencies": {
+        "@types/react": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-use-previous": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-use-previous/-/react-use-previous-1.1.0.tgz",
+      "integrity": "sha512-Z/e78qg2YFnnXcW88A4JmTtm4ADckLno6F7OXotmkQfeuCVaKuYzqAATPhVzl3delXE7CxIV8shofPn3jPc5Og==",
+      "license": "MIT",
+      "peerDependencies": {
+        "@types/react": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-use-rect": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-use-rect/-/react-use-rect-1.1.0.tgz",
+      "integrity": "sha512-0Fmkebhr6PiseyZlYAOtLS+nb7jLmpqTrJyv61Pe68MKYW6OWdRE2kI70TaYY27u7H0lajqM3hSMMLFq18Z7nQ==",
+      "license": "MIT",
+      "dependencies": {
+        "@radix-ui/rect": "1.1.0"
+      },
+      "peerDependencies": {
+        "@types/react": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-use-size": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-use-size/-/react-use-size-1.1.0.tgz",
+      "integrity": "sha512-XW3/vWuIXHa+2Uwcc2ABSfcCledmXhhQPlGbfcRXbiUQI5Icjcg19BGCZVKKInYbvUCut/ufbbLLPFC5cbb1hw==",
+      "license": "MIT",
+      "dependencies": {
+        "@radix-ui/react-use-layout-effect": "1.1.0"
+      },
+      "peerDependencies": {
+        "@types/react": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/react-visually-hidden": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-visually-hidden/-/react-visually-hidden-1.1.0.tgz",
+      "integrity": "sha512-N8MDZqtgCgG5S3aV60INAB475osJousYpZ4cTJ2cFbMpdHS5Y6loLTH8LPtkj2QN0x93J30HT/M3qJXM0+lyeQ==",
+      "license": "MIT",
+      "dependencies": {
+        "@radix-ui/react-primitive": "2.0.0"
+      },
+      "peerDependencies": {
+        "@types/react": "*",
+        "@types/react-dom": "*",
+        "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc",
+        "react-dom": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        },
+        "@types/react-dom": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/@radix-ui/rect": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/@radix-ui/rect/-/rect-1.1.0.tgz",
+      "integrity": "sha512-A9+lCBZoaMJlVKcRBz2YByCG+Cp2t6nAnMnNba+XiWxnj6r4JUFqfsgwocMBZU9LPtdxC6wB56ySYpc7LQIoJg==",
+      "license": "MIT"
     },
     "node_modules/@rollup/rollup-android-arm-eabi": {
       "version": "4.24.0",
@@ -1488,6 +2183,23 @@ export default tseslint.config(
       "dev": true,
       "license": "MIT"
     },
+    "node_modules/@types/lodash": {
+      "version": "4.17.10",
+      "resolved": "https://registry.npmjs.org/@types/lodash/-/lodash-4.17.10.tgz",
+      "integrity": "sha512-YpS0zzoduEhuOWjAotS6A5AVCva7X4lVlYLF0FYHAY9sdraBfnatttHItlWeZdGhuEkf+OzMNg2ZYAx8t+52uQ==",
+      "dev": true,
+      "license": "MIT"
+    },
+    "node_modules/@types/lodash.debounce": {
+      "version": "4.0.9",
+      "resolved": "https://registry.npmjs.org/@types/lodash.debounce/-/lodash.debounce-4.0.9.tgz",
+      "integrity": "sha512-Ma5JcgTREwpLRwMM+XwBR7DaWe96nC38uCBDFKZWbNKD+osjVzdpnUSwBcqCptrp16sSOLBAUb50Car5I0TCsQ==",
+      "dev": true,
+      "license": "MIT",
+      "dependencies": {
+        "@types/lodash": "*"
+      }
+    },
     "node_modules/@types/node": {
       "version": "22.7.4",
       "resolved": "https://registry.npmjs.org/@types/node/-/node-22.7.4.tgz",
@@ -1520,7 +2232,7 @@ export default tseslint.config(
       "version": "18.3.0",
       "resolved": "https://registry.npmjs.org/@types/react-dom/-/react-dom-18.3.0.tgz",
       "integrity": "sha512-EhwApuTmMBmXuFOikhQLIBUn6uFg81SwLMOAUgodJF14SOBOCMdU04gDoYi0WOJJHD144TL32z4yDqCW3dnkQg==",
-      "dev": true,
+      "devOptional": true,
       "license": "MIT",
       "dependencies": {
         "@types/react": "*"
@@ -1881,6 +2593,18 @@ export default tseslint.config(
       "integrity": "sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==",
       "dev": true,
       "license": "Python-2.0"
+    },
+    "node_modules/aria-hidden": {
+      "version": "1.2.4",
+      "resolved": "https://registry.npmjs.org/aria-hidden/-/aria-hidden-1.2.4.tgz",
+      "integrity": "sha512-y+CcFFwelSXpLZk/7fMB2mUbGtX9lKycf1MWJ7CaTIERyitVlyQx6C+sxcROU2BAJ24OiZyK+8wj2i8AlBoS3A==",
+      "license": "MIT",
+      "dependencies": {
+        "tslib": "^2.0.0"
+      },
+      "engines": {
+        "node": ">=10"
+      }
     },
     "node_modules/asynckit": {
       "version": "0.4.0",
@@ -2374,6 +3098,12 @@ export default tseslint.config(
       "engines": {
         "node": ">=0.4.0"
       }
+    },
+    "node_modules/detect-node-es": {
+      "version": "1.1.0",
+      "resolved": "https://registry.npmjs.org/detect-node-es/-/detect-node-es-1.1.0.tgz",
+      "integrity": "sha512-ypdmJU/TbBby2Dxibuv7ZLW3Bs1QEmM7nHjEANfohJLvE0XVujisn1qPJcZxg+qDucsr+bP6fLD1rPS3AhJ7EQ==",
+      "license": "MIT"
     },
     "node_modules/didyoumean": {
       "version": "1.2.2",
@@ -2989,6 +3719,31 @@ export default tseslint.config(
         "url": "https://github.com/sponsors/rawify"
       }
     },
+    "node_modules/framer-motion": {
+      "version": "11.11.1",
+      "resolved": "https://registry.npmjs.org/framer-motion/-/framer-motion-11.11.1.tgz",
+      "integrity": "sha512-Ucr9eHSrk0d+l6vyl9fvq6omh/PAWHjS+PlczpsoUdhJo1TuF3ULWJNuAMnpWQ1dGyPOyoUVuYlUKjE/s8dyCA==",
+      "license": "MIT",
+      "dependencies": {
+        "tslib": "^2.4.0"
+      },
+      "peerDependencies": {
+        "@emotion/is-prop-valid": "*",
+        "react": "^18.0.0",
+        "react-dom": "^18.0.0"
+      },
+      "peerDependenciesMeta": {
+        "@emotion/is-prop-valid": {
+          "optional": true
+        },
+        "react": {
+          "optional": true
+        },
+        "react-dom": {
+          "optional": true
+        }
+      }
+    },
     "node_modules/fs-extra": {
       "version": "11.2.0",
       "resolved": "https://registry.npmjs.org/fs-extra/-/fs-extra-11.2.0.tgz",
@@ -3035,6 +3790,15 @@ export default tseslint.config(
       "license": "MIT",
       "engines": {
         "node": ">=6.9.0"
+      }
+    },
+    "node_modules/get-nonce": {
+      "version": "1.0.1",
+      "resolved": "https://registry.npmjs.org/get-nonce/-/get-nonce-1.0.1.tgz",
+      "integrity": "sha512-FJhYRoDaiatfEkUK8HKlicmu/3SGFD51q3itKDGoSTysQJBnfOcxU5GxnhE1E6soB76MbT0MBtnKJuXyAx+96Q==",
+      "license": "MIT",
+      "engines": {
+        "node": ">=6"
       }
     },
     "node_modules/get-stream": {
@@ -3229,6 +3993,15 @@ export default tseslint.config(
       "integrity": "sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==",
       "dev": true,
       "license": "ISC"
+    },
+    "node_modules/invariant": {
+      "version": "2.2.4",
+      "resolved": "https://registry.npmjs.org/invariant/-/invariant-2.2.4.tgz",
+      "integrity": "sha512-phJfQVBuaJM5raOpJjSfkiD6BpbCE4Ns//LaXl6wGYtUBY83nWS6Rf9tXm2e8VaK60JEjYldbPif/A2B1C2gNA==",
+      "license": "MIT",
+      "dependencies": {
+        "loose-envify": "^1.0.0"
+      }
     },
     "node_modules/is-binary-path": {
       "version": "2.1.0",
@@ -3518,6 +4291,12 @@ export default tseslint.config(
       "funding": {
         "url": "https://github.com/sponsors/sindresorhus"
       }
+    },
+    "node_modules/lodash.debounce": {
+      "version": "4.0.8",
+      "resolved": "https://registry.npmjs.org/lodash.debounce/-/lodash.debounce-4.0.8.tgz",
+      "integrity": "sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==",
+      "license": "MIT"
     },
     "node_modules/lodash.merge": {
       "version": "4.6.2",
@@ -4314,6 +5093,76 @@ export default tseslint.config(
         "node": ">=0.10.0"
       }
     },
+    "node_modules/react-remove-scroll": {
+      "version": "2.6.0",
+      "resolved": "https://registry.npmjs.org/react-remove-scroll/-/react-remove-scroll-2.6.0.tgz",
+      "integrity": "sha512-I2U4JVEsQenxDAKaVa3VZ/JeJZe0/2DxPWL8Tj8yLKctQJQiZM52pn/GWFpSp8dftjM3pSAHVJZscAnC/y+ySQ==",
+      "license": "MIT",
+      "dependencies": {
+        "react-remove-scroll-bar": "^2.3.6",
+        "react-style-singleton": "^2.2.1",
+        "tslib": "^2.1.0",
+        "use-callback-ref": "^1.3.0",
+        "use-sidecar": "^1.1.2"
+      },
+      "engines": {
+        "node": ">=10"
+      },
+      "peerDependencies": {
+        "@types/react": "^16.8.0 || ^17.0.0 || ^18.0.0",
+        "react": "^16.8.0 || ^17.0.0 || ^18.0.0"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/react-remove-scroll-bar": {
+      "version": "2.3.6",
+      "resolved": "https://registry.npmjs.org/react-remove-scroll-bar/-/react-remove-scroll-bar-2.3.6.tgz",
+      "integrity": "sha512-DtSYaao4mBmX+HDo5YWYdBWQwYIQQshUV/dVxFxK+KM26Wjwp1gZ6rv6OC3oujI6Bfu6Xyg3TwK533AQutsn/g==",
+      "license": "MIT",
+      "dependencies": {
+        "react-style-singleton": "^2.2.1",
+        "tslib": "^2.0.0"
+      },
+      "engines": {
+        "node": ">=10"
+      },
+      "peerDependencies": {
+        "@types/react": "^16.8.0 || ^17.0.0 || ^18.0.0",
+        "react": "^16.8.0 || ^17.0.0 || ^18.0.0"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/react-style-singleton": {
+      "version": "2.2.1",
+      "resolved": "https://registry.npmjs.org/react-style-singleton/-/react-style-singleton-2.2.1.tgz",
+      "integrity": "sha512-ZWj0fHEMyWkHzKYUr2Bs/4zU6XLmq9HsgBURm7g5pAVfyn49DgUiNgY2d4lXRlYSiCif9YBGpQleewkcqddc7g==",
+      "license": "MIT",
+      "dependencies": {
+        "get-nonce": "^1.0.0",
+        "invariant": "^2.2.4",
+        "tslib": "^2.0.0"
+      },
+      "engines": {
+        "node": ">=10"
+      },
+      "peerDependencies": {
+        "@types/react": "^16.8.0 || ^17.0.0 || ^18.0.0",
+        "react": "^16.8.0 || ^17.0.0 || ^18.0.0"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
     "node_modules/read-cache": {
       "version": "1.0.0",
       "resolved": "https://registry.npmjs.org/read-cache/-/read-cache-1.0.0.tgz",
@@ -4899,6 +5748,12 @@ export default tseslint.config(
       "integrity": "sha512-Y/arvbn+rrz3JCKl9C4kVNfTfSm2/mEp5FSz5EsZSANGPSlQrpRI5M4PKF+mJnE52jOO90PnPSc3Ur3bTQw0gA==",
       "license": "Apache-2.0"
     },
+    "node_modules/tslib": {
+      "version": "2.7.0",
+      "resolved": "https://registry.npmjs.org/tslib/-/tslib-2.7.0.tgz",
+      "integrity": "sha512-gLXCKdN1/j47AiHiOkJN69hJmcbGTHI0ImLmbYLHykhgeN0jVGola9yVjFgzCUklsZQMW55o+dW7IXv3RCXDzA==",
+      "license": "0BSD"
+    },
     "node_modules/type-check": {
       "version": "0.4.0",
       "resolved": "https://registry.npmjs.org/type-check/-/type-check-0.4.0.tgz",
@@ -5008,11 +5863,67 @@ export default tseslint.config(
         "punycode": "^2.1.0"
       }
     },
+    "node_modules/use-callback-ref": {
+      "version": "1.3.2",
+      "resolved": "https://registry.npmjs.org/use-callback-ref/-/use-callback-ref-1.3.2.tgz",
+      "integrity": "sha512-elOQwe6Q8gqZgDA8mrh44qRTQqpIHDcZ3hXTLjBe1i4ph8XpNJnO+aQf3NaG+lriLopI4HMx9VjQLfPQ6vhnoA==",
+      "license": "MIT",
+      "dependencies": {
+        "tslib": "^2.0.0"
+      },
+      "engines": {
+        "node": ">=10"
+      },
+      "peerDependencies": {
+        "@types/react": "^16.8.0 || ^17.0.0 || ^18.0.0",
+        "react": "^16.8.0 || ^17.0.0 || ^18.0.0"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
+    "node_modules/use-sidecar": {
+      "version": "1.1.2",
+      "resolved": "https://registry.npmjs.org/use-sidecar/-/use-sidecar-1.1.2.tgz",
+      "integrity": "sha512-epTbsLuzZ7lPClpz2TyryBfztm7m+28DlEv2ZCQ3MDr5ssiwyOwGH/e5F9CkfWjJ1t4clvI58yF822/GUkjjhw==",
+      "license": "MIT",
+      "dependencies": {
+        "detect-node-es": "^1.1.0",
+        "tslib": "^2.0.0"
+      },
+      "engines": {
+        "node": ">=10"
+      },
+      "peerDependencies": {
+        "@types/react": "^16.9.0 || ^17.0.0 || ^18.0.0",
+        "react": "^16.8.0 || ^17.0.0 || ^18.0.0"
+      },
+      "peerDependenciesMeta": {
+        "@types/react": {
+          "optional": true
+        }
+      }
+    },
     "node_modules/util-deprecate": {
       "version": "1.0.2",
       "resolved": "https://registry.npmjs.org/util-deprecate/-/util-deprecate-1.0.2.tgz",
       "integrity": "sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==",
       "license": "MIT"
+    },
+    "node_modules/vaul": {
+      "version": "1.0.0",
+      "resolved": "https://registry.npmjs.org/vaul/-/vaul-1.0.0.tgz",
+      "integrity": "sha512-TegfMkwy86RSvSiIVREG6OqgRL7agqRsKYyWYacyVUAdpcIi34QoCOED476Mbf8J5d06e1hygSdvJhehlxEBhQ==",
+      "license": "MIT",
+      "dependencies": {
+        "@radix-ui/react-dialog": "^1.1.1"
+      },
+      "peerDependencies": {
+        "react": "^16.8 || ^17.0 || ^18.0",
+        "react-dom": "^16.8 || ^17.0 || ^18.0"
+      }
     },
     "node_modules/vite": {
       "version": "5.4.8",
@@ -5307,19 +6218,27 @@ export default tseslint.config(
     "preview": "vite preview"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.2",
+    "@radix-ui/react-progress": "^1.1.0",
+    "@radix-ui/react-select": "^2.1.2",
     "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-tabs": "^1.1.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "framer-motion": "^11.11.1",
+    "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.447.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "tailwind-merge": "^2.5.3",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "vaul": "^1.0.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
     "@shadcn/ui": "^0.0.4",
     "@types/axios": "^0.14.0",
+    "@types/lodash.debounce": "^4.0.9",
     "@types/node": "^22.7.4",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
@@ -5335,35 +6254,6 @@ export default tseslint.config(
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1"
   }
-}
-
-```
-
-## File: /home/runner/workspace/frontend/tsconfig.json
-```
-{
-  "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  },
-  "include": ["src"]
 }
 
 ```
@@ -5635,19 +6525,108 @@ export default {
 
 ```
 
+## File: /home/runner/workspace/frontend/tsconfig.json
+```
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"]
+}
+
+```
+
 ## File: /home/runner/workspace/frontend/tailwind.config.js
 ```
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  darkMode: ["class"],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
+    extend: {
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+      keyframes: {
+        "accordion-down": {
+          from: { height: 0 },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: 0 },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+      },
+    },
   },
-  plugins: [],
-}
+  plugins: [require("tailwindcss-animate")],
+};
 
 ```
 
@@ -5672,14 +6651,6 @@ createRoot(document.getElementById('root')!).render(
 
 ```
 
-## File: /home/runner/workspace/frontend/src/index.css
-```
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-```
-
 ## File: /home/runner/workspace/frontend/src/App.d.ts
 ```
 import './App.css';
@@ -5694,71 +6665,89 @@ import './index.css';
 
 ```
 
+## File: /home/runner/workspace/frontend/src/App.css
+```
+ 
+```
+
+## File: /home/runner/workspace/frontend/src/index.css
+```
+@import url('https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=Source+Serif+4:wght@400;600;700&family=Roboto:wght@400;700&family=Roboto+Condensed:wght@400;700&family=Roboto+Mono&family=Roboto+Slab:wght@400;700&display=swap');
+
+/* Then in your Tailwind config or CSS */
+body {
+  font-family: 'Source Sans 3', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Source Serif 4', serif;
+}
+
+/* Use Roboto families for specific elements as needed */
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 36 9% 22%; /* Stanford Black #2E2D29 */
+    --card: 0 0% 100%;
+    --card-foreground: 36 9% 22%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 36 9% 22%;
+    --primary: 0 85% 32%; /* Stanford Cardinal Red #8C1515 */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 95%; /* Light grey */
+    --secondary-foreground: 0 85% 32%;
+    --muted: 0 0% 96%; /* Stanford 10% Black #EAEAEA */
+    --muted-foreground: 210 4% 34%; /* Stanford Cool Grey #53565A */
+    --accent: 184 70% 29%; /* Stanford Lagunita #007C92 */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 65% 50%; /* Keeping original destructive color */
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 91%; /* Stanford 20% Black #D5D5D4 */
+    --input: 0 0% 91%;
+    --ring: 0 85% 32%;
+    --radius: 0.5rem;
+  }
+  .dark {
+    --background: 0 85% 32%; /* Stanford Cardinal Red #8C1515 */
+    --foreground: 0 0% 100%;
+    --card: 0 85% 32%;
+    --card-foreground: 0 0% 100%;
+    --popover: 0 85% 32%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 0% 100%;
+    --primary-foreground: 0 85% 32%;
+    --secondary: 36 9% 22%; /* Stanford Black #2E2D29 */
+    --secondary-foreground: 0 0% 100%;
+    --muted: 210 4% 34%; /* Stanford Cool Grey #53565A */
+    --muted-foreground: 0 0% 70%;
+    --accent: 184 70% 29%; /* Stanford Lagunita #007C92 */
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 45% 40%; /* Keeping original destructive color */
+    --destructive-foreground: 0 0% 100%;
+    --border: 210 4% 34%; /* Stanford Cool Grey #53565A */
+    --input: 210 4% 34%;
+    --ring: 0 0% 80%;
+  }
+}
+
+```
+
 ## File: /home/runner/workspace/frontend/src/App.tsx
 ```
+// src/App.tsx
+
 import React from "react";
-import "./App.css";
-import HelloWorld from "./components/HelloWorld";
-import "./index.css";
+import MainContainer from "./pages/MainContainer";
+
 const App: React.FC = () => {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <h1>My React App</h1>
-        <HelloWorld />
-      </header>
-    </div>
-  );
+  return <MainContainer />;
 };
 
 export default App;
-
-```
-
-## File: /home/runner/workspace/frontend/src/App.css
-```
-#root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
-}
 
 ```
 
@@ -5810,6 +6799,399 @@ const ButtonTest: React.FC = () => {
 };
 
 export default ButtonTest;
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/SearchBox.tsx
+```
+// src/components/SearchBox.tsx
+
+import React, { useState } from "react";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { SearchBoxProps } from "@/types";
+
+const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const handleSearch = () => {
+    onSearch(searchTerm);
+  };
+
+  return (
+    <div className="relative mb-4 w-full">
+      <Input
+        type="text"
+        placeholder="Search medical term"
+        className="pl-10 pr-4 py-2 w-full rounded-full border-2 border-gray-300"
+        value={searchTerm}
+        onChange={(e) => setSearchTerm(e.target.value)}
+        onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+      />
+      <Search
+        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground cursor-pointer"
+        size={20}
+        onClick={handleSearch}
+      />
+    </div>
+  );
+};
+
+export default SearchBox;
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/Disambiguation.tsx
+```
+// src/components/Disambiguation.tsx
+
+import React from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { DisambiguationProps } from "@/types";
+
+const Disambiguation: React.FC<DisambiguationProps> = ({
+  options,
+  onSelect,
+}) => {
+  return (
+    <div className="mb-8">
+      <h2 className="text-xl font-bold mb-4">Disambiguation</h2>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {options.map((option, index) => (
+          <Card
+            key={index}
+            className="hover:bg-accent hover:text-accent-foreground cursor-pointer transition-colors duration-200"
+            onClick={() => onSelect(option)}
+          >
+            <CardContent className="p-4">
+              <h3 className="text-lg font-semibold mb-2">{option.term}</h3>
+              <p className="text-sm">
+                <strong>Definition:</strong> {option.definition}
+              </p>
+              <p className="text-sm mt-1">
+                <strong>Category:</strong> {option.category}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default Disambiguation;
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/SynonymList.tsx
+```
+// src/components/SynonymList.tsx
+
+import React from "react";
+import { SynonymListProps } from "@/types";
+
+const SynonymList: React.FC<SynonymListProps> = ({
+  synonyms,
+  onSynonymClick,
+}) => {
+  return (
+    <div className="mb-8">
+      <h2 className="text-xl font-bold mb-4">Synonyms</h2>
+      <div className="flex flex-wrap gap-2">
+        {synonyms.map((synonym, index) => (
+          <button
+            key={index}
+            className="px-3 py-1 bg-secondary text-secondary-foreground rounded-full text-sm hover:bg-accent hover:text-accent-foreground transition-colors duration-200"
+            onClick={() => onSynonymClick(synonym)}
+          >
+            {synonym}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default SynonymList;
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/MedicalConceptsTable.tsx
+```
+// src/components/MedicalConceptsTable.tsx
+
+import React from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { MedicalConceptsTableProps } from "@/types";
+
+const MedicalConceptsTable: React.FC<MedicalConceptsTableProps> = ({
+  concepts,
+}) => {
+  return (
+    <div className="mb-8 overflow-x-auto">
+      <h2 className="text-xl font-bold mb-4">Medical Concepts</h2>
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="text-primary">Option</TableHead>
+            <TableHead className="text-primary">Concept ID</TableHead>
+            <TableHead className="text-primary">Name</TableHead>
+            <TableHead className="text-primary">Domain</TableHead>
+            <TableHead className="text-primary">Vocabulary</TableHead>
+            <TableHead className="text-primary">Standard Concept</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {concepts.map((concept, index) => (
+            <TableRow key={concept.id} className="hover:bg-muted">
+              <TableCell>{index + 1}</TableCell>
+              <TableCell>{concept.id}</TableCell>
+              <TableCell>{concept.name}</TableCell>
+              <TableCell>{concept.domain}</TableCell>
+              <TableCell>{concept.vocabulary}</TableCell>
+              <TableCell>{concept.standard}</TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+};
+
+export default MedicalConceptsTable;
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/Recommendation.tsx
+```
+// src/components/Recommendation.tsx
+
+import React from "react";
+
+const Recommendation: React.FC = () => {
+  return (
+    <div className="mt-8">
+      <h2 className="text-xl font-bold mb-4">Recommendation</h2>
+      <p className="text-sm">
+        We recommend exploring the concept "Cold" with ID 4224149 as the
+        standard concept. Verify in Athena:
+      </p>
+      <a
+        href="https://athena.ohdsi.org/search-terms/terms/4224149"
+        className="text-primary hover:underline text-sm break-all"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        https://athena.ohdsi.org/search-terms/terms/4224149
+      </a>
+    </div>
+  );
+};
+
+export default Recommendation;
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/Header.tsx
+```
+// src/components/Header.tsx
+
+import React from "react";
+
+const Header: React.FC = () => {
+  return (
+    <header className="bg-primary text-primary-foreground p-4 shadow-md">
+      <div className="container mx-auto">
+        <h1 className="text-2xl font-bold">Medical Concept Discovery</h1>
+      </div>
+    </header>
+  );
+};
+
+export default Header;
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/Footer.tsx
+```
+// src/components/Footer.tsx
+
+import React from "react";
+
+const Footer: React.FC = () => {
+  return (
+    <footer className="bg-background text-foreground p-4 text-center">
+      <div className="container mx-auto">
+        <p className="text-sm">© 2024 Medical Concept Discovery Tool</p>
+      </div>
+    </footer>
+  );
+};
+
+export default Footer;
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/index.ts
+```
+// src/components/index.ts
+
+export { default as LanguageSelector } from "./LanguageSelector";
+export { default as SearchBox } from "./SearchBox";
+export { default as Disambiguation } from "./Disambiguation";
+export { default as SynonymList } from "./SynonymList";
+export { default as MedicalConceptsTable } from "./MedicalConceptsTable";
+export { default as Recommendation } from "./Recommendation";
+export { default as Header } from "./Header";
+export { default as Footer } from "./Footer";
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/LanguageSelector.tsx
+```
+// src/components/LanguageSelector.tsx
+
+import React, { useState } from "react";
+import { Languages } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Drawer } from "@/components/ui/drawer";
+import { Input } from "@/components/ui/input";
+import { LanguageSelectorProps } from "@/types";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+
+const LanguageSelector: React.FC<LanguageSelectorProps> = ({
+  onLanguageChange,
+}) => {
+  const languageOptions = [
+    { value: "en", label: "English" },
+    { value: "es", label: "Español" },
+    { value: "fr", label: "Français" },
+    { value: "de", label: "Deutsch" },
+    { value: "custom", label: "Custom" },
+  ];
+
+  const [customLanguage, setCustomLanguage] = useState<string>("");
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("");
+  const isMobile = useMediaQuery("(max-width: 768px)"); // Custom hook to check screen size
+
+  const handleLanguageChange = (value: string) => {
+    setSelectedLanguage(value);
+    if (value !== "custom") {
+      setCustomLanguage("");
+      onLanguageChange(value);
+    }
+  };
+
+  const handleCustomLanguageChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const value = e.target.value;
+    setCustomLanguage(value);
+    onLanguageChange(value);
+  };
+
+  return (
+    <div className="flex items-center justify-center space-x-4 mb-4">
+      <h2 className="text-2xl font-bold">Search in any language</h2>
+      {isMobile ? (
+        // Use Drawer on mobile devices
+        <Drawer>
+          <DialogTrigger asChild>
+            <Button className="flex items-center space-x-2">
+              <Languages size={24} />
+              <span>Select Language</span>
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="p-6">
+            <DialogHeader>
+              <DialogTitle>Select Language</DialogTitle>
+              <DialogDescription>
+                Choose a language or enter a custom one below.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-4">
+              {languageOptions.map((option) => (
+                <div key={option.value} className="mb-2">
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleLanguageChange(option.value)}
+                  >
+                    {option.label}
+                  </Button>
+                </div>
+              ))}
+              {selectedLanguage === "custom" && (
+                <Input
+                  type="text"
+                  placeholder="Enter your language"
+                  className="mt-4"
+                  value={customLanguage}
+                  onChange={handleCustomLanguageChange}
+                />
+              )}
+            </div>
+          </DialogContent>
+        </Drawer>
+      ) : (
+        // Use Dialog on desktop
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button className="flex items-center space-x-2">
+              <Languages size={24} />
+              <span>Select Language</span>
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="p-6">
+            <DialogHeader>
+              <DialogTitle>Select Language</DialogTitle>
+              <DialogDescription>
+                Choose a language or enter a custom one below.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="mt-4">
+              {languageOptions.map((option) => (
+                <div key={option.value} className="mb-2">
+                  <Button
+                    variant="ghost"
+                    onClick={() => handleLanguageChange(option.value)}
+                  >
+                    {option.label}
+                  </Button>
+                </div>
+              ))}
+              {selectedLanguage === "custom" && (
+                <Input
+                  type="text"
+                  placeholder="Enter your language"
+                  className="mt-4"
+                  value={customLanguage}
+                  onChange={handleCustomLanguageChange}
+                />
+              )}
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </div>
+  );
+};
+
+export default LanguageSelector;
 
 ```
 
@@ -5987,19 +7369,1038 @@ export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
 
 ```
 
+## File: /home/runner/workspace/frontend/src/components/ui/table.tsx
+```
+import * as React from "react"
+
+import { cn } from "@/lib/utils"
+
+const Table = React.forwardRef<
+  HTMLTableElement,
+  React.HTMLAttributes<HTMLTableElement>
+>(({ className, ...props }, ref) => (
+  <div className="relative w-full overflow-auto">
+    <table
+      ref={ref}
+      className={cn("w-full caption-bottom text-sm", className)}
+      {...props}
+    />
+  </div>
+))
+Table.displayName = "Table"
+
+const TableHeader = React.forwardRef<
+  HTMLTableSectionElement,
+  React.HTMLAttributes<HTMLTableSectionElement>
+>(({ className, ...props }, ref) => (
+  <thead ref={ref} className={cn("[&_tr]:border-b", className)} {...props} />
+))
+TableHeader.displayName = "TableHeader"
+
+const TableBody = React.forwardRef<
+  HTMLTableSectionElement,
+  React.HTMLAttributes<HTMLTableSectionElement>
+>(({ className, ...props }, ref) => (
+  <tbody
+    ref={ref}
+    className={cn("[&_tr:last-child]:border-0", className)}
+    {...props}
+  />
+))
+TableBody.displayName = "TableBody"
+
+const TableFooter = React.forwardRef<
+  HTMLTableSectionElement,
+  React.HTMLAttributes<HTMLTableSectionElement>
+>(({ className, ...props }, ref) => (
+  <tfoot
+    ref={ref}
+    className={cn(
+      "border-t bg-muted/50 font-medium [&>tr]:last:border-b-0",
+      className
+    )}
+    {...props}
+  />
+))
+TableFooter.displayName = "TableFooter"
+
+const TableRow = React.forwardRef<
+  HTMLTableRowElement,
+  React.HTMLAttributes<HTMLTableRowElement>
+>(({ className, ...props }, ref) => (
+  <tr
+    ref={ref}
+    className={cn(
+      "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+      className
+    )}
+    {...props}
+  />
+))
+TableRow.displayName = "TableRow"
+
+const TableHead = React.forwardRef<
+  HTMLTableCellElement,
+  React.ThHTMLAttributes<HTMLTableCellElement>
+>(({ className, ...props }, ref) => (
+  <th
+    ref={ref}
+    className={cn(
+      "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
+      className
+    )}
+    {...props}
+  />
+))
+TableHead.displayName = "TableHead"
+
+const TableCell = React.forwardRef<
+  HTMLTableCellElement,
+  React.TdHTMLAttributes<HTMLTableCellElement>
+>(({ className, ...props }, ref) => (
+  <td
+    ref={ref}
+    className={cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className)}
+    {...props}
+  />
+))
+TableCell.displayName = "TableCell"
+
+const TableCaption = React.forwardRef<
+  HTMLTableCaptionElement,
+  React.HTMLAttributes<HTMLTableCaptionElement>
+>(({ className, ...props }, ref) => (
+  <caption
+    ref={ref}
+    className={cn("mt-4 text-sm text-muted-foreground", className)}
+    {...props}
+  />
+))
+TableCaption.displayName = "TableCaption"
+
+export {
+  Table,
+  TableHeader,
+  TableBody,
+  TableFooter,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableCaption,
+}
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/ui/input.tsx
+```
+import * as React from "react"
+
+import { cn } from "@/lib/utils"
+
+export interface InputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {}
+
+const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ className, type, ...props }, ref) => {
+    return (
+      <input
+        type={type}
+        className={cn(
+          "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium file:text-foreground placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+          className
+        )}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)
+Input.displayName = "Input"
+
+export { Input }
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/ui/select.tsx
+```
+import * as React from "react"
+import * as SelectPrimitive from "@radix-ui/react-select"
+import { Check, ChevronDown, ChevronUp } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+
+const Select = SelectPrimitive.Root
+
+const SelectGroup = SelectPrimitive.Group
+
+const SelectValue = SelectPrimitive.Value
+
+const SelectTrigger = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Trigger>
+>(({ className, children, ...props }, ref) => (
+  <SelectPrimitive.Trigger
+    ref={ref}
+    className={cn(
+      "flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+      className
+    )}
+    {...props}
+  >
+    {children}
+    <SelectPrimitive.Icon asChild>
+      <ChevronDown className="h-4 w-4 opacity-50" />
+    </SelectPrimitive.Icon>
+  </SelectPrimitive.Trigger>
+))
+SelectTrigger.displayName = SelectPrimitive.Trigger.displayName
+
+const SelectScrollUpButton = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.ScrollUpButton>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollUpButton>
+>(({ className, ...props }, ref) => (
+  <SelectPrimitive.ScrollUpButton
+    ref={ref}
+    className={cn(
+      "flex cursor-default items-center justify-center py-1",
+      className
+    )}
+    {...props}
+  >
+    <ChevronUp className="h-4 w-4" />
+  </SelectPrimitive.ScrollUpButton>
+))
+SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName
+
+const SelectScrollDownButton = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.ScrollDownButton>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.ScrollDownButton>
+>(({ className, ...props }, ref) => (
+  <SelectPrimitive.ScrollDownButton
+    ref={ref}
+    className={cn(
+      "flex cursor-default items-center justify-center py-1",
+      className
+    )}
+    {...props}
+  >
+    <ChevronDown className="h-4 w-4" />
+  </SelectPrimitive.ScrollDownButton>
+))
+SelectScrollDownButton.displayName =
+  SelectPrimitive.ScrollDownButton.displayName
+
+const SelectContent = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Content>
+>(({ className, children, position = "popper", ...props }, ref) => (
+  <SelectPrimitive.Portal>
+    <SelectPrimitive.Content
+      ref={ref}
+      className={cn(
+        "relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border bg-popover text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+        position === "popper" &&
+          "data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
+        className
+      )}
+      position={position}
+      {...props}
+    >
+      <SelectScrollUpButton />
+      <SelectPrimitive.Viewport
+        className={cn(
+          "p-1",
+          position === "popper" &&
+            "h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]"
+        )}
+      >
+        {children}
+      </SelectPrimitive.Viewport>
+      <SelectScrollDownButton />
+    </SelectPrimitive.Content>
+  </SelectPrimitive.Portal>
+))
+SelectContent.displayName = SelectPrimitive.Content.displayName
+
+const SelectLabel = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.Label>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>
+>(({ className, ...props }, ref) => (
+  <SelectPrimitive.Label
+    ref={ref}
+    className={cn("py-1.5 pl-8 pr-2 text-sm font-semibold", className)}
+    {...props}
+  />
+))
+SelectLabel.displayName = SelectPrimitive.Label.displayName
+
+const SelectItem = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.Item>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Item>
+>(({ className, children, ...props }, ref) => (
+  <SelectPrimitive.Item
+    ref={ref}
+    className={cn(
+      "relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      className
+    )}
+    {...props}
+  >
+    <span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+      <SelectPrimitive.ItemIndicator>
+        <Check className="h-4 w-4" />
+      </SelectPrimitive.ItemIndicator>
+    </span>
+
+    <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+  </SelectPrimitive.Item>
+))
+SelectItem.displayName = SelectPrimitive.Item.displayName
+
+const SelectSeparator = React.forwardRef<
+  React.ElementRef<typeof SelectPrimitive.Separator>,
+  React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator>
+>(({ className, ...props }, ref) => (
+  <SelectPrimitive.Separator
+    ref={ref}
+    className={cn("-mx-1 my-1 h-px bg-muted", className)}
+    {...props}
+  />
+))
+SelectSeparator.displayName = SelectPrimitive.Separator.displayName
+
+export {
+  Select,
+  SelectGroup,
+  SelectValue,
+  SelectTrigger,
+  SelectContent,
+  SelectLabel,
+  SelectItem,
+  SelectSeparator,
+  SelectScrollUpButton,
+  SelectScrollDownButton,
+}
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/ui/tabs.tsx
+```
+import * as React from "react"
+import * as TabsPrimitive from "@radix-ui/react-tabs"
+
+import { cn } from "@/lib/utils"
+
+const Tabs = TabsPrimitive.Root
+
+const TabsList = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.List>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.List>
+>(({ className, ...props }, ref) => (
+  <TabsPrimitive.List
+    ref={ref}
+    className={cn(
+      "inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground",
+      className
+    )}
+    {...props}
+  />
+))
+TabsList.displayName = TabsPrimitive.List.displayName
+
+const TabsTrigger = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Trigger>
+>(({ className, ...props }, ref) => (
+  <TabsPrimitive.Trigger
+    ref={ref}
+    className={cn(
+      "inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm",
+      className
+    )}
+    {...props}
+  />
+))
+TabsTrigger.displayName = TabsPrimitive.Trigger.displayName
+
+const TabsContent = React.forwardRef<
+  React.ElementRef<typeof TabsPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
+>(({ className, ...props }, ref) => (
+  <TabsPrimitive.Content
+    ref={ref}
+    className={cn(
+      "mt-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+      className
+    )}
+    {...props}
+  />
+))
+TabsContent.displayName = TabsPrimitive.Content.displayName
+
+export { Tabs, TabsList, TabsTrigger, TabsContent }
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/ui/alert.tsx
+```
+import * as React from "react"
+import { cva, type VariantProps } from "class-variance-authority"
+
+import { cn } from "@/lib/utils"
+
+const alertVariants = cva(
+  "relative w-full rounded-lg border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
+  {
+    variants: {
+      variant: {
+        default: "bg-background text-foreground",
+        destructive:
+          "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+)
+
+const Alert = React.forwardRef<
+  HTMLDivElement,
+  React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof alertVariants>
+>(({ className, variant, ...props }, ref) => (
+  <div
+    ref={ref}
+    role="alert"
+    className={cn(alertVariants({ variant }), className)}
+    {...props}
+  />
+))
+Alert.displayName = "Alert"
+
+const AlertTitle = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLHeadingElement>
+>(({ className, ...props }, ref) => (
+  <h5
+    ref={ref}
+    className={cn("mb-1 font-medium leading-none tracking-tight", className)}
+    {...props}
+  />
+))
+AlertTitle.displayName = "AlertTitle"
+
+const AlertDescription = React.forwardRef<
+  HTMLParagraphElement,
+  React.HTMLAttributes<HTMLParagraphElement>
+>(({ className, ...props }, ref) => (
+  <div
+    ref={ref}
+    className={cn("text-sm [&_p]:leading-relaxed", className)}
+    {...props}
+  />
+))
+AlertDescription.displayName = "AlertDescription"
+
+export { Alert, AlertTitle, AlertDescription }
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/ui/progress.tsx
+```
+import * as React from "react"
+import * as ProgressPrimitive from "@radix-ui/react-progress"
+
+import { cn } from "@/lib/utils"
+
+const Progress = React.forwardRef<
+  React.ElementRef<typeof ProgressPrimitive.Root>,
+  React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>
+>(({ className, value, ...props }, ref) => (
+  <ProgressPrimitive.Root
+    ref={ref}
+    className={cn(
+      "relative h-4 w-full overflow-hidden rounded-full bg-secondary",
+      className
+    )}
+    {...props}
+  >
+    <ProgressPrimitive.Indicator
+      className="h-full w-full flex-1 bg-primary transition-all"
+      style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
+    />
+  </ProgressPrimitive.Root>
+))
+Progress.displayName = ProgressPrimitive.Root.displayName
+
+export { Progress }
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/ui/dialog.tsx
+```
+import * as React from "react"
+import * as DialogPrimitive from "@radix-ui/react-dialog"
+import { X } from "lucide-react"
+
+import { cn } from "@/lib/utils"
+
+const Dialog = DialogPrimitive.Root
+
+const DialogTrigger = DialogPrimitive.Trigger
+
+const DialogPortal = DialogPrimitive.Portal
+
+const DialogClose = DialogPrimitive.Close
+
+const DialogOverlay = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Overlay
+    ref={ref}
+    className={cn(
+      "fixed inset-0 z-50 bg-black/80  data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      className
+    )}
+    {...props}
+  />
+))
+DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
+
+const DialogContent = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <DialogPortal>
+    <DialogOverlay />
+    <DialogPrimitive.Content
+      ref={ref}
+      className={cn(
+        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
+        className
+      )}
+      {...props}
+    >
+      {children}
+      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
+        <X className="h-4 w-4" />
+        <span className="sr-only">Close</span>
+      </DialogPrimitive.Close>
+    </DialogPrimitive.Content>
+  </DialogPortal>
+))
+DialogContent.displayName = DialogPrimitive.Content.displayName
+
+const DialogHeader = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn(
+      "flex flex-col space-y-1.5 text-center sm:text-left",
+      className
+    )}
+    {...props}
+  />
+)
+DialogHeader.displayName = "DialogHeader"
+
+const DialogFooter = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn(
+      "flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2",
+      className
+    )}
+    {...props}
+  />
+)
+DialogFooter.displayName = "DialogFooter"
+
+const DialogTitle = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Title
+    ref={ref}
+    className={cn(
+      "text-lg font-semibold leading-none tracking-tight",
+      className
+    )}
+    {...props}
+  />
+))
+DialogTitle.displayName = DialogPrimitive.Title.displayName
+
+const DialogDescription = React.forwardRef<
+  React.ElementRef<typeof DialogPrimitive.Description>,
+  React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
+>(({ className, ...props }, ref) => (
+  <DialogPrimitive.Description
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+))
+DialogDescription.displayName = DialogPrimitive.Description.displayName
+
+export {
+  Dialog,
+  DialogPortal,
+  DialogOverlay,
+  DialogClose,
+  DialogTrigger,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+}
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/ui/drawer.tsx
+```
+import * as React from "react"
+import { Drawer as DrawerPrimitive } from "vaul"
+
+import { cn } from "@/lib/utils"
+
+const Drawer = ({
+  shouldScaleBackground = true,
+  ...props
+}: React.ComponentProps<typeof DrawerPrimitive.Root>) => (
+  <DrawerPrimitive.Root
+    shouldScaleBackground={shouldScaleBackground}
+    {...props}
+  />
+)
+Drawer.displayName = "Drawer"
+
+const DrawerTrigger = DrawerPrimitive.Trigger
+
+const DrawerPortal = DrawerPrimitive.Portal
+
+const DrawerClose = DrawerPrimitive.Close
+
+const DrawerOverlay = React.forwardRef<
+  React.ElementRef<typeof DrawerPrimitive.Overlay>,
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Overlay>
+>(({ className, ...props }, ref) => (
+  <DrawerPrimitive.Overlay
+    ref={ref}
+    className={cn("fixed inset-0 z-50 bg-black/80", className)}
+    {...props}
+  />
+))
+DrawerOverlay.displayName = DrawerPrimitive.Overlay.displayName
+
+const DrawerContent = React.forwardRef<
+  React.ElementRef<typeof DrawerPrimitive.Content>,
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Content>
+>(({ className, children, ...props }, ref) => (
+  <DrawerPortal>
+    <DrawerOverlay />
+    <DrawerPrimitive.Content
+      ref={ref}
+      className={cn(
+        "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background",
+        className
+      )}
+      {...props}
+    >
+      <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />
+      {children}
+    </DrawerPrimitive.Content>
+  </DrawerPortal>
+))
+DrawerContent.displayName = "DrawerContent"
+
+const DrawerHeader = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn("grid gap-1.5 p-4 text-center sm:text-left", className)}
+    {...props}
+  />
+)
+DrawerHeader.displayName = "DrawerHeader"
+
+const DrawerFooter = ({
+  className,
+  ...props
+}: React.HTMLAttributes<HTMLDivElement>) => (
+  <div
+    className={cn("mt-auto flex flex-col gap-2 p-4", className)}
+    {...props}
+  />
+)
+DrawerFooter.displayName = "DrawerFooter"
+
+const DrawerTitle = React.forwardRef<
+  React.ElementRef<typeof DrawerPrimitive.Title>,
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Title>
+>(({ className, ...props }, ref) => (
+  <DrawerPrimitive.Title
+    ref={ref}
+    className={cn(
+      "text-lg font-semibold leading-none tracking-tight",
+      className
+    )}
+    {...props}
+  />
+))
+DrawerTitle.displayName = DrawerPrimitive.Title.displayName
+
+const DrawerDescription = React.forwardRef<
+  React.ElementRef<typeof DrawerPrimitive.Description>,
+  React.ComponentPropsWithoutRef<typeof DrawerPrimitive.Description>
+>(({ className, ...props }, ref) => (
+  <DrawerPrimitive.Description
+    ref={ref}
+    className={cn("text-sm text-muted-foreground", className)}
+    {...props}
+  />
+))
+DrawerDescription.displayName = DrawerPrimitive.Description.displayName
+
+export {
+  Drawer,
+  DrawerPortal,
+  DrawerOverlay,
+  DrawerTrigger,
+  DrawerClose,
+  DrawerContent,
+  DrawerHeader,
+  DrawerFooter,
+  DrawerTitle,
+  DrawerDescription,
+}
+
+```
+
+## File: /home/runner/workspace/frontend/src/types/index.ts
+```
+// src/types/index.ts
+
+export interface LanguageSelectorProps {
+  onLanguageChange: (lang: string) => void;
+}
+
+export interface SearchBoxProps {
+  onSearch: (term: string) => void;
+}
+
+export interface DisambiguationOption {
+  term: string;
+  definition: string;
+  category: string;
+}
+
+export interface DisambiguationProps {
+  options: DisambiguationOption[];
+  onSelect: (option: DisambiguationOption) => void;
+}
+
+export interface SynonymListProps {
+  synonyms: string[];
+  onSynonymClick: (synonym: string) => void;
+}
+
+export interface MedicalConcept {
+  id: number;
+  name: string;
+  domain: string;
+  vocabulary: string;
+  standard: string;
+}
+
+export interface MedicalConceptsTableProps {
+  concepts: MedicalConcept[];
+}
+
+export interface SearchResults {
+  disambiguation: DisambiguationOption[];
+  synonyms: string[];
+  concepts: MedicalConcept[];
+}
+
+```
+
+## File: /home/runner/workspace/frontend/src/pages/MainContainer.tsx
+```
+// src/pages/MainContainer.tsx
+
+import React, { useState, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { Progress } from "@/components/ui/progress";
+import {
+  LanguageSelector,
+  SearchBox,
+  Disambiguation,
+  SynonymList,
+  MedicalConceptsTable,
+  Recommendation,
+  Header,
+  Footer,
+} from "@/components";
+import { SearchResults, DisambiguationOption } from "@/types";
+
+const MainContainer: React.FC = () => {
+  const [searchResults, setSearchResults] = useState<SearchResults | null>(
+    null,
+  );
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [hasSearched, setHasSearched] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
+
+  useEffect(() => {
+    setHasSearched(false);
+    setSearchResults(null);
+  }, []);
+
+  const handleLanguageChange = (lang: string) => {
+    console.log(`Language changed to: ${lang}`);
+  };
+
+  const handleSearch = async (term: string) => {
+    setLoading(true);
+    setError(null);
+    setProgress(0);
+
+    const progressInterval = setInterval(() => {
+      setProgress((prev) => (prev >= 90 ? 90 : prev + 10));
+    }, 100);
+
+    try {
+      // Simulated API call
+      const response: SearchResults = await new Promise((resolve) => {
+        setTimeout(() => {
+          clearInterval(progressInterval);
+          setProgress(100);
+          resolve({
+            disambiguation: [
+              {
+                term: term,
+                definition: `A condition or symptom related to "${term}".`,
+                category: "General Medical Term",
+              },
+              {
+                term: `${term} (specific)`,
+                definition: `A more specific medical condition related to "${term}".`,
+                category: "Specific Medical Condition",
+              },
+            ],
+            synonyms: [term, `${term} synonym 1`, `${term} synonym 2`],
+            concepts: [
+              {
+                id: 1000000 + term.length,
+                name: term,
+                domain: "Observation",
+                vocabulary: "SNOMED",
+                standard: "Standard",
+              },
+              {
+                id: 2000000 + term.length,
+                name: `${term} related concept`,
+                domain: "Measurement",
+                vocabulary: "LOINC",
+                standard: "Non-Standard",
+              },
+            ],
+          });
+        }, 1000);
+      });
+      setSearchResults(response);
+      setHasSearched(true);
+    } catch (err) {
+      setError("An error occurred while fetching results. Please try again.");
+    } finally {
+      clearInterval(progressInterval);
+      setLoading(false);
+    }
+  };
+
+  const handleDisambiguationSelect = (option: DisambiguationOption) => {
+    console.log("Selected disambiguation option:", option);
+  };
+
+  const handleSynonymClick = (synonym: string) => {
+    console.log("Clicked synonym:", synonym);
+  };
+
+  return (
+    <div className="flex flex-col min-h-screen bg-background text-foreground">
+      <Header />
+
+      <main className="flex-1 container mx-auto px-4 py-8 flex flex-col">
+        <AnimatePresence mode="wait">
+          {!hasSearched ? (
+            <motion.div
+              key="centered-search"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="flex flex-col items-center justify-center flex-grow"
+            >
+              <div className="w-full max-w-2xl">
+                <LanguageSelector onLanguageChange={handleLanguageChange} />
+                <SearchBox onSearch={handleSearch} />
+              </div>
+            </motion.div>
+          ) : (
+            <motion.div
+              key="search-results"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="w-full"
+            >
+              <div className="mb-8">
+                <LanguageSelector onLanguageChange={handleLanguageChange} />
+                <SearchBox onSearch={handleSearch} />
+              </div>
+
+              {loading && <Progress value={progress} className="mb-4" />}
+              {error && <p className="text-destructive mb-4">{error}</p>}
+
+              {searchResults && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                  <div>
+                    <Disambiguation
+                      options={searchResults.disambiguation}
+                      onSelect={handleDisambiguationSelect}
+                    />
+                    <SynonymList
+                      synonyms={searchResults.synonyms}
+                      onSynonymClick={handleSynonymClick}
+                    />
+                  </div>
+                  <div>
+                    <MedicalConceptsTable concepts={searchResults.concepts} />
+                    <Recommendation />
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </main>
+
+      <Footer />
+    </div>
+  );
+};
+
+export default MainContainer;
+
+```
+
+## File: /home/runner/workspace/frontend/src/hooks/useMediaQuery.ts
+```
+// src/hooks/useMediaQuery.ts
+
+import { useEffect, useState } from "react";
+
+export function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState<boolean>(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(query);
+    const handleChange = () => setMatches(mediaQuery.matches);
+
+    handleChange();
+    mediaQuery.addEventListener("change", handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener("change", handleChange);
+    };
+  }, [query]);
+
+  return matches;
+}
+
+```
+
 ## File: /home/runner/workspace/frontend/tailwind.config.js
 ```
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: [
-    "./index.html",
-    "./src/**/*.{js,ts,jsx,tsx}",
-  ],
+  darkMode: ["class"],
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
+    extend: {
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+      keyframes: {
+        "accordion-down": {
+          from: { height: 0 },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: 0 },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+      },
+    },
   },
-  plugins: [],
-}
+  plugins: [require("tailwindcss-animate")],
+};
 
 ```
 
