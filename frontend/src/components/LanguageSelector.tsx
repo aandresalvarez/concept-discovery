@@ -97,7 +97,7 @@ export function LanguageSelector({
         <DialogTrigger asChild>
           <Button
             size="icon"
-            className="h-10 w-10 rounded-full"
+            className="h-10 w-10 rounded-full shadow-md hover:bg-primary hover:text-primary-foreground"
             variant="secondary"
           >
             <Languages className="h-6 w-6" />
