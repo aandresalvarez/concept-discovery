@@ -6618,10 +6618,15 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: 0 },
         },
+        blink: {
+          "0%, 100%": { opacity: 1 },
+          "50%": { opacity: 0 },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        blink: "blink 1s step-end infinite",
       },
     },
   },
@@ -6799,45 +6804,6 @@ const ButtonTest: React.FC = () => {
 };
 
 export default ButtonTest;
-
-```
-
-## File: /home/runner/workspace/frontend/src/components/SearchBox.tsx
-```
-// src/components/SearchBox.tsx
-
-import React, { useState } from "react";
-import { Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { SearchBoxProps } from "@/types";
-
-const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
-  const [searchTerm, setSearchTerm] = useState<string>("");
-
-  const handleSearch = () => {
-    onSearch(searchTerm);
-  };
-
-  return (
-    <div className="relative mb-4 w-full">
-      <Input
-        type="text"
-        placeholder="Search medical term"
-        className="pl-10 pr-4 py-2 w-full rounded-full border-2 border-gray-300"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-        onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-      />
-      <Search
-        className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground cursor-pointer"
-        size={20}
-        onClick={handleSearch}
-      />
-    </div>
-  );
-};
-
-export default SearchBox;
 
 ```
 
@@ -7051,6 +7017,144 @@ export { default as MedicalConceptsTable } from "./MedicalConceptsTable";
 export { default as Recommendation } from "./Recommendation";
 export { default as Header } from "./Header";
 export { default as Footer } from "./Footer";
+ 
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/Typewriter-effect.tsx
+```
+import { useState, useEffect } from "react";
+
+interface Phrase {
+  text: string;
+  color: string;
+}
+
+const defaultPhrases: Phrase[] = [
+  { text: "Search in any language", color: "text-primary" },
+  { text: "Busca en cualquier idioma", color: "text-secondary" },
+  { text: "Suche in jeder Sprache", color: "text-accent" },
+  { text: "Recherchez dans n'importe quelle langue", color: "text-muted" },
+];
+
+interface TypewriterEffectProps {
+  phrases?: Phrase[];
+  typingSpeed?: number;
+  deletingSpeed?: number;
+  pauseDuration?: number;
+  width?: string;
+  height?: string;
+  fontSize?: string;
+  backgroundColor?: string;
+}
+
+export default function TypewriterEffect({
+  phrases = defaultPhrases,
+  typingSpeed = 100,
+  deletingSpeed = 50,
+  pauseDuration = 1500,
+  width = "100%",
+  height = "100px",
+  fontSize = "2rem",
+  backgroundColor = "transparent",
+}: TypewriterEffectProps) {
+  const [text, setText] = useState("");
+  const [phraseIndex, setPhraseIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  useEffect(() => {
+    const currentPhrase = phrases[phraseIndex].text;
+    const timer = setTimeout(
+      () => {
+        if (!isDeleting && text === currentPhrase) {
+          setTimeout(() => setIsDeleting(true), pauseDuration);
+        } else if (isDeleting && text === "") {
+          setIsDeleting(false);
+          setPhraseIndex((prevIndex) => (prevIndex + 1) % phrases.length);
+        } else if (isDeleting) {
+          setText(currentPhrase.substring(0, text.length - 1));
+        } else {
+          setText(currentPhrase.substring(0, text.length + 1));
+        }
+      },
+      isDeleting ? deletingSpeed : typingSpeed,
+    );
+    return () => clearTimeout(timer);
+  }, [
+    text,
+    isDeleting,
+    phraseIndex,
+    phrases,
+    typingSpeed,
+    deletingSpeed,
+    pauseDuration,
+  ]);
+
+  return (
+    <div
+      className="flex items-start justify-start"
+      style={{ width, height, backgroundColor }}
+    >
+      <div className="font-bold relative" style={{ fontSize }}>
+        <span className={`${phrases[phraseIndex].color}`}>{text}</span>
+        <span className="inline-block w-[0.05em] h-[1.2em] bg-primary ml-[1px] animate-blink" />
+      </div>
+    </div>
+  );
+}
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/SearchBox.tsx
+```
+// src/components/SearchBox.tsx
+
+import React, { useState } from "react";
+import { Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { SearchBoxProps } from "@/types";
+import LanguageSelector from "./LanguageSelector";
+
+const SearchBox: React.FC<SearchBoxProps> = ({
+  onSearch,
+  placeholder,
+  onLanguageChange,
+  selectedLanguage,
+}) => {
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const handleSearch = () => {
+    onSearch(searchTerm);
+  };
+
+  return (
+    <div className="relative mb-4 w-full flex items-center">
+      <div className="relative flex-grow">
+        <Input
+          type="text"
+          placeholder={placeholder || "Search medical term"}
+          className="pl-10 pr-4 py-2 w-full rounded-full border-2 border-gray-300"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyPress={(e) => e.key === "Enter" && handleSearch()}
+        />
+        <Search
+          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground cursor-pointer"
+          size={20}
+          onClick={handleSearch}
+        />
+      </div>
+      <div className="ml-2">
+        <LanguageSelector
+          onLanguageChange={onLanguageChange}
+          initialLanguage={selectedLanguage}
+        />
+      </div>
+    </div>
+  );
+};
+
+export default SearchBox;
 
 ```
 
@@ -7059,42 +7163,54 @@ export { default as Footer } from "./Footer";
 // src/components/LanguageSelector.tsx
 
 import React, { useState } from "react";
-import { Languages } from "lucide-react";
+import { Languages, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
+  DialogTrigger,
 } from "@/components/ui/dialog";
-import { Drawer } from "@/components/ui/drawer";
-import { Input } from "@/components/ui/input";
-import { LanguageSelectorProps } from "@/types";
-import { useMediaQuery } from "@/hooks/useMediaQuery";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer";
 
-const LanguageSelector: React.FC<LanguageSelectorProps> = ({
+interface LanguageSelectorProps {
+  onLanguageChange: (language: string) => void;
+  initialLanguage?: string;
+}
+
+const languageOptions = [
+  { value: "en", label: "English" },
+  { value: "es", label: "Español" },
+  { value: "fr", label: "Français" },
+  { value: "de", label: "Deutsch" },
+  { value: "it", label: "Italiano" },
+  { value: "pt", label: "Português" },
+  { value: "ru", label: "Русский" },
+  { value: "zh", label: "中文" },
+];
+
+export function LanguageSelector({
   onLanguageChange,
-}) => {
-  const languageOptions = [
-    { value: "en", label: "English" },
-    { value: "es", label: "Español" },
-    { value: "fr", label: "Français" },
-    { value: "de", label: "Deutsch" },
-    { value: "custom", label: "Custom" },
-  ];
-
-  const [customLanguage, setCustomLanguage] = useState<string>("");
-  const [selectedLanguage, setSelectedLanguage] = useState<string>("");
-  const isMobile = useMediaQuery("(max-width: 768px)"); // Custom hook to check screen size
+  initialLanguage = "en",
+}: LanguageSelectorProps) {
+  const [open, setOpen] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const [customLanguage, setCustomLanguage] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState(initialLanguage);
 
   const handleLanguageChange = (value: string) => {
     setSelectedLanguage(value);
-    if (value !== "custom") {
-      setCustomLanguage("");
-      onLanguageChange(value);
-    }
+    onLanguageChange(value);
+    setOpen(false);
   };
 
   const handleCustomLanguageChange = (
@@ -7102,94 +7218,83 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
   ) => {
     const value = e.target.value;
     setCustomLanguage(value);
-    onLanguageChange(value);
+    if (value) {
+      setSelectedLanguage("custom");
+      onLanguageChange(value);
+    }
   };
 
-  return (
-    <div className="flex items-center justify-center space-x-4 mb-4">
-      <h2 className="text-2xl font-bold">Search in any language</h2>
-      {isMobile ? (
-        // Use Drawer on mobile devices
-        <Drawer>
-          <DialogTrigger asChild>
-            <Button className="flex items-center space-x-2">
-              <Languages size={24} />
-              <span>Select Language</span>
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="p-6">
-            <DialogHeader>
-              <DialogTitle>Select Language</DialogTitle>
-              <DialogDescription>
-                Choose a language or enter a custom one below.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="mt-4">
-              {languageOptions.map((option) => (
-                <div key={option.value} className="mb-2">
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleLanguageChange(option.value)}
-                  >
-                    {option.label}
-                  </Button>
-                </div>
-              ))}
-              {selectedLanguage === "custom" && (
-                <Input
-                  type="text"
-                  placeholder="Enter your language"
-                  className="mt-4"
-                  value={customLanguage}
-                  onChange={handleCustomLanguageChange}
-                />
-              )}
-            </div>
-          </DialogContent>
-        </Drawer>
-      ) : (
-        // Use Dialog on desktop
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button className="flex items-center space-x-2">
-              <Languages size={24} />
-              <span>Select Language</span>
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="p-6">
-            <DialogHeader>
-              <DialogTitle>Select Language</DialogTitle>
-              <DialogDescription>
-                Choose a language or enter a custom one below.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="mt-4">
-              {languageOptions.map((option) => (
-                <div key={option.value} className="mb-2">
-                  <Button
-                    variant="ghost"
-                    onClick={() => handleLanguageChange(option.value)}
-                  >
-                    {option.label}
-                  </Button>
-                </div>
-              ))}
-              {selectedLanguage === "custom" && (
-                <Input
-                  type="text"
-                  placeholder="Enter your language"
-                  className="mt-4"
-                  value={customLanguage}
-                  onChange={handleCustomLanguageChange}
-                />
-              )}
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+  const renderContent = () => (
+    <div className="mt-4">
+      <div className="grid grid-cols-2 gap-2 mb-4">
+        {languageOptions.map((option) => (
+          <Button
+            key={option.value}
+            variant={selectedLanguage === option.value ? "default" : "ghost"}
+            className="w-full justify-start"
+            onClick={() => handleLanguageChange(option.value)}
+          >
+            {option.label}
+            {selectedLanguage === option.value && (
+              <Check className="ml-2 h-4 w-4" />
+            )}
+          </Button>
+        ))}
+      </div>
+      <div className="mt-4">
+        <Input
+          type="text"
+          placeholder="Enter custom language"
+          value={customLanguage}
+          onChange={handleCustomLanguageChange}
+          className={`w-full ${selectedLanguage === "custom" ? "border-primary" : ""}`}
+        />
+      </div>
     </div>
   );
-};
+
+  if (isDesktop) {
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button
+            size="icon"
+            className="h-10 w-10 rounded-full"
+            variant="secondary"
+          >
+            <Languages className="h-6 w-6" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Select Language</DialogTitle>
+          </DialogHeader>
+          {renderContent()}
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return (
+    <Drawer open={open} onOpenChange={setOpen}>
+      <DrawerTrigger asChild>
+        <Button
+          size="icon"
+          className="h-10 w-10 rounded-full"
+          variant="secondary"
+        >
+          <Languages className="h-6 w-6" />
+        </Button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader className="text-left">
+          <DrawerTitle>Select Language</DrawerTitle>
+        </DrawerHeader>
+        <div className="px-4 pb-4">{renderContent()}</div>
+      </DrawerContent>
+    </Drawer>
+  );
+}
 
 export default LanguageSelector;
 
@@ -8093,6 +8198,9 @@ export interface LanguageSelectorProps {
 
 export interface SearchBoxProps {
   onSearch: (term: string) => void;
+  onLanguageChange: (lang: string) => void;
+  placeholder?: string;
+  selectedLanguage: string;
 }
 
 export interface DisambiguationOption {
@@ -8139,7 +8247,6 @@ import React, { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Progress } from "@/components/ui/progress";
 import {
-  LanguageSelector,
   SearchBox,
   Disambiguation,
   SynonymList,
@@ -8158,6 +8265,7 @@ const MainContainer: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("en");
 
   useEffect(() => {
     setHasSearched(false);
@@ -8166,6 +8274,11 @@ const MainContainer: React.FC = () => {
 
   const handleLanguageChange = (lang: string) => {
     console.log(`Language changed to: ${lang}`);
+    setSelectedLanguage(lang);
+    // Optionally, you can trigger a new search here if you want to refresh results on language change
+    // if (searchResults) {
+    //   handleSearch(searchResults.concepts[0].name);
+    // }
   };
 
   const handleSearch = async (term: string) => {
@@ -8187,16 +8300,20 @@ const MainContainer: React.FC = () => {
             disambiguation: [
               {
                 term: term,
-                definition: `A condition or symptom related to "${term}".`,
+                definition: `A condition or symptom related to "${term}" in ${selectedLanguage}.`,
                 category: "General Medical Term",
               },
               {
                 term: `${term} (specific)`,
-                definition: `A more specific medical condition related to "${term}".`,
+                definition: `A more specific medical condition related to "${term}" in ${selectedLanguage}.`,
                 category: "Specific Medical Condition",
               },
             ],
-            synonyms: [term, `${term} synonym 1`, `${term} synonym 2`],
+            synonyms: [
+              term,
+              `${term} synonym 1 (${selectedLanguage})`,
+              `${term} synonym 2 (${selectedLanguage})`,
+            ],
             concepts: [
               {
                 id: 1000000 + term.length,
@@ -8207,7 +8324,7 @@ const MainContainer: React.FC = () => {
               },
               {
                 id: 2000000 + term.length,
-                name: `${term} related concept`,
+                name: `${term} related concept (${selectedLanguage})`,
                 domain: "Measurement",
                 vocabulary: "LOINC",
                 standard: "Non-Standard",
@@ -8228,31 +8345,41 @@ const MainContainer: React.FC = () => {
 
   const handleDisambiguationSelect = (option: DisambiguationOption) => {
     console.log("Selected disambiguation option:", option);
+    handleSearch(option.term);
   };
 
   const handleSynonymClick = (synonym: string) => {
     console.log("Clicked synonym:", synonym);
+    handleSearch(synonym);
   };
 
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
       <Header />
 
-      <main className="flex-1 container mx-auto px-4 py-8 flex flex-col">
+      <main className="flex-1 container mx-auto px-4 py-8 flex flex-col items-center justify-center">
         <AnimatePresence mode="wait">
           {!hasSearched ? (
             <motion.div
-              key="centered-search"
+              key="initial-search"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.5 }}
-              className="flex flex-col items-center justify-center flex-grow"
+              className="w-full max-w-2xl text-center"
             >
-              <div className="w-full max-w-2xl">
-                <LanguageSelector onLanguageChange={handleLanguageChange} />
-                <SearchBox onSearch={handleSearch} />
-              </div>
+              <h1 className="text-4xl font-bold mb-8">
+                Medical Concept Discovery
+              </h1>
+              <p className="text-xl mb-8">
+                Explore medical terms across languages and vocabularies
+              </p>
+              <SearchBox
+                onSearch={handleSearch}
+                onLanguageChange={handleLanguageChange}
+                placeholder="Enter a medical term, e.g., 'hypertension'"
+                selectedLanguage={selectedLanguage}
+              />
             </motion.div>
           ) : (
             <motion.div
@@ -8260,11 +8387,16 @@ const MainContainer: React.FC = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
-              className="w-full"
+              className="w-full max-w-4xl"
             >
               <div className="mb-8">
-                <LanguageSelector onLanguageChange={handleLanguageChange} />
-                <SearchBox onSearch={handleSearch} />
+                <h2 className="text-2xl font-bold mb-4">Search Results</h2>
+                <SearchBox
+                  onSearch={handleSearch}
+                  onLanguageChange={handleLanguageChange}
+                  placeholder="Enter a medical term, e.g., 'hypertension'"
+                  selectedLanguage={selectedLanguage}
+                />
               </div>
 
               {loading && <Progress value={progress} className="mb-4" />}
@@ -8306,22 +8438,20 @@ export default MainContainer;
 ```
 // src/hooks/useMediaQuery.ts
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 
 export function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = useState<boolean>(false);
+  const [matches, setMatches] = useState(false);
 
   useEffect(() => {
-    const mediaQuery = window.matchMedia(query);
-    const handleChange = () => setMatches(mediaQuery.matches);
-
-    handleChange();
-    mediaQuery.addEventListener("change", handleChange);
-
-    return () => {
-      mediaQuery.removeEventListener("change", handleChange);
-    };
-  }, [query]);
+    const media = window.matchMedia(query);
+    if (media.matches !== matches) {
+      setMatches(media.matches);
+    }
+    const listener = () => setMatches(media.matches);
+    media.addListener(listener);
+    return () => media.removeListener(listener);
+  }, [matches, query]);
 
   return matches;
 }
@@ -8392,10 +8522,15 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: 0 },
         },
+        blink: {
+          "0%, 100%": { opacity: 1 },
+          "50%": { opacity: 0 },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        blink: "blink 1s step-end infinite",
       },
     },
   },

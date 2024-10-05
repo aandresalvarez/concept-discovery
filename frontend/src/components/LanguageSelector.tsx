@@ -1,28 +1,28 @@
-import * as React from "react";
-import { Languages } from "lucide-react";
+// src/components/LanguageSelector.tsx
+
+import React, { useState } from "react";
+import { Languages, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import TypewriterEffect from "@/components/Typewriter-effect";
+import { Input } from "@/components/ui/input";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 import {
   Dialog,
-  DialogTrigger,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
+  DialogTrigger,
 } from "@/components/ui/dialog";
 import {
   Drawer,
-  DrawerTrigger,
   DrawerContent,
   DrawerHeader,
   DrawerTitle,
-  DrawerDescription,
-  DrawerClose,
+  DrawerTrigger,
 } from "@/components/ui/drawer";
-import { Input } from "@/components/ui/input";
 
 interface LanguageSelectorProps {
   onLanguageChange: (language: string) => void;
+  initialLanguage?: string;
 }
 
 const languageOptions = [
@@ -30,124 +30,108 @@ const languageOptions = [
   { value: "es", label: "Español" },
   { value: "fr", label: "Français" },
   { value: "de", label: "Deutsch" },
-  { value: "custom", label: "Custom" },
+  { value: "it", label: "Italiano" },
+  { value: "pt", label: "Português" },
+  { value: "ru", label: "Русский" },
+  { value: "zh", label: "中文" },
 ];
 
-function useMediaQuery(query: string): boolean {
-  const [matches, setMatches] = React.useState(false);
-
-  React.useEffect(() => {
-    const media = window.matchMedia(query);
-    if (media.matches !== matches) {
-      setMatches(media.matches);
-    }
-    const listener = () => setMatches(media.matches);
-    window.addEventListener("resize", listener);
-    return () => window.removeEventListener("resize", listener);
-  }, [matches, query]);
-
-  return matches;
-}
-
-export default function LanguageSelector({
+export function LanguageSelector({
   onLanguageChange,
+  initialLanguage = "en",
 }: LanguageSelectorProps) {
-  const [customLanguage, setCustomLanguage] = React.useState("");
-  const [selectedLanguage, setSelectedLanguage] = React.useState("");
-  const isMobile = useMediaQuery("(max-width: 768px)");
+  const [open, setOpen] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const [customLanguage, setCustomLanguage] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState(initialLanguage);
 
-  const handleLanguageChange = React.useCallback(
-    (value: string) => {
-      setSelectedLanguage(value);
-      if (value !== "custom") {
-        setCustomLanguage("");
-        onLanguageChange(value);
-      }
-    },
-    [onLanguageChange],
-  );
+  const handleLanguageChange = (value: string) => {
+    setSelectedLanguage(value);
+    onLanguageChange(value);
+    setOpen(false);
+  };
 
-  const handleCustomLanguageChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => {
-      const value = e.target.value;
-      setCustomLanguage(value);
+  const handleCustomLanguageChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const value = e.target.value;
+    setCustomLanguage(value);
+    if (value) {
+      setSelectedLanguage("custom");
       onLanguageChange(value);
-    },
-    [onLanguageChange],
-  );
+    }
+  };
 
-  const renderLanguageOptions = () => (
-    <div className="mt-4 space-y-2">
-      {languageOptions.map((option) => (
-        <Button
-          key={option.value}
-          variant="ghost"
-          className="w-full justify-start"
-          onClick={() => handleLanguageChange(option.value)}
-        >
-          {option.label}
-        </Button>
-      ))}
-      {selectedLanguage === "custom" && (
+  const renderContent = () => (
+    <div className="mt-4">
+      <div className="grid grid-cols-2 gap-2 mb-4">
+        {languageOptions.map((option) => (
+          <Button
+            key={option.value}
+            variant={selectedLanguage === option.value ? "default" : "ghost"}
+            className="w-full justify-start"
+            onClick={() => handleLanguageChange(option.value)}
+          >
+            {option.label}
+            {selectedLanguage === option.value && (
+              <Check className="ml-2 h-4 w-4" />
+            )}
+          </Button>
+        ))}
+      </div>
+      <div className="mt-4">
         <Input
           type="text"
-          placeholder="Enter your language"
+          placeholder="Enter custom language"
           value={customLanguage}
           onChange={handleCustomLanguageChange}
-          className="mt-2 w-full"
-        />
-      )}
-    </div>
-  );
-
-  return (
-    <div className="flex items-center justify-between px-4 py-6 mb-4 w-full max-w-2xl mx-auto">
-      <div className="flex items-center space-x-4">
-        {isMobile ? (
-          <Drawer>
-            <DrawerTrigger asChild>
-              <Button size="icon" className="h-10 w-10">
-                <Languages className="h-6 w-6" />
-              </Button>
-            </DrawerTrigger>
-            <DrawerContent className="p-4">
-              <DrawerHeader>
-                <DrawerTitle>Select Language</DrawerTitle>
-                <DrawerDescription>
-                  Choose a language or enter a custom one below.
-                </DrawerDescription>
-              </DrawerHeader>
-              {renderLanguageOptions()}
-              <DrawerClose />
-            </DrawerContent>
-          </Drawer>
-        ) : (
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button size="icon" className="h-10 w-10">
-                <Languages className="h-6 w-6" />
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="p-6 max-w-lg mx-auto">
-              <DialogHeader>
-                <DialogTitle>Select Language</DialogTitle>
-                <DialogDescription>
-                  Choose a language or enter a custom one below.
-                </DialogDescription>
-              </DialogHeader>
-              {renderLanguageOptions()}
-            </DialogContent>
-          </Dialog>
-        )}
-        <TypewriterEffect
-          typingSpeed={80}
-          deletingSpeed={40}
-          pauseDuration={2000}
-          width="auto"
-          height="60px"
-          fontSize="1.5rem"
+          className={`w-full ${selectedLanguage === "custom" ? "border-primary" : ""}`}
         />
       </div>
     </div>
   );
+
+  if (isDesktop) {
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button
+            size="icon"
+            className="h-10 w-10 rounded-full"
+            variant="secondary"
+          >
+            <Languages className="h-6 w-6" />
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Select Language</DialogTitle>
+          </DialogHeader>
+          {renderContent()}
+        </DialogContent>
+      </Dialog>
+    );
+  }
+
+  return (
+    <Drawer open={open} onOpenChange={setOpen}>
+      <DrawerTrigger asChild>
+        <Button
+          size="icon"
+          className="h-10 w-10 rounded-full"
+          variant="secondary"
+        >
+          <Languages className="h-6 w-6" />
+        </Button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerHeader className="text-left">
+          <DrawerTitle>Select Language</DrawerTitle>
+        </DrawerHeader>
+        <div className="px-4 pb-4">{renderContent()}</div>
+      </DrawerContent>
+    </Drawer>
+  );
 }
+
+export default LanguageSelector;

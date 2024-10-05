@@ -6,6 +6,9 @@ export interface LanguageSelectorProps {
 
 export interface SearchBoxProps {
   onSearch: (term: string) => void;
+  onLanguageChange: (lang: string) => void;
+  placeholder?: string;
+  selectedLanguage: string;
 }
 
 export interface DisambiguationOption {
