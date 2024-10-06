@@ -1,12 +1,9 @@
 import ell
 import requests
-from typing import List, Dict, Any, Optional, Literal
-from ell.types import Message, ContentBlock, _lstr
+from typing import List, Optional
+from ell.types import Message
 from pydantic import BaseModel, Field
-from collections import OrderedDict
 from enum import Enum
-from PIL import Image
-import json
 from pydantic import HttpUrl  # Add this import
 
 
