@@ -3,6 +3,7 @@ from typing import Union
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from workflow import testurl
 
 app = FastAPI()
 
@@ -19,6 +20,11 @@ app.add_middleware(
 @app.get("/api")
 def read_root():
     return {"Hello": "World"}
+
+
+@app.get("/api/test")
+def test1(name: str):
+    return testurl(name)
 
 
 @app.get("/api/items/{item_id}")
