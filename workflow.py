@@ -34,23 +34,25 @@ class Concept(BaseModel):
 
 
 @ell.simple(model="gpt-4o-mini")
-def disambiguate(term: str) -> List[Message]:
+def disambiguate(term: str, language: str = "en") -> List[Message]:
     """
     Return a list of possible meanings of a medical term, formatted in Markdown.
+    The results will be in the specified language, defaulting to English if not specified.
     """
     return [
         ell.system(
-            """You are a helpful medical assistant. Explain a potentially ambiguous medical term to a user.
+            f"""You are a helpful medical assistant. Explain a potentially ambiguous medical term to a user in {language}.
             Format your output as a list of markdown code blocks, each containing a possible interpretation of the term.
             Each interpretation should include the following:
 
             ```markdown
             ## Term: <The medical term>
-            ## Definition: <Definition of the term>
-            ## Category: <Category the term belongs to, e.g., Symptom, Diagnosis, Procedure, etc.>
+            ## Definition: <Definition of the term in {language}>
+            ## Category: <Category the term belongs to, e.g., Symptom, Diagnosis, Procedure, etc. in {language}>
             ```
             """),
-        ell.user(f"Disambiguate the following medical term: {term}"),
+        ell.user(
+            f"Disambiguate the following medical term in {language}: {term}"),
     ]
 
 
