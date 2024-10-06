@@ -33,6 +33,32 @@ class Concept(BaseModel):
     concept_class_id: str
 
 
+class SynonymResult(BaseModel):
+    synonym: str = Field(description="A synonym for the given term")
+    relevance: float = Field(
+        description="The relevance score of the synonym, between 0 and 1")
+
+
+class SynonymResponse(BaseModel):
+    synonyms: List[SynonymResult] = Field(
+        description="List of synonyms with their relevance scores")
+
+
+@ell.complex(model="gpt-4o-mini", response_format=SynonymResponse)
+def generate_synonyms(term: str, language: str) -> List[ell.Message]:
+    """
+    Generate synonyms for a given term in the specified language.
+    """
+    return [
+        ell.system(
+            f"""You are a medical language expert. Generate up to 5 synonyms for the given medical term in {language}.
+        Provide each synonym with a relevance score between 0 and 1, where 1 is highly relevant and 0 is less relevant."""
+        ),
+        ell.user(
+            f"Generate synonyms for the medical term '{term}' in {language}.")
+    ]
+
+
 @ell.simple(model="gpt-4o-mini")
 def disambiguate(term: str, language: str = "en") -> List[Message]:
     """
@@ -116,12 +142,6 @@ def find_omop_concept(
     concepts = athena_lookup(
         AthenaLookupParams(concept_name=chosen_term, synonyms=synonyms))
     return concepts
-
-
-@ell.simple(model="gpt-4o-mini")
-def generate_synonyms(prompt: str) -> List[str]:
-    """Generates synonyms for a given term using an LLM."""
-    return prompt
 
 
 @ell.simple(model="gpt-4o-mini")

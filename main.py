@@ -3,8 +3,8 @@ from typing import Union, List
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-from workflow import testurl, disambiguate
+from pydantic import BaseModel, Field
+from workflow import testurl, disambiguate, generate_synonyms
 import logging
 import traceback
 
@@ -33,6 +33,35 @@ class DisambiguationResult(BaseModel):
 
 class SearchResponse(BaseModel):
     results: List[DisambiguationResult]
+
+
+class SynonymResult(BaseModel):
+    synonym: str = Field(description="A synonym for the given term")
+    relevance: float = Field(
+        description="The relevance score of the synonym, between 0 and 1")
+
+
+class SynonymResponse(BaseModel):
+    synonyms: List[SynonymResult] = Field(
+        description="List of synonyms with their relevance scores")
+
+
+@app.get("/api/synonyms", response_model=SynonymResponse)
+async def get_synonyms(term: str = Query(..., min_length=1),
+                       language: str = Query("en")):
+    try:
+        response = generate_synonyms(term, language)
+        synonym_response = response.parsed
+        return synonym_response
+    except Exception as e:
+        raise HTTPException(status_code=500,
+                            detail=f"An error occurred: {str(e)}")
+
+
+# Make sure this is at the end of your file
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
 
 
 @app.get("/api/search", response_model=SearchResponse)
