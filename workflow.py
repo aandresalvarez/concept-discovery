@@ -36,6 +36,27 @@ class Concept(BaseModel):
     concept_class_id: str
 
 
+@ell.simple(model="gpt-4o-mini")
+def disambiguate(term: str) -> List[Message]:
+    """
+    Return a list of possible meanings of a medical term, formatted in Markdown.
+    """
+    return [
+        ell.system(
+            """You are a helpful medical assistant. Explain a potentially ambiguous medical term to a user.
+            Format your output as a list of markdown code blocks, each containing a possible interpretation of the term.
+            Each interpretation should include the following:
+
+            ```markdown
+            ## Term: <The medical term>
+            ## Definition: <Definition of the term>
+            ## Category: <Category the term belongs to, e.g., Symptom, Diagnosis, Procedure, etc.>
+            ```
+            """),
+        ell.user(f"Disambiguate the following medical term: {term}"),
+    ]
+
+
 # Tools
 @ell.tool(exempt_from_tracking=True)  # Exempting web search from tracking
 def web_search(params: WebSearchToolParams) -> List[SearchResult]:
