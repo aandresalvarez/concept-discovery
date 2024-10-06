@@ -1,0 +1,7 @@
+{
+  "retry": "Retry",
+  "serverError": "Server error",
+  "unknownError": "Unknown error",
+  "noResponseError": "No response received from server. Please try again.",
+  "genericError": "An error occurred"
+}

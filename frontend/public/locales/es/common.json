@@ -1,0 +1,7 @@
+{
+    "retry": "Reintentar",
+    "serverError": "Error del servidor",
+    "unknownError": "Error desconocido",
+    "noResponseError": "No se recibió respuesta del servidor. Por favor, inténtelo de nuevo.",
+    "genericError": "Ocurrió un error"
+}

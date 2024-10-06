@@ -1,0 +1,7 @@
+{
+  "title": "Medical Concept Discovery",
+  "searchPlaceholder": "Enter a medical term, e.g., 'aspirin'",
+  "loading": "Loading results...",
+  "noResults": "No results found. Try another search term.",
+  "results": "Results"
+}

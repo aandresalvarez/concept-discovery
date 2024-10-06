@@ -1,16 +1,17 @@
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { SearchBox, Header } from "@/components";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import axios from "axios";
 
 const MainContainer: React.FC = () => {
-  const [searchResults, setSearchResults] = useState<any>(null);
+  const { t, i18n } = useTranslation(["mainContainer", "common"]);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState<boolean>(false);
-  const [selectedLanguage, setSelectedLanguage] = useState<string>("en");
   const [lastSearchTerm, setLastSearchTerm] = useState<string>("");
 
   const handleSearch = async (term: string) => {
@@ -21,7 +22,7 @@ const MainContainer: React.FC = () => {
 
     try {
       const response = await axios.get(`/api/search`, {
-        params: { term, language: selectedLanguage },
+        params: { term, language: i18n.language },
       });
 
       setSearchResults(response.data.results);
@@ -29,12 +30,12 @@ const MainContainer: React.FC = () => {
       console.error("API call error:", err);
       if (err.response) {
         setError(
-          `Server error: ${err.response.data.detail || "Unknown error"}`,
+          `${t("serverError", { ns: "common" })}: ${err.response.data.detail || t("unknownError", { ns: "common" })}`,
         );
       } else if (err.request) {
-        setError("No response received from server. Please try again.");
+        setError(t("noResponseError", { ns: "common" }));
       } else {
-        setError(`An error occurred: ${err.message}`);
+        setError(`${t("genericError", { ns: "common" })}: ${err.message}`);
       }
     } finally {
       setLoading(false);
@@ -42,7 +43,7 @@ const MainContainer: React.FC = () => {
   };
 
   const handleLanguageChange = (lang: string) => {
-    setSelectedLanguage(lang);
+    i18n.changeLanguage(lang);
   };
 
   const handleRetry = () => {
@@ -98,14 +99,14 @@ const MainContainer: React.FC = () => {
               className="flex flex-col items-center justify-center h-[calc(100vh-120px)]"
             >
               <h1 className="text-4xl font-bold mb-8 text-foreground text-center">
-                Medical Concept Discovery
+                {t("title", { ns: "mainContainer" })}
               </h1>
               <div className="w-full max-w-2xl">
                 <SearchBox
                   onSearch={handleSearch}
-                  placeholder="Enter a medical term, e.g., 'aspirin'"
+                  placeholder={t("searchPlaceholder", { ns: "mainContainer" })}
                   onLanguageChange={handleLanguageChange}
-                  selectedLanguage={selectedLanguage}
+                  selectedLanguage={i18n.language}
                 />
               </div>
             </motion.div>
@@ -119,16 +120,16 @@ const MainContainer: React.FC = () => {
               <div className="mb-6">
                 <SearchBox
                   onSearch={handleSearch}
-                  placeholder="Enter a medical term, e.g., 'aspirin'"
+                  placeholder={t("searchPlaceholder", { ns: "mainContainer" })}
                   onLanguageChange={handleLanguageChange}
-                  selectedLanguage={selectedLanguage}
+                  selectedLanguage={i18n.language}
                 />
               </div>
 
               {loading ? (
                 <div>
                   <h2 className="text-xl font-semibold mb-4 text-foreground">
-                    Loading results...
+                    {t("loading", { ns: "mainContainer" })}
                   </h2>
                   {renderSkeletons()}
                 </div>
@@ -136,21 +137,21 @@ const MainContainer: React.FC = () => {
                 <div className="text-center text-destructive">
                   <p>{error}</p>
                   <Button onClick={handleRetry} className="mt-4">
-                    Retry
+                    {t("retry", { ns: "common" })}
                   </Button>
                 </div>
-              ) : searchResults && searchResults.length > 0 ? (
+              ) : searchResults.length > 0 ? (
                 <>
                   <h2 className="text-xl font-semibold mb-4 text-foreground">
-                    Results
+                    {t("results", { ns: "mainContainer" })}
                   </h2>
-                  {searchResults.map((item: any, index: number) =>
+                  {searchResults.map((item, index) =>
                     renderSearchResult(item, index),
                   )}
                 </>
               ) : (
                 <div className="text-center text-muted-foreground">
-                  No results found. Try another search term.
+                  {t("noResults", { ns: "mainContainer" })}
                 </div>
               )}
             </motion.div>
