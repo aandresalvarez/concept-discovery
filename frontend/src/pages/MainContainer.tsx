@@ -1,8 +1,6 @@
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-
 import { SearchBox, Header } from "@/components";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import axios from "axios";
@@ -60,16 +58,13 @@ const MainContainer: React.FC = () => {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: index * 0.1 }}
+        className="mb-6 p-4 rounded-lg hover:bg-accent/5 transition-colors duration-200 border border-accent/10 sm:border-0 sm:hover:border-accent/10"
       >
-        <Card className="mb-4 hover:shadow-md transition-shadow duration-200">
-          <CardContent className="p-4">
-            <h3 className="text-lg font-semibold mb-2">{item.term}</h3>
-            <p className="text-sm text-muted-foreground mb-2">
-              {item.category}
-            </p>
-            <p className="text-sm">{item.definition}</p>
-          </CardContent>
-        </Card>
+        <h3 className="text-lg font-semibold mb-2 text-primary">{item.term}</h3>
+        <p className="text-sm text-muted-foreground mb-2 inline-block bg-accent/10 px-2 py-1 rounded">
+          {item.category}
+        </p>
+        <p className="text-sm text-foreground mt-2">{item.definition}</p>
       </motion.div>
     );
   };
@@ -78,13 +73,14 @@ const MainContainer: React.FC = () => {
     return Array(3)
       .fill(null)
       .map((_, index) => (
-        <Card key={index} className="mb-4">
-          <CardContent className="p-4">
-            <Skeleton className="h-6 w-3/4 mb-2" />
-            <Skeleton className="h-4 w-1/2 mb-2" />
-            <Skeleton className="h-4 w-full" />
-          </CardContent>
-        </Card>
+        <div
+          key={index}
+          className="mb-6 p-4 border border-accent/10 sm:border-0 rounded-lg"
+        >
+          <Skeleton className="h-6 w-3/4 mb-2" />
+          <Skeleton className="h-4 w-1/3 mb-2" />
+          <Skeleton className="h-4 w-full" />
+        </div>
       ));
   };
 
@@ -101,7 +97,7 @@ const MainContainer: React.FC = () => {
               exit={{ opacity: 0 }}
               className="flex flex-col items-center justify-center h-[calc(100vh-120px)]"
             >
-              <h1 className="text-4xl font-bold mb-8">
+              <h1 className="text-4xl font-bold mb-8 text-foreground text-center">
                 Medical Concept Discovery
               </h1>
               <div className="w-full max-w-2xl">
@@ -131,7 +127,7 @@ const MainContainer: React.FC = () => {
 
               {loading ? (
                 <div>
-                  <h2 className="text-xl font-semibold mb-4">
+                  <h2 className="text-xl font-semibold mb-4 text-foreground">
                     Loading results...
                   </h2>
                   {renderSkeletons()}
@@ -145,7 +141,9 @@ const MainContainer: React.FC = () => {
                 </div>
               ) : searchResults && searchResults.length > 0 ? (
                 <>
-                  <h2 className="text-xl font-semibold mb-4">Results</h2>
+                  <h2 className="text-xl font-semibold mb-4 text-foreground">
+                    Results
+                  </h2>
                   {searchResults.map((item: any, index: number) =>
                     renderSearchResult(item, index),
                   )}
