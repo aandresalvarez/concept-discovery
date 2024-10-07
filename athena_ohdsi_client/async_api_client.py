@@ -81,9 +81,9 @@ class AsyncAthenaOHDSIAPI:
         params = {'query': query}
 
         if page_size is not None:
-            params['pageSize'] = page_size
+            params['pageSize'] = str(page_size)
         if page is not None:
-            params['page'] = page
+            params['page'] = str(page)
         if standard_concept is not None:
             params['standardConcept'] = standard_concept
         if domain is not None:
@@ -100,10 +100,13 @@ class AsyncAthenaOHDSIAPI:
                     response.raise_for_status()
                     data = await response.json()
                     logger.debug(f"Medical Concepts Response JSON: {data}")
-                    return MedicalConceptsResponse.parse_obj(data)
+                    return MedicalConceptsResponse.model_validate(data)
             except aiohttp.ClientResponseError as http_err:
+                # Ensure response is checked for valid text response
+                response_text = await response.text(
+                ) if response is not None else 'No response'
                 logger.error(
-                    f"HTTP error occurred: {http_err} - Response: {await response.text()}"
+                    f"HTTP error occurred: {http_err} - Response: {response_text}"
                 )
                 raise
             except asyncio.TimeoutError:

@@ -52,7 +52,12 @@ class AthenaOHDSIAPI:
         """
         self.base_url = base_url.rstrip('/')
         self.session = requests.Session()
-        self.session.timeout = session_timeout
+        self.session.mount(
+            'https://',
+            HTTPAdapter(
+                max_retries=Retry(total=3,
+                                  backoff_factor=0.3,
+                                  status_forcelist=[500, 502, 503, 504])))
 
         headers = {
             'Accept': 'application/json',
