@@ -3,5 +3,6 @@
     "serverError": "Error del servidor",
     "unknownError": "Error desconocido",
     "noResponseError": "No se recibió respuesta del servidor. Por favor, inténtelo de nuevo.",
-    "genericError": "Ocurrió un error"
+    "genericError": "Ocurrió un error",
+    "backToResults": "Volver a los Resultados"
 }

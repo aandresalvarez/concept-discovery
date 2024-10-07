@@ -1,0 +1,11 @@
+{
+  "title": "Découverte de Concepts Médicaux",
+  "searchPlaceholder": "Entrez un terme médical, par exemple 'aspirine'",
+  "loading": "Chargement des résultats...",
+  "noResults": "Aucun résultat trouvé. Essayez un autre terme de recherche.",
+  "results": "Résultats",
+  "synonymsFor": "Synonymes pour '{{term}}'",
+  "noConceptsFound": "Aucun concept trouvé pour '{{synonym}}'",
+  "conceptTable": "Tableau des Concepts",
+  "backToResults": "Retour aux Résultats"
+}

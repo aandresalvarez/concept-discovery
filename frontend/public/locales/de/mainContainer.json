@@ -1,0 +1,11 @@
+{
+  "title": "Entdeckung Medizinischer Konzepte",
+  "searchPlaceholder": "Geben Sie einen medizinischen Begriff ein, z.B. 'Aspirin'",
+  "loading": "Ergebnisse werden geladen...",
+  "noResults": "Keine Ergebnisse gefunden. Versuchen Sie einen anderen Suchbegriff.",
+  "results": "Ergebnisse",
+  "synonymsFor": "Synonyme für '{{term}}'",
+  "noConceptsFound": "Keine Konzepte gefunden für '{{synonym}}'",
+  "conceptTable": "Konzepttabelle",
+  "backToResults": "Zurück zu den Ergebnissen"
+}

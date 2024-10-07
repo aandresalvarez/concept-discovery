@@ -1,0 +1,8 @@
+{
+  "retry": "Réessayer",
+  "serverError": "Erreur du serveur",
+  "unknownError": "Erreur inconnue",
+  "noResponseError": "Aucune réponse reçue du serveur. Veuillez réessayer.",
+  "genericError": "Une erreur s'est produite",
+  "backToResults": "Retour aux Résultats"
+}

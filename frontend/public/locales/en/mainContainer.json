@@ -3,5 +3,9 @@
   "searchPlaceholder": "Enter a medical term, e.g., 'aspirin'",
   "loading": "Loading results...",
   "noResults": "No results found. Try another search term.",
-  "results": "Results"
+  "results": "Results",
+  "synonymsFor": "Synonyms for '{{term}}'",
+  "noConceptsFound": "No concepts found for '{{synonym}}'",
+  "conceptTable": "Concept Table",
+  "backToResults": "Back to Results"
 }

@@ -2,6 +2,10 @@
   "title": "Descubrimiento de Conceptos Médicos",
   "searchPlaceholder": "Ingrese un término médico, por ejemplo, 'aspirina'",
   "loading": "Cargando resultados...",
-  "noResults": "No se encontraron resultados. Pruebe con otro término de búsqueda.",
-  "results": "Resultados"
+  "noResults": "No se encontraron resultados. Intente con otro término de búsqueda.",
+  "results": "Resultados",
+  "synonymsFor": "Sinónimos para '{{term}}'",
+  "noConceptsFound": "No se encontraron conceptos para '{{synonym}}'",
+  "conceptTable": "Tabla de Conceptos",
+  "backToResults": "Volver a los Resultados"
 }

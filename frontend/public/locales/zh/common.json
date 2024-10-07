@@ -1,0 +1,8 @@
+{
+  "retry": "重试",
+  "serverError": "服务器错误",
+  "unknownError": "未知错误",
+  "noResponseError": "未收到服务器响应。请重试。",
+  "genericError": "发生错误",
+  "backToResults": "返回结果"
+}

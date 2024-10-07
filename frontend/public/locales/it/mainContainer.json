@@ -1,0 +1,11 @@
+{
+  "title": "Scoperta di Concetti Medici",
+  "searchPlaceholder": "Inserisci un termine medico, ad esempio 'aspirina'",
+  "loading": "Caricamento dei risultati...",
+  "noResults": "Nessun risultato trovato. Prova con un altro termine di ricerca.",
+  "results": "Risultati",
+  "synonymsFor": "Sinonimi per '{{term}}'",
+  "noConceptsFound": "Nessun concetto trovato per '{{synonym}}'",
+  "conceptTable": "Tabella dei Concetti",
+  "backToResults": "Torna ai Risultati"
+}

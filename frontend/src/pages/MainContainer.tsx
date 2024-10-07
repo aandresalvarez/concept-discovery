@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft } from "lucide-react";
 import axios from "axios";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface DisambiguationResult {
   term: string;
@@ -33,11 +34,13 @@ const MainContainer: React.FC = () => {
   const [synonyms, setSynonyms] = useState<SynonymResult[]>([]);
   const [conceptTable, setConceptTable] = useState<ConceptTableRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [conceptLoading, setConceptLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState<boolean>(false);
   const [selectedTerm, setSelectedTerm] = useState<DisambiguationResult | null>(
     null,
   );
+  const [selectedSynonym, setSelectedSynonym] = useState<string | null>(null);
   const [lastSearchTerm, setLastSearchTerm] = useState<string>("");
 
   const handleSearch = async (term: string) => {
@@ -46,6 +49,7 @@ const MainContainer: React.FC = () => {
     setLastSearchTerm(term);
     setHasSearched(true);
     setSelectedTerm(null);
+    setSelectedSynonym(null);
     setConceptTable([]);
 
     try {
@@ -64,6 +68,8 @@ const MainContainer: React.FC = () => {
     setLoading(true);
     setError(null);
     setSelectedTerm(term);
+    setSelectedSynonym(null);
+    setConceptTable([]);
 
     try {
       const response = await axios.get(`/api/synonyms`, {
@@ -78,8 +84,9 @@ const MainContainer: React.FC = () => {
   };
 
   const handleSynonymClick = async (synonym: string) => {
-    setLoading(true);
+    setConceptLoading(true);
     setError(null);
+    setSelectedSynonym(synonym);
 
     try {
       const response = await axios.get(`/api/concept_lookup`, {
@@ -89,12 +96,13 @@ const MainContainer: React.FC = () => {
     } catch (err: any) {
       handleError(err);
     } finally {
-      setLoading(false);
+      setConceptLoading(false);
     }
   };
 
   const handleBack = () => {
     setSelectedTerm(null);
+    setSelectedSynonym(null);
     setConceptTable([]);
   };
 
@@ -149,7 +157,7 @@ const MainContainer: React.FC = () => {
       className="mt-6 p-6 rounded-lg bg-accent/5 border border-accent/10"
     >
       {selectedTerm && (
-        <div className="mb-6 p-4 rounded-lg bg-primary/10 border border-primary/20">
+        <div className="mb-6 p-4">
           <h3 className="text-xl font-semibold mb-2 text-primary">
             {selectedTerm.term}
           </h3>
@@ -164,26 +172,51 @@ const MainContainer: React.FC = () => {
       <h3 className="text-xl font-semibold mb-4 text-primary">
         {t("synonymsFor", { term: selectedTerm?.term })}
       </h3>
-      <ul className="space-y-2">
+      <ToggleGroup
+        type="single"
+        value={selectedSynonym || ""}
+        className="flex flex-wrap gap-2"
+      >
         {synonyms.map((synonym, index) => (
-          <li key={index}>
-            <a
-              href="#"
-              onClick={(e) => {
-                e.preventDefault();
-                handleSynonymClick(synonym.synonym);
-              }}
-              className="text-primary hover:underline"
-            >
-              {synonym.synonym}
-            </a>
-          </li>
+          <ToggleGroupItem
+            key={index}
+            value={synonym.synonym}
+            onClick={() => handleSynonymClick(synonym.synonym)}
+            className={`px-3 py-1 rounded-full text-sm transition-colors duration-200 ${
+              selectedSynonym === synonym.synonym
+                ? "bg-primary text-primary-foreground"
+                : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"
+            }`}
+          >
+            {synonym.synonym}
+          </ToggleGroupItem>
         ))}
-      </ul>
+      </ToggleGroup>
     </motion.div>
   );
 
   const renderConceptTable = () => {
+    if (conceptLoading) {
+      return (
+        <div className="mt-6">
+          <Skeleton className="h-8 w-1/4 mb-4" />
+          <Skeleton className="h-10 w-full mb-2" />
+          <Skeleton className="h-10 w-full mb-2" />
+          <Skeleton className="h-10 w-full mb-2" />
+        </div>
+      );
+    }
+
+    if (conceptTable.length === 0 && selectedSynonym) {
+      return (
+        <div className="mt-6 p-6 rounded-lg bg-accent/5 border border-accent/10">
+          <p className="text-center text-muted-foreground">
+            {t("noConceptsFound", { synonym: selectedSynonym })}
+          </p>
+        </div>
+      );
+    }
+
     if (conceptTable.length === 0) return null;
 
     return (
@@ -321,8 +354,7 @@ const MainContainer: React.FC = () => {
                 </>
               )}
 
-              {/* "Back to Results" Button */}
-              {(selectedTerm || conceptTable.length > 0) && (
+              {selectedTerm && (
                 <div className="mt-6">
                   <Button
                     onClick={handleBack}
