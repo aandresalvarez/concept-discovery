@@ -102,7 +102,9 @@ const MainContainer: React.FC = () => {
     console.error("API call error:", err);
     if (err.response) {
       setError(
-        `${t("serverError", { ns: "common" })}: ${err.response.data.detail || t("unknownError", { ns: "common" })}`,
+        `${t("serverError", { ns: "common" })}: ${
+          err.response.data.detail || t("unknownError", { ns: "common" })
+        }`,
       );
     } else if (err.request) {
       setError(t("noResponseError", { ns: "common" }));
@@ -242,7 +244,7 @@ const MainContainer: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main className="flex-1 container mx-auto px-4 py-6">
+      <main className="flex flex-col flex-1 container mx-auto px-4 py-6">
         <AnimatePresence mode="wait">
           {!hasSearched ? (
             <motion.div
@@ -250,7 +252,7 @@ const MainContainer: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex flex-col items-center justify-center h-[calc(100vh-120px)]"
+              className="flex flex-col items-center justify-center flex-grow"
             >
               <h1 className="text-4xl font-bold mb-8 text-foreground text-center">
                 {t("title", { ns: "mainContainer" })}
@@ -270,6 +272,7 @@ const MainContainer: React.FC = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              className="flex flex-col flex-grow"
             >
               <div className="mb-6">
                 <SearchBox
@@ -323,8 +326,9 @@ const MainContainer: React.FC = () => {
                 <div className="mt-6">
                   <Button
                     onClick={handleBack}
-                    className="w-full flex items-center justify-center"
+                    className="w-full flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-accent"
                     variant="outline"
+                    aria-label={t("backToResults", { ns: "common" })}
                   >
                     <ChevronLeft className="mr-2 h-4 w-4" />
                     {t("backToResults", { ns: "common" })}
