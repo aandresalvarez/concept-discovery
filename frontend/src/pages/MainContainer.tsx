@@ -87,16 +87,7 @@ const MainContainer: React.FC = () => {
       });
       setConceptTable(response.data.concepts);
     } catch (err: any) {
-      console.error("API call error:", err);
-      if (err.response && err.response.status === 500) {
-        setError(
-          `${t("serverError", { ns: "common" })}: ${err.response.data.detail || t("unknownError", { ns: "common" })}`,
-        );
-      } else if (err.request) {
-        setError(t("noResponseError", { ns: "common" }));
-      } else {
-        setError(`${t("genericError", { ns: "common" })}: ${err.message}`);
-      }
+      handleError(err);
     } finally {
       setLoading(false);
     }
@@ -187,14 +178,6 @@ const MainContainer: React.FC = () => {
           </li>
         ))}
       </ul>
-      <Button
-        onClick={handleBack}
-        className="mt-6 w-full flex items-center justify-center"
-        variant="outline"
-      >
-        <ChevronLeft className="mr-2 h-4 w-4" />
-        {t("backToResults", { ns: "common" })}
-      </Button>
     </motion.div>
   );
 
@@ -311,23 +294,41 @@ const MainContainer: React.FC = () => {
                     {t("retry", { ns: "common" })}
                   </Button>
                 </div>
-              ) : selectedTerm ? (
+              ) : (
                 <>
-                  {renderSynonyms()}
-                  {renderConceptTable()}
-                </>
-              ) : searchResults.length > 0 ? (
-                <>
-                  <h2 className="text-xl font-semibold mb-4 text-foreground">
-                    {t("results", { ns: "mainContainer" })}
-                  </h2>
-                  {searchResults.map((item, index) =>
-                    renderSearchResult(item, index),
+                  {selectedTerm ? (
+                    <>
+                      {renderSynonyms()}
+                      {renderConceptTable()}
+                    </>
+                  ) : searchResults.length > 0 ? (
+                    <>
+                      <h2 className="text-xl font-semibold mb-4 text-foreground">
+                        {t("results", { ns: "mainContainer" })}
+                      </h2>
+                      {searchResults.map((item, index) =>
+                        renderSearchResult(item, index),
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-center text-muted-foreground">
+                      {t("noResults", { ns: "mainContainer" })}
+                    </div>
                   )}
                 </>
-              ) : (
-                <div className="text-center text-muted-foreground">
-                  {t("noResults", { ns: "mainContainer" })}
+              )}
+
+              {/* "Back to Results" Button */}
+              {(selectedTerm || conceptTable.length > 0) && (
+                <div className="mt-6">
+                  <Button
+                    onClick={handleBack}
+                    className="w-full flex items-center justify-center"
+                    variant="outline"
+                  >
+                    <ChevronLeft className="mr-2 h-4 w-4" />
+                    {t("backToResults", { ns: "common" })}
+                  </Button>
                 </div>
               )}
             </motion.div>
