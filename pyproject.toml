@@ -12,6 +12,7 @@ ell-ai = {extras = ["all"], version = "^0.0.13"}
 openai = "^1.51.0"
 pydantic = "^2.9.2"
 requests = "^2.32.3"
+aiohttp = "^3.10.9"
 
 [tool.pyright]
 # https://github.com/microsoft/pyright/blob/main/docs/configuration.md

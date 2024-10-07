@@ -1,0 +1,51 @@
+# async_example.py
+
+import asyncio
+from athena_ohdsi_client.async_api_client import AsyncAthenaOHDSIAPI
+from pydantic import ValidationError
+import aiohttp
+
+
+async def main():
+    # Initialize the asynchronous API client without passing the API key
+    # This ensures no Authorization header is sent
+    api_client = AsyncAthenaOHDSIAPI()
+    try:
+        # Example 1: Retrieve medical concepts with a search query
+        concepts_response = await api_client.get_medical_concepts(
+            query="diabetes",
+            page_size=10,
+            page=1,
+            standard_concept="Standard",
+            domain="Condition",
+            vocabulary="SNOMED")
+        print("Medical Concepts Response:")
+        for concept in concepts_response.content:
+            print(f"- {concept.id}: {concept.name} ({concept.vocabulary})")
+
+        # Example 2: Retrieve relationships for a specific concept ID
+        concept_id = 4220821  # Replace with a valid concept ID from your successful curl response
+        relationships_response = await api_client.get_concept_relationships(
+            concept_id)
+        print(f"\nRelationships for Concept ID {concept_id}:")
+        for item in relationships_response.items:
+            print(f"Relationship Name: {item.relationshipName}")
+            for relationship in item.relationships:
+                print(
+                    f"  - {relationship.relationshipName} -> {relationship.targetConceptName} ({relationship.targetVocabularyId})"
+                )
+
+    except aiohttp.ClientResponseError as http_err:
+        print(f"HTTP error occurred: {http_err}")  # Handle HTTP errors
+    except ValidationError as val_err:
+        print(f"Data validation error: {val_err}"
+              )  # Handle data validation errors
+    except Exception as err:
+        print(f"An unexpected error occurred: {err}"
+              )  # Handle other possible errors
+    finally:
+        await api_client.close()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
