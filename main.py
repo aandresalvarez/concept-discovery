@@ -4,7 +4,7 @@ from fastapi import FastAPI, Query, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from workflow import testurl, disambiguate, generate_synonyms
+from workflow import testurl, disambiguate, generate_synonyms, concept_lookup
 import logging
 import traceback
 
@@ -44,6 +44,31 @@ class SynonymResult(BaseModel):
 class SynonymResponse(BaseModel):
     synonyms: List[SynonymResult] = Field(
         description="List of synonyms with their relevance scores")
+
+
+# Add this new model
+class ConceptTableRow(BaseModel):
+    concept_id: int
+    name: str
+    domain: str
+    vocabulary: str
+    standard_concept: str
+
+
+class ConceptTableResponse(BaseModel):
+    concepts: List[ConceptTableRow]
+
+
+@app.get("/api/concept_lookup")
+async def get_concept_table(term: str, language: str):
+    try:
+        response = concept_lookup(term, language)
+        concepts = response.parsed.concepts
+        return {"concepts": [concept.dict() for concept in concepts]}
+    except Exception as e:
+        logger.error(f"An error occurred during concept lookup: {str(e)}")
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api/synonyms", response_model=SynonymResponse)

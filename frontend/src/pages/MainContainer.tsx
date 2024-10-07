@@ -15,7 +15,14 @@ interface DisambiguationResult {
 
 interface SynonymResult {
   synonym: string;
-  relevance: number;
+}
+
+interface ConceptTableRow {
+  concept_id: number;
+  name: string;
+  domain: string;
+  vocabulary: string;
+  standard_concept: string;
 }
 
 const MainContainer: React.FC = () => {
@@ -24,6 +31,7 @@ const MainContainer: React.FC = () => {
     [],
   );
   const [synonyms, setSynonyms] = useState<SynonymResult[]>([]);
+  const [conceptTable, setConceptTable] = useState<ConceptTableRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState<boolean>(false);
@@ -38,12 +46,12 @@ const MainContainer: React.FC = () => {
     setLastSearchTerm(term);
     setHasSearched(true);
     setSelectedTerm(null);
+    setConceptTable([]);
 
     try {
       const response = await axios.get(`/api/search`, {
         params: { term, language: i18n.language },
       });
-
       setSearchResults(response.data.results);
     } catch (err: any) {
       handleError(err);
@@ -61,7 +69,6 @@ const MainContainer: React.FC = () => {
       const response = await axios.get(`/api/synonyms`, {
         params: { term: term.term, language: i18n.language },
       });
-
       setSynonyms(response.data.synonyms);
     } catch (err: any) {
       handleError(err);
@@ -70,8 +77,34 @@ const MainContainer: React.FC = () => {
     }
   };
 
+  const handleSynonymClick = async (synonym: string) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await axios.get(`/api/concept_lookup`, {
+        params: { term: synonym, language: i18n.language },
+      });
+      setConceptTable(response.data.concepts);
+    } catch (err: any) {
+      console.error("API call error:", err);
+      if (err.response && err.response.status === 500) {
+        setError(
+          `${t("serverError", { ns: "common" })}: ${err.response.data.detail || t("unknownError", { ns: "common" })}`,
+        );
+      } else if (err.request) {
+        setError(t("noResponseError", { ns: "common" }));
+      } else {
+        setError(`${t("genericError", { ns: "common" })}: ${err.message}`);
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleBack = () => {
     setSelectedTerm(null);
+    setConceptTable([]);
   };
 
   const handleError = (err: any) => {
@@ -97,86 +130,131 @@ const MainContainer: React.FC = () => {
     }
   };
 
-  const renderSearchResult = (item: DisambiguationResult, index: number) => {
-    return (
-      <motion.div
-        key={index}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3, delay: index * 0.1 }}
-        className="mb-6 p-4 rounded-lg hover:bg-accent/5 transition-colors duration-200 border border-accent/10 sm:border-0 sm:hover:border-accent/10 cursor-pointer"
-        onClick={() => handleDisambiguationSelect(item)}
-      >
-        <h3 className="text-lg font-semibold mb-2 text-primary">{item.term}</h3>
-        <p className="text-sm text-muted-foreground mb-2 inline-block bg-accent/10 px-2 py-1 rounded">
-          {item.category}
-        </p>
-        <p className="text-sm text-foreground mt-2">{item.definition}</p>
-      </motion.div>
-    );
-  };
+  const renderSearchResult = (item: DisambiguationResult, index: number) => (
+    <motion.div
+      key={index}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3, delay: index * 0.1 }}
+      className="mb-6 p-4 rounded-lg hover:bg-accent/5 transition-colors duration-200 border border-accent/10 sm:border-0 sm:hover:border-accent/10 cursor-pointer"
+      onClick={() => handleDisambiguationSelect(item)}
+    >
+      <h3 className="text-lg font-semibold mb-2 text-primary">{item.term}</h3>
+      <p className="text-sm text-muted-foreground mb-2 inline-block bg-accent/10 px-2 py-1 rounded">
+        {item.category}
+      </p>
+      <p className="text-sm text-foreground mt-2">{item.definition}</p>
+    </motion.div>
+  );
 
-  const renderSynonyms = () => {
+  const renderSynonyms = () => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      transition={{ duration: 0.3 }}
+      className="mt-6 p-6 rounded-lg bg-accent/5 border border-accent/10"
+    >
+      {selectedTerm && (
+        <div className="mb-6 p-4 rounded-lg bg-primary/10 border border-primary/20">
+          <h3 className="text-xl font-semibold mb-2 text-primary">
+            {selectedTerm.term}
+          </h3>
+          <p className="text-sm text-muted-foreground mb-2 inline-block bg-primary/20 px-2 py-1 rounded">
+            {selectedTerm.category}
+          </p>
+          <p className="text-sm text-foreground mt-2">
+            {selectedTerm.definition}
+          </p>
+        </div>
+      )}
+      <h3 className="text-xl font-semibold mb-4 text-primary">
+        {t("synonymsFor", { term: selectedTerm?.term })}
+      </h3>
+      <ul className="space-y-2">
+        {synonyms.map((synonym, index) => (
+          <li key={index}>
+            <a
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                handleSynonymClick(synonym.synonym);
+              }}
+              className="text-primary hover:underline"
+            >
+              {synonym.synonym}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <Button
+        onClick={handleBack}
+        className="mt-6 w-full flex items-center justify-center"
+        variant="outline"
+      >
+        <ChevronLeft className="mr-2 h-4 w-4" />
+        {t("backToResults", { ns: "common" })}
+      </Button>
+    </motion.div>
+  );
+
+  const renderConceptTable = () => {
+    if (conceptTable.length === 0) return null;
+
     return (
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -20 }}
         transition={{ duration: 0.3 }}
         className="mt-6 p-6 rounded-lg bg-accent/5 border border-accent/10"
       >
-        {selectedTerm && (
-          <div className="mb-6 p-4 rounded-lg bg-primary/10 border border-primary/20">
-            <h3 className="text-xl font-semibold mb-2 text-primary">
-              {selectedTerm.term}
-            </h3>
-            <p className="text-sm text-muted-foreground mb-2 inline-block bg-primary/20 px-2 py-1 rounded">
-              {selectedTerm.category}
-            </p>
-            <p className="text-sm text-foreground mt-2">
-              {selectedTerm.definition}
-            </p>
-          </div>
-        )}
         <h3 className="text-xl font-semibold mb-4 text-primary">
-          {t("synonymsFor", { term: selectedTerm?.term })}
+          {t("conceptTable")}
         </h3>
-        <ul className="space-y-2">
-          {synonyms.map((synonym, index) => (
-            <li key={index} className="flex items-center justify-between">
-              <span className="text-foreground">{synonym.synonym}</span>
-              <span className="text-sm text-muted-foreground">
-                {t("relevance")}: {(synonym.relevance * 100).toFixed(0)}%
-              </span>
-            </li>
-          ))}
-        </ul>
-        <Button
-          onClick={handleBack}
-          className="mt-6 w-full flex items-center justify-center"
-          variant="outline"
-        >
-          <ChevronLeft className="mr-2 h-4 w-4" />
-          {t("backToResults", { ns: "common" })}
-        </Button>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm text-left text-foreground">
+            <thead className="text-xs text-foreground uppercase bg-accent/10">
+              <tr>
+                <th className="px-6 py-3">Concept ID</th>
+                <th className="px-6 py-3">Name</th>
+                <th className="px-6 py-3">Domain</th>
+                <th className="px-6 py-3">Vocabulary</th>
+                <th className="px-6 py-3">Standard Concept</th>
+              </tr>
+            </thead>
+            <tbody>
+              {conceptTable.map((row, index) => (
+                <tr key={index} className="bg-background border-b">
+                  <td className="px-6 py-4">{row.concept_id}</td>
+                  <td className="px-6 py-4">{row.name}</td>
+                  <td className="px-6 py-4">{row.domain}</td>
+                  <td className="px-6 py-4">{row.vocabulary}</td>
+                  <td className="px-6 py-4">{row.standard_concept}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </motion.div>
     );
   };
 
-  const renderSkeletons = () => {
-    return Array(3)
-      .fill(null)
-      .map((_, index) => (
-        <div
-          key={index}
-          className="mb-6 p-4 border border-accent/10 sm:border-0 rounded-lg"
-        >
-          <Skeleton className="h-6 w-3/4 mb-2" />
-          <Skeleton className="h-4 w-1/3 mb-2" />
-          <Skeleton className="h-4 w-full" />
-        </div>
-      ));
-  };
+  const renderSkeletons = () => (
+    <>
+      {Array(3)
+        .fill(null)
+        .map((_, index) => (
+          <div
+            key={index}
+            className="mb-6 p-4 border border-accent/10 sm:border-0 rounded-lg"
+          >
+            <Skeleton className="h-6 w-3/4 mb-2" />
+            <Skeleton className="h-4 w-1/3 mb-2" />
+            <Skeleton className="h-4 w-full" />
+          </div>
+        ))}
+    </>
+  );
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -234,7 +312,10 @@ const MainContainer: React.FC = () => {
                   </Button>
                 </div>
               ) : selectedTerm ? (
-                renderSynonyms()
+                <>
+                  {renderSynonyms()}
+                  {renderConceptTable()}
+                </>
               ) : searchResults.length > 0 ? (
                 <>
                   <h2 className="text-xl font-semibold mb-4 text-foreground">

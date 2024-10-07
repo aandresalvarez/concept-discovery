@@ -44,6 +44,33 @@ class SynonymResponse(BaseModel):
         description="List of synonyms with their relevance scores")
 
 
+class ConceptTableRow(BaseModel):
+    concept_id: int = Field(
+        ..., description="The unique identifier for the concept")
+    name: str = Field(..., description="The name of the concept")
+    domain: str = Field(..., description="The domain of the concept")
+    vocabulary: str = Field(
+        ..., description="The vocabulary the concept belongs to")
+    standard_concept: str = Field(
+        ..., description="Whether the concept is a standard concept")
+
+
+class ConceptResponse(BaseModel):
+    concepts: List[ConceptTableRow]
+
+
+@ell.complex(model="gpt-4o-mini", response_format=ConceptResponse)
+def concept_lookup(term: str, language: str) -> List[ell.Message]:
+    """You are a medical database expert. For the given medical term in {language}, 
+    provide a list of up to 5 relevant concepts with their Concept ID, Name, Domain, Vocabulary, and Standard Concept status.
+    Use realistic-looking data for demonstration purposes."""
+    return [
+        ell.system(
+            f"Provide concept information for the medical term '{term}' in {language}."
+        ),
+    ]
+
+
 @ell.complex(model="gpt-4o-mini", response_format=SynonymResponse)
 def generate_synonyms(term: str, language: str) -> List[ell.Message]:
     """
