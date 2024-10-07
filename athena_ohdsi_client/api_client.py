@@ -39,7 +39,7 @@ class AthenaOHDSIAPI:
                  retries: int = 3,
                  backoff_factor: float = 0.3,
                  status_forcelist: list = [500, 502, 503, 504],
-                 session_timeout: int = 10):
+                 session_timeout: Optional[int] = None):  # noqa: ARG002
         """
         Initializes the API client with enhanced configurations.
 
