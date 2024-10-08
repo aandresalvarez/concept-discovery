@@ -1,4 +1,5 @@
 # worflow.py
+from traceback import print_exc
 import ell
 from typing import List, Optional
 from ell.types import Message
@@ -171,6 +172,13 @@ vocabulary"""),
     ]
 
 
+@ell.simple(model="gpt-4o-mini", temperature=0.0)
+def translate(termed: str, language: str = "en"):
+    """
+    Translates a given term to the specified language. Only anser with the translated term and nothing else."""
+    return f"{termed} trasnlated to {language} is : !"
+
+
 @ell.complex(
     model="gpt-4o-mini",
     response_format=ConceptResponse)  # Use complex for structured output
@@ -178,15 +186,22 @@ def concept_lookup(term: str, language: str = "en") -> List[Message]:
     """
     Looks up a medical term in the OMOP database and returns structured concept information.
     """
-    concepts_json = find_omop_concept(term, language)
+    string_to_search = translate(term, "english")
+    logger.debug(f"Received term: {term}, language: {language}")
+    print(f"EL string tosearthc:::: {string_to_search}")
+    concepts_json = find_omop_concept(string_to_search, language)
 
     try:
         # Attempt to parse the JSON. If it's an error, send it to the LMP to handle.
         json.loads(concepts_json)
         return [
-            ell.system(
-                "You are a medical information retrieval system. You receive a JSON string containing medical concepts. Return the concepts as a structured list."
-            ),
+            ell.system(f"""You are a medical information retrieval system. 
+                You receive a JSON string containing medical concepts or an error message.
+                If the input is valid concept data, translate the 'name', 'domain', 'vocabulary', and 'standardConcept' fields into {language} and then
+                return the concepts as a structured list of ConceptTableRow objects. 
+                If the input is an error message or no concepts are found, return an empty list, but still structure your response
+                as a valid ConceptResponse.  Ensure all fields of ConceptResponse and ConceptTableRow are present, even if empty."""
+                       ),
             ell.user(concepts_json)
         ]
     except json.JSONDecodeError:
