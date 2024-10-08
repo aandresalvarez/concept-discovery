@@ -1,10 +1,11 @@
+# main.py
 import os
 from typing import Union, List
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from workflow import testurl, disambiguate, generate_synonyms, concept_lookup
+from workflow import disambiguate, generate_synonyms, concept_lookup
 import logging
 import traceback
 
@@ -46,7 +47,6 @@ class SynonymResponse(BaseModel):
         description="List of synonyms with their relevance scores")
 
 
-# Add this new model
 class ConceptTableRow(BaseModel):
     concept_id: int
     name: str
@@ -63,8 +63,10 @@ class ConceptTableResponse(BaseModel):
 async def get_concept_table(term: str, language: str):
     try:
         response = concept_lookup(term, language)
-        concepts = response.parsed.concepts
-        return {"concepts": [concept.dict() for concept in concepts]}
+        concepts = response.parsed.concepts  # Access the parsed concepts
+        return {
+            "concepts": [concept.model_dump() for concept in concepts]
+        }  # Use model_dump for dictionaries
     except Exception as e:
         logger.error(f"An error occurred during concept lookup: {str(e)}")
         logger.error(traceback.format_exc())
@@ -81,12 +83,6 @@ async def get_synonyms(term: str = Query(..., min_length=1),
     except Exception as e:
         raise HTTPException(status_code=500,
                             detail=f"An error occurred: {str(e)}")
-
-
-# Make sure this is at the end of your file
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
 
 
 @app.get("/api/search", response_model=SearchResponse)

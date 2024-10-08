@@ -1,30 +1,18 @@
+# worflow.py
 import ell
-import requests
 from typing import List, Optional
 from ell.types import Message
 from pydantic import BaseModel, Field
 from enum import Enum
-from pydantic import HttpUrl  # Add this import
+from athena_ohdsi_client import AthenaOHDSIAPI
+import logging, json
+
+# Configure logging
+logging.basicConfig(level=logging.ERROR)
+logger = logging.getLogger(__name__)
 
 
-# Data models for structured outputs and tool parameters
-class WebSearchToolParams(BaseModel):
-    query: str = Field(..., description="The search query")
-    language: str = Field(..., description="The language of the query")
-
-
-class AthenaLookupParams(BaseModel):
-    concept_name: str = Field(description="Concept to search for in Athena")
-    synonyms: Optional[List[str]] = Field(
-        default_factory=list, description="Synonyms for the concept")
-
-
-class SearchResult(BaseModel):
-    title: str
-    snippet: str
-    link: HttpUrl  # Replace ell.HttpUrl with pydantic's HttpUrl
-
-
+# Data models for structured outputs
 class Concept(BaseModel):
     concept_id: int
     concept_name: str
@@ -33,15 +21,13 @@ class Concept(BaseModel):
     concept_class_id: str
 
 
-class SynonymResult(BaseModel):
-    synonym: str = Field(description="A synonym for the given term")
-    relevance: float = Field(
-        description="The relevance score of the synonym, between 0 and 1")
-
-
-class SynonymResponse(BaseModel):
-    synonyms: List[SynonymResult] = Field(
-        description="List of synonyms with their relevance scores")
+# Data model for structured output of the table
+class ConceptTable(BaseModel):
+    headers: List[str] = [
+        "ID", "Code", "Name", "Class", "Standard Concept", "Invalid Reason",
+        "Domain", "Vocabulary"
+    ]
+    rows: List[List[str]]
 
 
 class ConceptTableRow(BaseModel):
@@ -59,20 +45,20 @@ class ConceptResponse(BaseModel):
     concepts: List[ConceptTableRow]
 
 
-@ell.complex(model="gpt-4o-mini", response_format=ConceptResponse)
-def concept_lookup(term: str, language: str) -> List[ell.Message]:
-    """You are a medical database expert. For the given medical term in {language}, 
-    provide a list of up to 5 relevant concepts with their Concept ID, Name, Domain, Vocabulary, and Standard Concept status.
-    Use realistic-looking data for demonstration purposes."""
-    return [
-        ell.system(
-            f"Provide concept information for the medical term '{term}' in {language}."
-        ),
-    ]
+class SynonymResult(BaseModel):
+    synonym: str = Field(description="A synonym for the given term")
+    relevance: float = Field(
+        description="The relevance score of the synonym, between 0 and 1")
 
 
+class SynonymResponse(BaseModel):
+    synonyms: List[SynonymResult] = Field(
+        description="List of synonyms with their relevance scores")
+
+
+# LMP for generating synonyms
 @ell.complex(model="gpt-4o-mini", response_format=SynonymResponse)
-def generate_synonyms(term: str, language: str) -> List[ell.Message]:
+def generate_synonyms(term: str, language: str) -> List[Message]:
     """
     Generate synonyms for a given term in the specified language.
     """
@@ -86,6 +72,7 @@ def generate_synonyms(term: str, language: str) -> List[ell.Message]:
     ]
 
 
+# LMP for concept disambiguation
 @ell.simple(model="gpt-4o-mini")
 def disambiguate(term: str, language: str = "en") -> List[Message]:
     """
@@ -109,69 +96,111 @@ def disambiguate(term: str, language: str = "en") -> List[Message]:
     ]
 
 
-# Tools
-@ell.tool(exempt_from_tracking=True)  # Exempting web search from tracking
-def web_search(params: WebSearchToolParams) -> List[SearchResult]:
-    """Performs a web search and returns the results."""
-    # Replace with actual web search logic (e.g., using SerpApi or similar)
-    # This example returns mock results
-    results = [
-        SearchResult(
-            title=f"Result {i+1} for {params.query}",
-            snippet="Mock snippet",
-            link="http://example.com",
-        ) for i in range(3)
-    ]
-    return results
-
-
-@ell.tool()
-def athena_lookup(params: AthenaLookupParams) -> List[Concept]:
-    """Looks up a concept in Athena and returns matching concepts."""
-    # Replace with actual Athena API call (using concept name or synonyms)
-    ATHENA_API_BASE = (
-        "your athena api url"  # Replace with the actual base URL
-    )
-    url = f"{ATHENA_API_BASE}/concepts?name={params.concept_name}"
-
-    if params.synonyms:
-        url += f"&synonyms={','.join(params.synonyms)}"
-
-    try:
-        response = requests.get(url)
-        response.raise_for_status()
-        concept_data = response.json()  # Assumes JSON response
-        concepts = [Concept(**concept) for concept in concept_data]
-        return concepts
-
-    except requests.exceptions.RequestException as e:
-        print(f"Error calling Athena API: {e}")
-        return []  # Return an empty list on failure
-
-
-# Define language support (can be extended)
-class Language(str, Enum):
-    ENGLISH = "en"
-    SPANISH = "es"
-    POLISH = "pl"
-
-
-# Main LMP
-@ell.complex(model="gpt-4o-mini", tools=[athena_lookup])
+# Main function for finding OMOP concept (not an LMP)
 def find_omop_concept(
     chosen_term: str,
-    language: Language = Language.ENGLISH,
+    language: str = "en",
     synonyms: Optional[List[str]] = None,
-) -> List[Concept]:
+) -> str:  # Returns a JSON string
     """
-    Finds the OMOP standard concept ID for a given medical term.
+    Finds the OMOP standard concept ID for a given medical term by directly calling Athena and returns a JSON string.
     """
-    concepts = athena_lookup(
-        AthenaLookupParams(concept_name=chosen_term, synonyms=synonyms))
-    return concepts
+    logger.debug(
+        f"Starting find_omop_concept with term: {chosen_term}, synonyms: {synonyms}"
+    )
+
+    with AthenaOHDSIAPI() as api_client:
+        try:
+            # Construct the query string
+            query = chosen_term
+            if synonyms:
+                query += " OR " + " OR ".join(synonyms)
+
+            logger.debug(f"Constructed query: {query}")
+
+            # Call the API
+            logger.debug("Calling Athena API...")
+            response = api_client.get_medical_concepts(
+                query=query,
+                page_size=20,  # Adjust as needed
+                standard_concept="Standard",
+            )
+
+            if not response or not hasattr(response, "content"):
+                logger.error("No valid content returned from Athena API.")
+                return json.dumps({"error": "No concepts found."
+                                   })  # Return JSON error message
+
+            logger.debug("Athena API call successful.")
+
+            # Convert the response to ConceptTableRow objects and then to a list of dictionaries
+            concept_table_rows = [
+                ConceptTableRow(
+                    concept_id=concept.id,
+                    name=concept.name,
+                    domain=concept.domain,
+                    vocabulary=concept.vocabulary,
+                    standard_concept=concept.standardConcept,
+                ).model_dump()  # Convert to dictionary
+                for concept in response.content
+            ]
+
+            # Create the ConceptResponse dictionary
+            concept_response = {"concepts": concept_table_rows}
+
+            return json.dumps(concept_response, indent=2)  # Return JSON string
+
+        except Exception as e:
+            logger.exception(f"Error calling Athena API: {e}")
+            return json.dumps({"error": str(e)})  # Return JSON error message
 
 
-@ell.simple(model="gpt-4o-mini")
-def testurl(prompt: str) -> List[str]:
-    """Generates synonyms for a given term using an LLM."""
-    return f"Say hello to {prompt}!"
+@ell.complex(model="gpt-4o-mini")
+def format_concept_table(concepts_json: str):
+
+    return [
+        ell.system("""generate a well formated table with columns: id
+code
+name
+className
+standardConcept
+invalidReason
+domain
+vocabulary"""),
+        ell.user(f"createa table for : {concepts_json}.")
+    ]
+
+
+@ell.complex(
+    model="gpt-4o-mini",
+    response_format=ConceptResponse)  # Use complex for structured output
+def concept_lookup(term: str, language: str = "en") -> List[Message]:
+    """
+    Looks up a medical term in the OMOP database and returns structured concept information.
+    """
+    concepts_json = find_omop_concept(term, language)
+
+    try:
+        # Attempt to parse the JSON. If it's an error, send it to the LMP to handle.
+        json.loads(concepts_json)
+        return [
+            ell.system(
+                "You are a medical information retrieval system. You receive a JSON string containing medical concepts. Return the concepts as a structured list."
+            ),
+            ell.user(concepts_json)
+        ]
+    except json.JSONDecodeError:
+        # If JSON parsing fails (likely an error message), handle it gracefully.
+        return [
+            ell.system(
+                "You are a medical information retrieval system. You sometimes receive error messages instead of concept data. If you receive an error, return an empty list of concepts."
+            ),
+            ell.user(concepts_json)
+        ]
+
+
+# Example usage:
+# concepts_json = find_omop_concept("cystic fibrosis", "en")
+
+# format_concept_table(concepts_json)
+# print(table_message)

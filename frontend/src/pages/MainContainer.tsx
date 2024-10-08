@@ -92,7 +92,15 @@ const MainContainer: React.FC = () => {
       const response = await axios.get(`/api/concept_lookup`, {
         params: { term: synonym, language: i18n.language },
       });
-      setConceptTable(response.data.concepts);
+
+      if (response.data.concepts && response.data.concepts.length > 0) {
+        setConceptTable(response.data.concepts);
+      } else {
+        // Handle the case where no concepts are found.  For example:
+        setConceptTable([]); // Clear the table
+        // Optionally, display a "no concepts found" message to the user.
+        // You could use a state variable for this and conditionally render a message.
+      }
     } catch (err: any) {
       handleError(err);
     } finally {
