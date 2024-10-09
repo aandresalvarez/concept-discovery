@@ -12,5 +12,7 @@
   "name": "Название",
   "domain": "Область",
   "vocabulary": "Словарь",
-  "standardConcept": "Стандартная Концепция"
+  "standardConcept": "Стандартная Концепция",
+  "usage": "Использование",
+  "context": "Контекст"
 }

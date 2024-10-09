@@ -3,6 +3,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { SearchBox, Header } from "@/components";
 import { Button } from "@/components/ui/button";
+import { Separator } from "@/components/ui/separator";
+
 import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft } from "lucide-react";
 import axios from "axios";
@@ -152,14 +154,13 @@ const MainContainer: React.FC = () => {
       onClick={() => handleDisambiguationSelect(item)}
     >
       <h3 className="text-lg font-semibold mb-2 text-primary">{item.term}</h3>
-      <p className="text-sm text-muted-foreground mb-2 inline-block bg-accent/10 px-2 py-1 rounded">
-        {item.category}
-      </p>
-      <p className="text-sm text-foreground mt-2">{item.definition}</p>
-      <p className="text-sm text-foreground mt-2">
+      <Separator />
+
+      <p className="text-base text-foreground mt-2">{item.definition}</p>
+      <p className="text-base text-foreground mt-2">
         <strong>{t("usage")}:</strong> {item.usage}
       </p>
-      <p className="text-sm text-foreground mt-2">
+      <p className="text-base text-foreground mt-2">
         <strong>{t("context")}:</strong> {item.context}
       </p>
     </motion.div>
@@ -178,16 +179,15 @@ const MainContainer: React.FC = () => {
           <h3 className="text-xl font-semibold mb-2 text-primary">
             {selectedTerm.term}
           </h3>
-          <p className="text-sm text-muted-foreground mb-2 inline-block bg-primary/20 px-2 py-1 rounded">
-            {selectedTerm.category}
-          </p>
-          <p className="text-sm text-foreground mt-2">
+          <Separator />
+
+          <p className="text-base text-foreground mt-2">
             {selectedTerm.definition}
           </p>
-          <p className="text-sm text-foreground mt-2">
+          <p className="text-base text-foreground mt-2">
             <strong>{t("usage")}:</strong> {selectedTerm.usage}
           </p>
-          <p className="text-sm text-foreground mt-2">
+          <p className="text-base text-foreground mt-2">
             <strong>{t("context")}:</strong> {selectedTerm.context}
           </p>
         </div>
@@ -205,7 +205,7 @@ const MainContainer: React.FC = () => {
             key={index}
             value={synonym.synonym}
             onClick={() => handleSynonymClick(synonym.synonym)}
-            className={`px-3 py-1 rounded-full text-sm transition-colors duration-200 ${
+            className={`px-3 py-1 rounded-lg text-base transition-colors duration-200 ${
               selectedSynonym === synonym.synonym
                 ? "bg-primary text-primary-foreground"
                 : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"
@@ -253,7 +253,7 @@ const MainContainer: React.FC = () => {
           {t("conceptTable")}
         </h3>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left text-foreground">
+          <table className="w-full text-base text-left text-foreground">
             <thead className="text-xs text-foreground uppercase bg-accent/10">
               <tr>
                 <th className="px-6 py-3">{t("conceptId")}</th>

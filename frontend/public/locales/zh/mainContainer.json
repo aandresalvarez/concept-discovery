@@ -12,5 +12,7 @@
   "name": "名称",
   "domain": "领域",
   "vocabulary": "词汇表",
-  "standardConcept": "标准概念"
+  "standardConcept": "标准概念",
+  "usage": "使用",
+  "context": "上下文"
 }

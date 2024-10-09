@@ -12,5 +12,7 @@
   "name": "Nome",
   "domain": "Dominio",
   "vocabulary": "Vocabolario",
-  "standardConcept": "Concetto Standard"
+  "standardConcept": "Concetto Standard",
+  "usage": "Utilizzo",
+  "context": "Contesto"
 }
