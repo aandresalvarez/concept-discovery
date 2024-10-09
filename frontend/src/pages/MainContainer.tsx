@@ -266,7 +266,16 @@ const MainContainer: React.FC = () => {
             <tbody>
               {conceptTable.map((row, index) => (
                 <tr key={index} className="bg-background border-b">
-                  <td className="px-6 py-4">{row.concept_id}</td>
+                  <td className="px-6 py-4">
+                    <a
+                      href={`https://athena.ohdsi.org/search-terms/terms/${row.concept_id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="no-underline hover:underline"
+                    >
+                      {row.concept_id}
+                    </a>
+                  </td>
                   <td className="px-6 py-4">{row.name}</td>
                   <td className="px-6 py-4">{row.domain}</td>
                   <td className="px-6 py-4">{row.vocabulary}</td>

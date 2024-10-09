@@ -65,11 +65,14 @@ def generate_synonyms(term: str, language: str, context: str) -> List[Message]:
     """
     return [
         ell.system(
-            f"""You are a medical language expert. Generate up to 5 synonyms for the given medical term in {language}.
-        Provide each synonym with a relevance score between 0 and 1, where 1 is highly relevant and 0 is less relevant."""
+            f"""You are a medical language expert. Generate up to 5 synonyms for the given medical term given the provided context.
+        Provide each synonym with a relevance score between 0 and 1, where 1 is highly relevant and 0 is less relevant. asuming the provided context"""
         ),
         ell.user(
             f"Generate synonyms for the medical term '{term}' in the context of '{context}' in {language}. "
+        ),
+        ell.user(
+            f"if the term '{term}' with the context '{context}' is could valid in the provided language {language}, then add the term to the synonyms list."
         )
     ]
 
@@ -84,9 +87,18 @@ def disambiguate(term: str, language: str = "en") -> str:
     """
     return [
         ell.system(
-            f"""You are a helpful medical assistant. Explain a potentially ambiguous medical term to a user in {language}.
-            Format your output as a JSON array of objects, each representing a possible meaning of the term.
-            Each object should have the following structure:
+            f"""Explain a potentially ambiguous medical term to a user in the specified language '{language}'. Your output should be formatted as a JSON array of objects, where each object represents a possible meaning of the term.
+
+- Do not include specific opinions.
+- Limit explanations to possible definitions that can be understood in the language and cultural context.
+
+# Steps
+
+1. Identify the medical term to be explained.
+2. Provide multiple possible meanings or interpretations of the term.
+3. Ensure definitions are culturally and linguistically appropriate for the user's context.
+4. Limit the explanations to factual, non-opinionated content.
+
 
             ```json
             {{
