@@ -90,8 +90,8 @@ def disambiguate(term: str, language: str = "en") -> str:
             ```json
             {{
               "term": "<The medical term>",
-              "definition": "<Definition of the term in {language}>",
-              "usage": "<Example of how the term is used in {language}>",
+              "definition": "<Definition of the medical term in {language}>",
+              "usage": "<How the medical term is used. in {language}>",
               "context": "<Medical context or specialty where the term is commonly used in {language}>"
             }}
             ```

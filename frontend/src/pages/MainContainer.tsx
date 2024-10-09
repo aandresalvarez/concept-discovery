@@ -98,10 +98,7 @@ const MainContainer: React.FC = () => {
       if (response.data.concepts && response.data.concepts.length > 0) {
         setConceptTable(response.data.concepts);
       } else {
-        // Handle the case where no concepts are found.  For example:
-        setConceptTable([]); // Clear the table
-        // Optionally, display a "no concepts found" message to the user.
-        // You could use a state variable for this and conditionally render a message.
+        setConceptTable([]);
       }
     } catch (err: any) {
       handleError(err);
@@ -155,6 +152,12 @@ const MainContainer: React.FC = () => {
         {item.category}
       </p>
       <p className="text-sm text-foreground mt-2">{item.definition}</p>
+      <p className="text-sm text-foreground mt-2">
+        <strong>{t("usage")}:</strong> {item.usage}
+      </p>
+      <p className="text-sm text-foreground mt-2">
+        <strong>{t("context")}:</strong> {item.context}
+      </p>
     </motion.div>
   );
 
@@ -176,6 +179,12 @@ const MainContainer: React.FC = () => {
           </p>
           <p className="text-sm text-foreground mt-2">
             {selectedTerm.definition}
+          </p>
+          <p className="text-sm text-foreground mt-2">
+            <strong>{t("usage")}:</strong> {selectedTerm.usage}
+          </p>
+          <p className="text-sm text-foreground mt-2">
+            <strong>{t("context")}:</strong> {selectedTerm.context}
           </p>
         </div>
       )}
