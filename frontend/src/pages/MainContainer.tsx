@@ -12,6 +12,8 @@ interface DisambiguationResult {
   term: string;
   definition: string;
   category: string;
+  usage: string;
+  context: string;
 }
 
 interface SynonymResult {

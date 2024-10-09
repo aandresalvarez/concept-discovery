@@ -6,7 +6,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from workflow import disambiguate, generate_synonyms, concept_lookup
-import logging
+import logging, json
 import traceback
 
 logging.basicConfig(
@@ -29,7 +29,8 @@ app.add_middleware(
 class DisambiguationResult(BaseModel):
     term: str
     definition: str
-    category: str
+    usage: str
+    context: str
 
 
 class SearchResponse(BaseModel):
@@ -93,39 +94,38 @@ async def search(term: str = Query(..., min_length=1),
     try:
         logger.debug("Calling disambiguate function")
         response = disambiguate(term, language)
+        print(f"\n\n\n\n\n EL responseAAAA: {response.text} \n\n\n\n\n\n")
         logger.debug(f"Disambiguate function returned: {response}")
-        if not isinstance(response, str):
-            logger.error(
-                f"Unexpected response type from disambiguate function: {type(response)}"
-            )
-            raise ValueError(
-                "Unexpected response type from disambiguate function")
 
-        # Parse the markdown content
-        results = []
-        current_result = {}
-        for line in response.split('\n'):
-            logger.debug(f"Processing line: {line}")
-            if line.startswith('## Term:'):
-                if current_result:
-                    logger.debug(f"Adding result: {current_result}")
-                    results.append(DisambiguationResult(**current_result))
-                    current_result = {}
-                current_result['term'] = line.split(':', 1)[1].strip()
-            elif line.startswith('## Definition:'):
-                current_result['definition'] = line.split(':', 1)[1].strip()
-            elif line.startswith('## Category:'):
-                current_result['category'] = line.split(':', 1)[1].strip()
-        if current_result:
-            logger.debug(f"Adding final result: {current_result}")
-            results.append(DisambiguationResult(**current_result))
+        # Since disambiguate returns a list of Messages
+        # and the last message should contain the JSON response
+        response_message = response.text
+        response_message = response_message.strip().replace('```json',
+                                                            '').replace(
+                                                                '```', '')
+        # Attempt to parse the response, handle potential errors
+        try:
+            # Access the text content of the response message
+            results = json.loads(response_message)
 
-        if not results:
-            logger.warning(f"No results found for term: {term}")
-            return SearchResponse(results=[])
+        except json.JSONDecodeError as e:
+            logger.error(f"Failed to parse JSON response: {e}")
+            logger.error(f"Raw response: {response_message}")
+            raise HTTPException(status_code=500,
+                                detail="Failed to parse LLM response")
 
-        logger.info(f"Returning {len(results)} disambiguation results")
-        return SearchResponse(results=results)
+        # Validate and convert to DisambiguationResult objects
+        disambiguation_results = []
+        for result in results:
+            try:
+                disambiguation_results.append(DisambiguationResult(**result))
+            except Exception as e:
+                logger.warning(
+                    f"Skipping invalid result: {result}, Error: {e}")
+
+        logger.info(
+            f"Returning {len(disambiguation_results)} disambiguation results")
+        return SearchResponse(results=disambiguation_results)
     except Exception as e:
         logger.error(f"An error occurred: {str(e)}")
         logger.error(traceback.format_exc())

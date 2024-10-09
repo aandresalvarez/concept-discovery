@@ -74,22 +74,26 @@ def generate_synonyms(term: str, language: str) -> List[Message]:
 
 
 # LMP for concept disambiguation
-@ell.simple(model="gpt-4o-mini")
-def disambiguate(term: str, language: str = "en") -> List[Message]:
+@ell.complex(model="gpt-4o-mini")
+def disambiguate(term: str, language: str = "en") -> str:
     """
-    Return a list of possible meanings of a medical term, formatted in Markdown.
+    Return a list of possible meanings of a medical term, formatted as a JSON structure.
+    Each meaning includes definition, usage, and medical context.
     The results will be in the specified language, defaulting to English if not specified.
     """
     return [
         ell.system(
             f"""You are a helpful medical assistant. Explain a potentially ambiguous medical term to a user in {language}.
-            Format your output as a list of markdown code blocks, each containing a possible interpretation of the term.
-            Each interpretation should include the following:
+            Format your output as a JSON array of objects, each representing a possible meaning of the term.
+            Each object should have the following structure:
 
-            ```markdown
-            ## Term: <The medical term>
-            ## Definition: <Definition of the term in {language}>
-            ## Category: <Category the term belongs to, e.g., Symptom, Diagnosis, Procedure, etc. in {language}>
+            ```json
+            {{
+              "term": "<The medical term>",
+              "definition": "<Definition of the term in {language}>",
+              "usage": "<Example of how the term is used in {language}>",
+              "context": "<Medical context or specialty where the term is commonly used in {language}>"
+            }}
             ```
             """),
         ell.user(
