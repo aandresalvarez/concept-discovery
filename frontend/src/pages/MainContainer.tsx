@@ -75,7 +75,11 @@ const MainContainer: React.FC = () => {
 
     try {
       const response = await axios.get(`/api/synonyms`, {
-        params: { term: term.term, language: i18n.language },
+        params: {
+          term: term.term,
+          context: term.definition, // Corrected parameter name
+          language: i18n.language,
+        },
       });
       setSynonyms(response.data.synonyms);
     } catch (err: any) {

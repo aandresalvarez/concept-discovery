@@ -59,7 +59,7 @@ class SynonymResponse(BaseModel):
 
 # LMP for generating synonyms
 @ell.complex(model="gpt-4o-mini", response_format=SynonymResponse)
-def generate_synonyms(term: str, language: str) -> List[Message]:
+def generate_synonyms(term: str, language: str, context: str) -> List[Message]:
     """
     Generate synonyms for a given term in the specified language.
     """
@@ -69,7 +69,8 @@ def generate_synonyms(term: str, language: str) -> List[Message]:
         Provide each synonym with a relevance score between 0 and 1, where 1 is highly relevant and 0 is less relevant."""
         ),
         ell.user(
-            f"Generate synonyms for the medical term '{term}' in {language}.")
+            f"Generate synonyms for the medical term '{term}' in the context of '{context}' in {language}. "
+        )
     ]
 
 

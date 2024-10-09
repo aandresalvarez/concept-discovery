@@ -1,4 +1,5 @@
 # main.py
+from decimal import Context
 import os
 from typing import Union, List
 from fastapi import FastAPI, Query, HTTPException
@@ -76,9 +77,10 @@ async def get_concept_table(term: str, language: str):
 
 @app.get("/api/synonyms", response_model=SynonymResponse)
 async def get_synonyms(term: str = Query(..., min_length=1),
-                       language: str = Query("en")):
+                       language: str = Query("en"),
+                       context: str = Query(...)):
     try:
-        response = generate_synonyms(term, language)
+        response = generate_synonyms(term, language, context)
         synonym_response = response.parsed
         return synonym_response
     except Exception as e:
