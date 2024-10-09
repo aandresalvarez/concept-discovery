@@ -1,16 +1,16 @@
 {
   "title": "医学概念发现",
-  "searchPlaceholder": "输入医学术语，例如'阿司匹林'",
+  "searchPlaceholder": "输入一个医学术语，例如'阿司匹林'",
   "loading": "加载结果中...",
   "noResults": "未找到结果。请尝试其他搜索词。",
   "results": "结果",
-  "synonymsFor": "'{{term}}'的同义词",
-  "noConceptsFound": "未找到'{{synonym}}'的概念",
+  "synonymsFor": "'{{term}}' 的同义词。请选择一个生成的同义词以探索结果。",
+  "noConceptsFound": "未找到 '{{synonym}}' 的相关概念",
   "conceptTable": "概念表",
   "backToResults": "返回结果",
-  "conceptId": "概念ID",
+  "conceptId": "概念 ID",
   "name": "名称",
-  "domain": "域",
+  "domain": "领域",
   "vocabulary": "词汇表",
   "standardConcept": "标准概念"
 }

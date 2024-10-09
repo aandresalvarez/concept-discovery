@@ -1,16 +1,16 @@
 {
   "title": "Découverte de Concepts Médicaux",
-  "searchPlaceholder": "Entrez un terme médical, par exemple 'aspirine'",
+  "searchPlaceholder": "Entrez un terme médical, par exemple, 'aspirine'",
   "loading": "Chargement des résultats...",
   "noResults": "Aucun résultat trouvé. Essayez un autre terme de recherche.",
   "results": "Résultats",
-  "synonymsFor": "Synonymes pour '{{term}}'",
+  "synonymsFor": "Synonymes pour '{{term}}'. Veuillez sélectionner l'un des synonymes générés pour explorer les résultats.",
   "noConceptsFound": "Aucun concept trouvé pour '{{synonym}}'",
   "conceptTable": "Tableau des Concepts",
   "backToResults": "Retour aux Résultats",
-  "conceptId": "ID du concept",
+  "conceptId": "ID du Concept",
   "name": "Nom",
   "domain": "Domaine",
   "vocabulary": "Vocabulaire",
-  "standardConcept": "Concept standard"
+  "standardConcept": "Concept Standard"
 }

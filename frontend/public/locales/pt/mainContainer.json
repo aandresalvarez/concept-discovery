@@ -1,16 +1,16 @@
 {
   "title": "Descoberta de Conceitos Médicos",
-  "searchPlaceholder": "Digite um termo médico, por exemplo 'aspirina'",
+  "searchPlaceholder": "Insira um termo médico, por exemplo, 'aspirina'",
   "loading": "Carregando resultados...",
   "noResults": "Nenhum resultado encontrado. Tente outro termo de pesquisa.",
   "results": "Resultados",
-  "synonymsFor": "Sinônimos para '{{term}}'",
+  "synonymsFor": "Sinônimos para '{{term}}'. Selecione um dos sinônimos gerados para explorar os resultados.",
   "noConceptsFound": "Nenhum conceito encontrado para '{{synonym}}'",
   "conceptTable": "Tabela de Conceitos",
   "backToResults": "Voltar aos Resultados",
-  "conceptId": "ID do conceito",
+  "conceptId": "ID do Conceito",
   "name": "Nome",
   "domain": "Domínio",
   "vocabulary": "Vocabulário",
-  "standardConcept": "Conceito padrão"
+  "standardConcept": "Conceito Padrão"
 }

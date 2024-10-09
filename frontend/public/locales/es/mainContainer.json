@@ -4,7 +4,7 @@
   "loading": "Cargando resultados...",
   "noResults": "No se encontraron resultados. Intente con otro término de búsqueda.",
   "results": "Resultados",
-  "synonymsFor": "Sinónimos para '{{term}}'",
+  "synonymsFor": "Sinónimos para '{{term}}'. Por favor, elija uno de los sinónimos generados para explorar los resultados.",
   "noConceptsFound": "No se encontraron conceptos para '{{synonym}}'",
   "conceptTable": "Tabla de Conceptos",
   "backToResults": "Volver a los Resultados",

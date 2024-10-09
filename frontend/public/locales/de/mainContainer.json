@@ -1,16 +1,16 @@
 {
-  "title": "Entdeckung Medizinischer Konzepte",
-  "searchPlaceholder": "Geben Sie einen medizinischen Begriff ein, z.B. 'Aspirin'",
-  "loading": "Ergebnisse werden geladen...",
+  "title": "Entdeckung medizinischer Konzepte",
+  "searchPlaceholder": "Geben Sie einen medizinischen Begriff ein, z. B. 'Aspirin'",
+  "loading": "Lade Ergebnisse...",
   "noResults": "Keine Ergebnisse gefunden. Versuchen Sie einen anderen Suchbegriff.",
   "results": "Ergebnisse",
-  "synonymsFor": "Synonyme für '{{term}}'",
-  "noConceptsFound": "Keine Konzepte gefunden für '{{synonym}}'",
+  "synonymsFor": "Synonyme für '{{term}}'. Bitte wählen Sie eines der generierten Synonyme, um die Ergebnisse zu erkunden.",
+  "noConceptsFound": "Keine Konzepte für '{{synonym}}' gefunden",
   "conceptTable": "Konzepttabelle",
   "backToResults": "Zurück zu den Ergebnissen",
   "conceptId": "Konzept-ID",
   "name": "Name",
-  "domain": "Domäne",
+  "domain": "Bereich",
   "vocabulary": "Vokabular",
   "standardConcept": "Standardkonzept"
 }
