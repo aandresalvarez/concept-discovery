@@ -241,11 +241,11 @@ const MainContainer: React.FC = () => {
           <table className="w-full text-sm text-left text-foreground">
             <thead className="text-xs text-foreground uppercase bg-accent/10">
               <tr>
-                <th className="px-6 py-3">Concept ID</th>
-                <th className="px-6 py-3">Name</th>
-                <th className="px-6 py-3">Domain</th>
-                <th className="px-6 py-3">Vocabulary</th>
-                <th className="px-6 py-3">Standard Concept</th>
+                <th className="px-6 py-3">{t("conceptId")}</th>
+                <th className="px-6 py-3">{t("name")}</th>
+                <th className="px-6 py-3">{t("domain")}</th>
+                <th className="px-6 py-3">{t("vocabulary")}</th>
+                <th className="px-6 py-3">{t("standardConcept")}</th>
               </tr>
             </thead>
             <tbody>

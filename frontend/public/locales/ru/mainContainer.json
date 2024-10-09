@@ -7,5 +7,10 @@
   "synonymsFor": "Синонимы для '{{term}}'",
   "noConceptsFound": "Понятия не найдены для '{{synonym}}'",
   "conceptTable": "Таблица Понятий",
-  "backToResults": "Вернуться к Результатам"
+  "backToResults": "Вернуться к Результатам",
+  "conceptId": "ID концепции",
+  "name": "Название",
+  "domain": "Домен",
+  "vocabulary": "Словарь",
+  "standardConcept": "Стандартная концепция"
 }

@@ -7,5 +7,10 @@
   "synonymsFor": "Sinónimos para '{{term}}'",
   "noConceptsFound": "No se encontraron conceptos para '{{synonym}}'",
   "conceptTable": "Tabla de Conceptos",
-  "backToResults": "Volver a los Resultados"
+  "backToResults": "Volver a los Resultados",
+  "conceptId": "ID de Concepto",
+  "name": "Nombre",
+  "domain": "Dominio",
+  "vocabulary": "Vocabulario",
+  "standardConcept": "Concepto Estándar"
 }

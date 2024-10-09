@@ -7,5 +7,10 @@
   "synonymsFor": "'{{term}}'的同义词",
   "noConceptsFound": "未找到'{{synonym}}'的概念",
   "conceptTable": "概念表",
-  "backToResults": "返回结果"
+  "backToResults": "返回结果",
+  "conceptId": "概念ID",
+  "name": "名称",
+  "domain": "域",
+  "vocabulary": "词汇表",
+  "standardConcept": "标准概念"
 }

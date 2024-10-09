@@ -124,7 +124,6 @@ def find_omop_concept(
             response = api_client.get_medical_concepts(
                 query=query,
                 page_size=20,  # Adjust as needed
-                standard_concept="Standard",
             )
 
             if not response or not hasattr(response, "content"):
@@ -212,10 +211,3 @@ def concept_lookup(term: str, language: str = "en") -> List[Message]:
             ),
             ell.user(concepts_json)
         ]
-
-
-# Example usage:
-# concepts_json = find_omop_concept("cystic fibrosis", "en")
-
-# format_concept_table(concepts_json)
-# print(table_message)
