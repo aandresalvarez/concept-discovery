@@ -11,11 +11,12 @@ const SearchBox: React.FC<SearchBoxProps> = ({
   placeholder,
   onLanguageChange,
   selectedLanguage,
+  showLangSelection = true, // Default to true if not provided
 }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   const handleSearch = () => {
-    onSearch(searchTerm);
+    onSearch(searchTerm.trim());
   };
 
   return (
@@ -35,12 +36,14 @@ const SearchBox: React.FC<SearchBoxProps> = ({
           onClick={handleSearch}
         />
       </div>
-      <div className="ml-2">
-        <LanguageSelector
-          onLanguageChange={onLanguageChange}
-          initialLanguage={selectedLanguage}
-        />
-      </div>
+      {showLangSelection && (
+        <div className="ml-2">
+          <LanguageSelector
+            onLanguageChange={onLanguageChange}
+            selectedLanguage={selectedLanguage}
+          />
+        </div>
+      )}
     </div>
   );
 };

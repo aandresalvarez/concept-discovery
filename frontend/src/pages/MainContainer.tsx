@@ -339,6 +339,7 @@ const MainContainer: React.FC = () => {
                   placeholder={t("searchPlaceholder", { ns: "mainContainer" })}
                   onLanguageChange={handleLanguageChange}
                   selectedLanguage={i18n.language}
+                  showLangSelection={false}
                 />
               </div>
             </motion.div>
@@ -356,6 +357,7 @@ const MainContainer: React.FC = () => {
                   placeholder={t("searchPlaceholder", { ns: "mainContainer" })}
                   onLanguageChange={handleLanguageChange}
                   selectedLanguage={i18n.language}
+                  showLangSelection={false}
                 />
               </div>
 

@@ -9,6 +9,7 @@ export interface SearchBoxProps {
   onLanguageChange: (lang: string) => void;
   placeholder?: string;
   selectedLanguage: string;
+  showLangSelection?: boolean; // New optional prop
 }
 
 export interface DisambiguationOption {

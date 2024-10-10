@@ -15,11 +15,11 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { Button } from "@/components/ui/button";
-import { Check } from "lucide-react";
+import { Languages, Check } from "lucide-react"; // Added Languages icon
 import { useTranslation } from "react-i18next";
 
 interface ForcedLanguageSelectorProps {
-  onLanguageSelected: () => void;
+  onLanguageSelected: (language: string) => void;
 }
 
 const languageOptions = [
@@ -43,7 +43,7 @@ const ForcedLanguageSelector: React.FC<ForcedLanguageSelectorProps> = ({
   const handleLanguageSelect = (language: string) => {
     i18n.changeLanguage(language);
     setSelectedLanguage(language);
-    onLanguageSelected();
+    onLanguageSelected(language);
   };
 
   const renderLanguageOptions = () => (
@@ -72,7 +72,8 @@ const ForcedLanguageSelector: React.FC<ForcedLanguageSelectorProps> = ({
       }}
     >
       <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
+        <DialogHeader className="flex items-center">
+          <Languages className="mr-2 h-6 w-6" /> {/* Languages icon added */}
           <DialogTitle>{t("selectYourLanguage")}</DialogTitle>
         </DialogHeader>
         {renderLanguageOptions()}
@@ -86,7 +87,8 @@ const ForcedLanguageSelector: React.FC<ForcedLanguageSelectorProps> = ({
       }}
     >
       <DrawerContent>
-        <DrawerHeader className="text-left">
+        <DrawerHeader className="flex items-center">
+          <Languages className="mr-2 h-6 w-6" /> {/* Languages icon added */}
           <DrawerTitle>{t("selectYourLanguage")}</DrawerTitle>
         </DrawerHeader>
         <div className="px-4 pb-4">{renderLanguageOptions()}</div>
