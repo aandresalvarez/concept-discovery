@@ -1,3 +1,5 @@
+// src/components/MainContainer.tsx
+
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -9,6 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ChevronLeft } from "lucide-react";
 import axios from "axios";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import ForcedLanguageSelector from "@/components/ForcedLanguageSelector";
 
 interface DisambiguationResult {
   term: string;
@@ -46,6 +49,24 @@ const MainContainer: React.FC = () => {
   );
   const [selectedSynonym, setSelectedSynonym] = useState<string | null>(null);
   const [lastSearchTerm, setLastSearchTerm] = useState<string>("");
+  const [languageSelected, setLanguageSelected] = useState<boolean>(false); // New state
+
+  // Handle language change from SearchBox (optional: allows changing language later)
+  const handleLanguageChange = (lang: string) => {
+    i18n.changeLanguage(lang);
+  };
+
+  // Handle retry after error
+  const handleRetry = () => {
+    if (lastSearchTerm) {
+      handleSearch(lastSearchTerm);
+    }
+  };
+
+  // Handle language selection from ForcedLanguageSelector
+  const handleLanguageSelected = () => {
+    setLanguageSelected(true);
+  };
 
   const handleSearch = async (term: string) => {
     setLoading(true);
@@ -131,16 +152,6 @@ const MainContainer: React.FC = () => {
       setError(t("noResponseError", { ns: "common" }));
     } else {
       setError(`${t("genericError", { ns: "common" })}: ${err.message}`);
-    }
-  };
-
-  const handleLanguageChange = (lang: string) => {
-    i18n.changeLanguage(lang);
-  };
-
-  const handleRetry = () => {
-    if (lastSearchTerm) {
-      handleSearch(lastSearchTerm);
     }
   };
 
@@ -403,6 +414,11 @@ const MainContainer: React.FC = () => {
           )}
         </AnimatePresence>
       </main>
+
+      {/* Render ForcedLanguageSelector */}
+      {!languageSelected && (
+        <ForcedLanguageSelector onLanguageSelected={handleLanguageSelected} />
+      )}
     </div>
   );
 };

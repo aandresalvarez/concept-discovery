@@ -4,5 +4,6 @@
   "unknownError": "Unbekannter Fehler",
   "noResponseError": "Keine Antwort vom Server erhalten. Bitte versuchen Sie es erneut.",
   "genericError": "Ein Fehler ist aufgetreten",
-  "backToResults": "Zurück zu den Ergebnissen"
+  "backToResults": "Zurück zu den Ergebnissen",
+  "selectYourLanguage": "Wählen Sie Ihre Sprache"
 }

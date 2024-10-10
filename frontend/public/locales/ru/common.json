@@ -4,5 +4,6 @@
   "unknownError": "Неизвестная ошибка",
   "noResponseError": "Нет ответа от сервера. Пожалуйста, попробуйте снова.",
   "genericError": "Произошла ошибка",
-  "backToResults": "Вернуться к Результатам"
+  "backToResults": "Вернуться к Результатам",
+  "selectYourLanguage": "Выберите ваш язык"
 }

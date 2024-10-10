@@ -4,5 +4,6 @@
   "unknownError": "Unknown error",
   "noResponseError": "No response received from server. Please try again.",
   "genericError": "An error occurred",
-  "backToResults": "Back to Results"
+  "backToResults": "Back to Results",
+  "selectYourLanguage": "Select your language"
 }

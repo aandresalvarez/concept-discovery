@@ -4,5 +4,6 @@
   "unknownError": "Errore sconosciuto",
   "noResponseError": "Nessuna risposta ricevuta dal server. Si prega di riprovare.",
   "genericError": "Si è verificato un errore",
-  "backToResults": "Torna ai Risultati"
+  "backToResults": "Torna ai Risultati",
+  "selectYourLanguage": "Seleziona la tua lingua"
 }
