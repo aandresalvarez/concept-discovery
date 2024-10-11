@@ -1,9 +1,9 @@
 // src/components/MainContainer.tsx
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { SearchBox, Header } from "@/components";
+import { SearchBox, Header, LoadingComponent } from "@/components"; // Ensure LoadingComponent is correctly imported
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,6 +14,7 @@ import {
   Book,
   ChevronLeft,
   ArrowRight,
+  ExternalLink,
 } from "lucide-react";
 import axios from "axios";
 import { Badge } from "@/components/ui/badge";
@@ -49,6 +50,8 @@ const MainContainer: React.FC = () => {
   const [conceptTable, setConceptTable] = useState<ConceptTableRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [conceptLoading, setConceptLoading] = useState<boolean>(false);
+  const [initialLoading, setInitialLoading] = useState<boolean>(false); // New state
+  const [synonymLoading, setSynonymLoading] = useState<boolean>(false); // New state
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState<boolean>(false);
   const [selectedTerm, setSelectedTerm] = useState<DisambiguationResult | null>(
@@ -57,6 +60,16 @@ const MainContainer: React.FC = () => {
   const [selectedSynonym, setSelectedSynonym] = useState<string | null>(null);
   const [lastSearchTerm, setLastSearchTerm] = useState<string>("");
   const [languageSelected, setLanguageSelected] = useState<boolean>(false);
+
+  // Optional: Simulate initial loading (remove in production)
+  useEffect(() => {
+    // If you have an actual initial API call, place it here instead
+    // For demonstration, we'll simulate a delay
+    // setInitialLoading(true);
+    // setTimeout(() => {
+    //   setInitialLoading(false);
+    // }, 1000);
+  }, []);
 
   // Handle language change from SearchBox (optional: allows changing language later)
   const handleLanguageChange = (lang: string) => {
@@ -75,6 +88,7 @@ const MainContainer: React.FC = () => {
   };
 
   const handleSearch = async (term: string) => {
+    setInitialLoading(true); // Start initial loading
     setLoading(true);
     setError(null);
     setLastSearchTerm(term);
@@ -92,10 +106,12 @@ const MainContainer: React.FC = () => {
       handleError(err);
     } finally {
       setLoading(false);
+      setInitialLoading(false); // End initial loading
     }
   };
 
   const handleDisambiguationSelect = async (term: DisambiguationResult) => {
+    setSynonymLoading(true); // Start synonym loading
     setLoading(true);
     setError(null);
     setSelectedTerm(term);
@@ -115,6 +131,7 @@ const MainContainer: React.FC = () => {
       handleError(err);
     } finally {
       setLoading(false);
+      setSynonymLoading(false); // End synonym loading
     }
   };
 
@@ -206,23 +223,6 @@ const MainContainer: React.FC = () => {
         </Button>
       </CardContent>
     </Card>
-  );
-
-  const renderSkeletons = () => (
-    <>
-      {Array(3)
-        .fill(null)
-        .map((_, index) => (
-          <div
-            key={index}
-            className="mb-6 p-4 border border-accent/10 sm:border-0 rounded-lg"
-          >
-            <Skeleton className="h-6 w-3/4 mb-2" />
-            <Skeleton className="h-4 w-1/3 mb-2" />
-            <Skeleton className="h-4 w-full" />
-          </div>
-        ))}
-    </>
   );
 
   const renderDisambiguationScreen = () => (
@@ -363,9 +363,11 @@ const MainContainer: React.FC = () => {
                       href={`https://athena.ohdsi.org/search-terms/terms/${row.concept_id}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="no-underline hover:underline"
+                      className="flex items-center text-primary-500 hover:text-primary-700 underline font-semibold"
+                      aria-label={`Open concept ${row.concept_id} in Athena OHDSI`}
                     >
                       {row.concept_id}
+                      <ExternalLink className="ml-1 h-4 w-4 text-primary-500" />
                     </a>
                   </td>
                   <td className="px-6 py-4">{row.name}</td>
@@ -384,7 +386,7 @@ const MainContainer: React.FC = () => {
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
-      <main className="flex flex-col flex-1 container mx-auto px-4 py-6">
+      <main className="flex flex-col flex-1 container mx-auto px-4 py-6 max-w-4xl">
         <AnimatePresence mode="wait">
           {!hasSearched ? (
             <motion.div
@@ -397,7 +399,7 @@ const MainContainer: React.FC = () => {
               <h1 className="text-4xl font-bold mb-8 text-foreground text-center">
                 {t("title", { ns: "mainContainer" })}
               </h1>
-              <div className="w-full max-w-2xl">
+              <div className="w-full">
                 <SearchBox
                   onSearch={handleSearch}
                   placeholder={t("searchPlaceholder", { ns: "mainContainer" })}
@@ -425,38 +427,71 @@ const MainContainer: React.FC = () => {
                 />
               </div>
 
-              {loading ? (
-                <div>
-                  <h2 className="text-xl font-semibold mb-4 text-foreground">
-                    {t("loading", { ns: "mainContainer" })}
-                  </h2>
-                  {renderSkeletons()}
-                </div>
-              ) : error ? (
-                <div className="text-center text-destructive">
-                  <p>{error}</p>
-                  <Button onClick={handleRetry} className="mt-4">
-                    {t("retry", { ns: "common" })}
-                  </Button>
-                </div>
-              ) : selectedTerm ? (
+              {/* Loading States Integration */}
+              {(initialLoading || synonymLoading || conceptLoading) && (
+                <LoadingComponent
+                  loadingText={
+                    initialLoading
+                      ? t("loadingInitial", {
+                          ns: "mainContainer",
+                          defaultValue: "Searching...",
+                        })
+                      : synonymLoading
+                        ? t("loadingSynonyms", {
+                            ns: "mainContainer",
+                            defaultValue: "Fetching synonyms...",
+                          })
+                        : t("loadingConcepts", {
+                            ns: "mainContainer",
+                            defaultValue: "Retrieving concepts...",
+                          })
+                  }
+                  size="lg"
+                  showAdditionalInfo={conceptLoading} // Show additional info only during concept loading
+                  additionalInfoText={
+                    conceptLoading
+                      ? t("loadingAdditionalInfo", {
+                          ns: "mainContainer",
+                          defaultValue: "This might take a few seconds...",
+                        })
+                      : undefined
+                  }
+                  primaryColor="border-primary" // Customize colors as needed
+                  accentColor="border-accent"
+                  secondaryColor="border-secondary"
+                />
+              )}
+
+              {/* Conditional Rendering based on loading and error states */}
+              {!initialLoading && !synonymLoading && !conceptLoading && (
                 <>
-                  {renderDisambiguationScreen()}
-                  {renderConceptTable()}
-                </>
-              ) : searchResults.length > 0 ? (
-                <>
-                  <h2 className="text-xl font-semibold mb-4 text-foreground">
-                    {t("results", { ns: "mainContainer" })}
-                  </h2>
-                  {searchResults.map((item, index) =>
-                    renderSearchResult(item, index),
+                  {loading ? null : error ? ( // Removed existing skeletons and loading messages // LoadingComponent is handling the loading state
+                    <div className="text-center text-destructive">
+                      <p>{error}</p>
+                      <Button onClick={handleRetry} className="mt-4">
+                        {t("retry", { ns: "common" })}
+                      </Button>
+                    </div>
+                  ) : selectedTerm ? (
+                    <>
+                      {renderDisambiguationScreen()}
+                      {renderConceptTable()}
+                    </>
+                  ) : searchResults.length > 0 ? (
+                    <>
+                      <h2 className="text-xl font-semibold mb-4 text-foreground">
+                        {t("results", { ns: "mainContainer" })}
+                      </h2>
+                      {searchResults.map((item, index) =>
+                        renderSearchResult(item, index),
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-center text-muted-foreground">
+                      {t("noResults", { ns: "mainContainer" })}
+                    </div>
                   )}
                 </>
-              ) : (
-                <div className="text-center text-muted-foreground">
-                  {t("noResults", { ns: "mainContainer" })}
-                </div>
               )}
             </motion.div>
           )}

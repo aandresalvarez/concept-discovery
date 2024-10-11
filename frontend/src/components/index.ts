@@ -8,4 +8,4 @@ export { default as MedicalConceptsTable } from "./MedicalConceptsTable";
 export { default as Recommendation } from "./Recommendation";
 export { default as Header } from "./Header";
 export { default as Footer } from "./Footer";
- 
+export { default as LoadingComponent } from "./LoadingComponent";
