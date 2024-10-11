@@ -7,9 +7,16 @@ import { SearchBox, Header } from "@/components";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronRight, Tag, Info, Book, ChevronLeft } from "lucide-react";
+import {
+  ChevronRight,
+  Tag,
+  Info,
+  Book,
+  ChevronLeft,
+  ArrowRight,
+} from "lucide-react";
 import axios from "axios";
-import { Badge } from "@/components/ui/badge"; // Ensure this import path is correct
+import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import ForcedLanguageSelector from "@/components/ForcedLanguageSelector";
 
@@ -162,16 +169,9 @@ const MainContainer: React.FC = () => {
     >
       <CardHeader className="bg-secondary pb-2">
         <CardTitle className="flex items-center justify-between">
-          <a
-            href="#"
-            className="text-2xl font-bold text-foreground font-serif hover:text-[#007C92] hover:underline transition-colors duration-200"
-            onClick={(e) => {
-              e.preventDefault();
-              handleDisambiguationSelect(item);
-            }}
-          >
+          <span className="text-2xl font-bold text-foreground font-serif hover:text-[#007C92] hover:underline transition-colors duration-200">
             {item.term}
-          </a>
+          </span>
           <Badge
             variant="outline"
             className="text-sm px-2 py-1 bg-accent text-accent-foreground"
@@ -181,10 +181,10 @@ const MainContainer: React.FC = () => {
         </CardTitle>
       </CardHeader>
       <CardContent className="pt-4 bg-card text-card-foreground">
-        <p className="text-base mb-4 flex items-start font-sans">
+        <div className="text-base mb-4 flex items-start font-sans">
           <Book className="mr-2 h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
           <span>{item.definition}</span>
-        </p>
+        </div>
         <Separator className="my-4 bg-border" />
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-sans">
           <div className="flex items-start">
@@ -225,57 +225,95 @@ const MainContainer: React.FC = () => {
     </>
   );
 
-  const renderSynonyms = () => (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.3 }}
-      className="mt-6 p-6 rounded-lg bg-accent/5 border border-accent/10"
-    >
-      {selectedTerm && (
-        <div className="mb-6 p-4">
-          <h3 className="text-xl font-semibold mb-2 text-primary">
-            {selectedTerm.term}
-          </h3>
-          <Separator />
+  const renderDisambiguationScreen = () => (
+    <div className="space-y-6 max-w-4xl mx-auto p-4">
+      {/* Back Button */}
+      <Button
+        onClick={handleBack}
+        variant="outline"
+        className="mb-4 text-foreground hover:text-primary transition-colors duration-200"
+      >
+        <ChevronLeft className="mr-2 h-4 w-4" />
+        Volver a los Resultados
+      </Button>
 
-          <p className="text-base text-foreground mt-2">
-            {selectedTerm.definition}
-          </p>
-          <p className="text-base text-foreground mt-2">
-            <strong>{t("usage")}:</strong> {selectedTerm.usage}
-          </p>
-          <p className="text-base text-foreground mt-2">
-            <strong>{t("context")}:</strong> {selectedTerm.context}
-          </p>
-        </div>
+      {/* Term Details Card */}
+      {selectedTerm && (
+        <Card className="border-border overflow-hidden shadow-md">
+          <CardHeader className="bg-secondary pb-2">
+            <CardTitle className="flex items-center justify-between">
+              <span className="text-3xl font-bold text-primary font-serif">
+                {selectedTerm.term}
+              </span>
+              <Badge
+                variant="outline"
+                className="text-sm px-2 py-1 bg-accent text-accent-foreground"
+              >
+                Término Médico
+              </Badge>
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4 bg-card text-card-foreground">
+            <div className="space-y-4">
+              <div className="flex items-start">
+                <Book className="mr-2 h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+                <p className="text-base">{selectedTerm.definition}</p>
+              </div>
+              <Separator className="my-2 bg-border" />
+              <div className="flex items-start">
+                <Tag className="mr-2 h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+                <div>
+                  <strong className="font-semibold">Uso:</strong>{" "}
+                  {selectedTerm.usage}
+                </div>
+              </div>
+              <div className="flex items-start">
+                <Info className="mr-2 h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+                <div>
+                  <strong className="font-semibold">Contexto:</strong>{" "}
+                  {selectedTerm.context}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       )}
-      <h3 className="text-xl font-semibold mb-4 text-primary">
-        {t("synonymsFor", { term: selectedTerm?.term })}
-      </h3>
-      <div className="flex flex-wrap gap-2">
-        {synonyms.map((synonym, index) => (
-          <Button
-            key={index}
-            onClick={() => handleSynonymClick(synonym.synonym)}
-            className={`px-3 py-1 rounded-lg text-base transition-colors duration-200 ${
-              selectedSynonym === synonym.synonym
-                ? "bg-primary text-primary-foreground"
-                : "bg-secondary text-secondary-foreground hover:bg-accent hover:text-accent-foreground"
-            }`}
-          >
-            {synonym.synonym}
-          </Button>
-        ))}
-      </div>
-    </motion.div>
+
+      {/* Synonyms Selection Card */}
+      <Card className="border-border shadow-md bg-accent/10">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-primary font-serif flex items-center">
+            <ArrowRight className="mr-2 h-6 w-6" />
+            Seleccione un sinónimo para '{selectedTerm?.term}'
+          </CardTitle>
+          <p className="text-muted-foreground font-medium">
+            Para continuar, elija uno de los siguientes sinónimos. Esto nos
+            ayudará a refinar su búsqueda y proporcionar resultados más
+            precisos.
+          </p>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            {synonyms.map((synonym, index) => (
+              <Button
+                key={index}
+                onClick={() => handleSynonymClick(synonym.synonym)}
+                variant="outline"
+                className="bg-background text-foreground hover:bg-primary hover:text-primary-foreground transition-colors duration-200 border-2 border-primary"
+              >
+                {synonym.synonym}
+              </Button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
   );
 
   const renderConceptTable = () => {
     if (conceptLoading) {
       return (
-        <div className="mt-6">
+        <div className="mt-6 p-4">
           <Skeleton className="h-8 w-1/4 mb-4" />
           <Skeleton className="h-10 w-full mb-2" />
           <Skeleton className="h-10 w-full mb-2" />
@@ -403,7 +441,7 @@ const MainContainer: React.FC = () => {
                 </div>
               ) : selectedTerm ? (
                 <>
-                  {renderSynonyms()}
+                  {renderDisambiguationScreen()}
                   {renderConceptTable()}
                 </>
               ) : searchResults.length > 0 ? (
@@ -418,20 +456,6 @@ const MainContainer: React.FC = () => {
               ) : (
                 <div className="text-center text-muted-foreground">
                   {t("noResults", { ns: "mainContainer" })}
-                </div>
-              )}
-
-              {selectedTerm && (
-                <div className="mt-6">
-                  <Button
-                    onClick={handleBack}
-                    className="w-full flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-accent"
-                    variant="outline"
-                    aria-label={t("backToResults", { ns: "common" })}
-                  >
-                    <ChevronLeft className="mr-2 h-4 w-4" />
-                    {t("backToResults", { ns: "common" })}
-                  </Button>
                 </div>
               )}
             </motion.div>
