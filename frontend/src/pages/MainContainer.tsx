@@ -6,11 +6,11 @@ import { useTranslation } from "react-i18next";
 import { SearchBox, Header } from "@/components";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-
 import { Skeleton } from "@/components/ui/skeleton";
-import { ChevronLeft } from "lucide-react";
+import { ChevronRight, Tag, Info, Book, ChevronLeft } from "lucide-react";
 import axios from "axios";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Badge } from "@/components/ui/badge"; // Ensure this import path is correct
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import ForcedLanguageSelector from "@/components/ForcedLanguageSelector";
 
 interface DisambiguationResult {
@@ -49,7 +49,7 @@ const MainContainer: React.FC = () => {
   );
   const [selectedSynonym, setSelectedSynonym] = useState<string | null>(null);
   const [lastSearchTerm, setLastSearchTerm] = useState<string>("");
-  const [languageSelected, setLanguageSelected] = useState<boolean>(false); // New state
+  const [languageSelected, setLanguageSelected] = useState<boolean>(false);
 
   // Handle language change from SearchBox (optional: allows changing language later)
   const handleLanguageChange = (lang: string) => {
@@ -63,7 +63,6 @@ const MainContainer: React.FC = () => {
     }
   };
 
-  // Handle language selection from ForcedLanguageSelector
   const handleLanguageSelected = () => {
     setLanguageSelected(true);
   };
@@ -100,7 +99,7 @@ const MainContainer: React.FC = () => {
       const response = await axios.get(`/api/synonyms`, {
         params: {
           term: term.term,
-          context: term.definition, // Corrected parameter name
+          context: term.definition,
           language: i18n.language,
         },
       });
@@ -156,25 +155,74 @@ const MainContainer: React.FC = () => {
   };
 
   const renderSearchResult = (item: DisambiguationResult, index: number) => (
-    <motion.div
+    <Card
       key={index}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3, delay: index * 0.1 }}
-      className="mb-6 p-4 rounded-lg hover:bg-accent/5 transition-colors duration-200 border border-accent/10 sm:border-0 sm:hover:border-accent/10 cursor-pointer"
+      className="hover:shadow-lg transition-shadow duration-300 overflow-hidden border-border mb-6"
       onClick={() => handleDisambiguationSelect(item)}
     >
-      <h3 className="text-lg font-semibold mb-2 text-primary">{item.term}</h3>
-      <Separator />
+      <CardHeader className="bg-secondary pb-2">
+        <CardTitle className="flex items-center justify-between">
+          <a
+            href="#"
+            className="text-2xl font-bold text-foreground font-serif hover:text-[#007C92] hover:underline transition-colors duration-200"
+            onClick={(e) => {
+              e.preventDefault();
+              handleDisambiguationSelect(item);
+            }}
+          >
+            {item.term}
+          </a>
+          <Badge
+            variant="outline"
+            className="text-sm px-2 py-1 bg-accent text-accent-foreground"
+          >
+            {item.category}
+          </Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pt-4 bg-card text-card-foreground">
+        <p className="text-base mb-4 flex items-start font-sans">
+          <Book className="mr-2 h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+          <span>{item.definition}</span>
+        </p>
+        <Separator className="my-4 bg-border" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-sans">
+          <div className="flex items-start">
+            <Tag className="mr-2 h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+            <p>
+              <strong>{t("usage")}:</strong> {item.usage}
+            </p>
+          </div>
+          <div className="flex items-start">
+            <Info className="mr-2 h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+            <p>
+              <strong>{t("context")}:</strong> {item.context}
+            </p>
+          </div>
+        </div>
+        <Button className="mt-6 w-full bg-[#8C1515] hover:bg-[#8C1515]/90 text-white transition-colors duration-200 font-sans">
+          {t("viewDetails", { ns: "common" })}
+          <ChevronRight className="ml-2 h-4 w-4" />
+        </Button>
+      </CardContent>
+    </Card>
+  );
 
-      <p className="text-base text-foreground mt-2">{item.definition}</p>
-      <p className="text-base text-foreground mt-2">
-        <strong>{t("usage")}:</strong> {item.usage}
-      </p>
-      <p className="text-base text-foreground mt-2">
-        <strong>{t("context")}:</strong> {item.context}
-      </p>
-    </motion.div>
+  const renderSkeletons = () => (
+    <>
+      {Array(3)
+        .fill(null)
+        .map((_, index) => (
+          <div
+            key={index}
+            className="mb-6 p-4 border border-accent/10 sm:border-0 rounded-lg"
+          >
+            <Skeleton className="h-6 w-3/4 mb-2" />
+            <Skeleton className="h-4 w-1/3 mb-2" />
+            <Skeleton className="h-4 w-full" />
+          </div>
+        ))}
+    </>
   );
 
   const renderSynonyms = () => (
@@ -206,15 +254,10 @@ const MainContainer: React.FC = () => {
       <h3 className="text-xl font-semibold mb-4 text-primary">
         {t("synonymsFor", { term: selectedTerm?.term })}
       </h3>
-      <ToggleGroup
-        type="single"
-        value={selectedSynonym || ""}
-        className="flex flex-wrap gap-2"
-      >
+      <div className="flex flex-wrap gap-2">
         {synonyms.map((synonym, index) => (
-          <ToggleGroupItem
+          <Button
             key={index}
-            value={synonym.synonym}
             onClick={() => handleSynonymClick(synonym.synonym)}
             className={`px-3 py-1 rounded-lg text-base transition-colors duration-200 ${
               selectedSynonym === synonym.synonym
@@ -223,9 +266,9 @@ const MainContainer: React.FC = () => {
             }`}
           >
             {synonym.synonym}
-          </ToggleGroupItem>
+          </Button>
         ))}
-      </ToggleGroup>
+      </div>
     </motion.div>
   );
 
@@ -300,23 +343,6 @@ const MainContainer: React.FC = () => {
     );
   };
 
-  const renderSkeletons = () => (
-    <>
-      {Array(3)
-        .fill(null)
-        .map((_, index) => (
-          <div
-            key={index}
-            className="mb-6 p-4 border border-accent/10 sm:border-0 rounded-lg"
-          >
-            <Skeleton className="h-6 w-3/4 mb-2" />
-            <Skeleton className="h-4 w-1/3 mb-2" />
-            <Skeleton className="h-4 w-full" />
-          </div>
-        ))}
-    </>
-  );
-
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
@@ -375,28 +401,24 @@ const MainContainer: React.FC = () => {
                     {t("retry", { ns: "common" })}
                   </Button>
                 </div>
-              ) : (
+              ) : selectedTerm ? (
                 <>
-                  {selectedTerm ? (
-                    <>
-                      {renderSynonyms()}
-                      {renderConceptTable()}
-                    </>
-                  ) : searchResults.length > 0 ? (
-                    <>
-                      <h2 className="text-xl font-semibold mb-4 text-foreground">
-                        {t("results", { ns: "mainContainer" })}
-                      </h2>
-                      {searchResults.map((item, index) =>
-                        renderSearchResult(item, index),
-                      )}
-                    </>
-                  ) : (
-                    <div className="text-center text-muted-foreground">
-                      {t("noResults", { ns: "mainContainer" })}
-                    </div>
+                  {renderSynonyms()}
+                  {renderConceptTable()}
+                </>
+              ) : searchResults.length > 0 ? (
+                <>
+                  <h2 className="text-xl font-semibold mb-4 text-foreground">
+                    {t("results", { ns: "mainContainer" })}
+                  </h2>
+                  {searchResults.map((item, index) =>
+                    renderSearchResult(item, index),
                   )}
                 </>
+              ) : (
+                <div className="text-center text-muted-foreground">
+                  {t("noResults", { ns: "mainContainer" })}
+                </div>
               )}
 
               {selectedTerm && (
@@ -417,7 +439,6 @@ const MainContainer: React.FC = () => {
         </AnimatePresence>
       </main>
 
-      {/* Render ForcedLanguageSelector */}
       {!languageSelected && (
         <ForcedLanguageSelector onLanguageSelected={handleLanguageSelected} />
       )}
