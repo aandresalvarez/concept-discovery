@@ -1,14 +1,21 @@
 // tailwind.config.js
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: ["class"],
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  darkMode: ["class"], // Enables dark mode using a CSS class
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"], // Specifies the paths to all of your template files
+  safelist: [
+    {
+      // Safelists dynamic border and text color classes used in LoadingComponent
+      pattern:
+        /^(border|text)-(primary|accent|secondary|muted|destructive|popover|card)(-foreground)?$/,
+    },
+  ],
   theme: {
     container: {
-      center: true,
-      padding: "2rem",
+      center: true, // Centers the container
+      padding: "2rem", // Adds 2rem padding on all sides
       screens: {
-        "2xl": "1400px",
+        "2xl": "1400px", // Customizes the 2xl breakpoint
       },
     },
     extend: {
@@ -48,9 +55,9 @@ export default {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "var(--radius)", // Large border radius
+        md: "calc(var(--radius) - 2px)", // Medium border radius
+        sm: "calc(var(--radius) - 4px)", // Small border radius
       },
       keyframes: {
         "accordion-down": {
@@ -90,5 +97,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate")], // Includes the tailwindcss-animate plugin for additional animations
 };

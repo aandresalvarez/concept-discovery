@@ -1,12 +1,12 @@
 // src/components/MainContainer.tsx
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { SearchBox, Header, LoadingComponent } from "@/components"; // Ensure LoadingComponent is correctly imported
+import { SearchBox, Header, LoadingComponent } from "@/components";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
+
 import {
   ChevronRight,
   Tag,
@@ -14,12 +14,16 @@ import {
   Book,
   ChevronLeft,
   ArrowRight,
-  ExternalLink,
 } from "lucide-react";
 import axios from "axios";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import ForcedLanguageSelector from "@/components/ForcedLanguageSelector";
+
+import ConceptTable from "@/components/ConceptTable"; // Import ConceptTable
+import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
+
+import { useMediaQuery } from "@/hooks/useMediaQuery"; // Import the useMediaQuery hook
 
 interface DisambiguationResult {
   term: string;
@@ -61,15 +65,9 @@ const MainContainer: React.FC = () => {
   const [lastSearchTerm, setLastSearchTerm] = useState<string>("");
   const [languageSelected, setLanguageSelected] = useState<boolean>(false);
 
-  // Optional: Simulate initial loading (remove in production)
-  useEffect(() => {
-    // If you have an actual initial API call, place it here instead
-    // For demonstration, we'll simulate a delay
-    // setInitialLoading(true);
-    // setTimeout(() => {
-    //   setInitialLoading(false);
-    // }, 1000);
-  }, []);
+  // Use the useMediaQuery hook to determine screen size
+  const isSmallScreen = useMediaQuery("(max-width: 767px)"); // Tailwind's 'md' breakpoint is 768px
+  const loadingSize: "sm" | "md" = isSmallScreen ? "sm" : "md";
 
   // Handle language change from SearchBox (optional: allows changing language later)
   const handleLanguageChange = (lang: string) => {
@@ -176,6 +174,48 @@ const MainContainer: React.FC = () => {
     } else {
       setError(`${t("genericError", { ns: "common" })}: ${err.message}`);
     }
+  };
+
+  // Define the renderConceptTable function inside the MainContainer component
+  const renderConceptTable = () => {
+    if (conceptLoading) {
+      return (
+        <div className="mt-6 p-4">
+          <Skeleton className="h-8 w-1/4 mb-4" />
+          <Skeleton className="h-10 w-full mb-2" />
+          <Skeleton className="h-10 w-full mb-2" />
+          <Skeleton className="h-10 w-full mb-2" />
+        </div>
+      );
+    }
+
+    if (conceptTable.length === 0 && selectedSynonym) {
+      return (
+        <div className="mt-6 p-6 rounded-lg bg-accent/5 border border-accent/10">
+          <p className="text-center text-muted-foreground">
+            {t("noConceptsFound", { synonym: selectedSynonym })}
+          </p>
+        </div>
+      );
+    }
+
+    if (conceptTable.length === 0) return null;
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+        className="mt-6 p-6 rounded-lg bg-accent/5 border border-accent/10"
+      >
+        <h3 className="text-xl font-semibold mb-4 text-primary">
+          {t("conceptTable")}
+        </h3>
+        <div className="overflow-x-auto">
+          <ConceptTable data={conceptTable} />
+        </div>
+      </motion.div>
+    );
   };
 
   const renderSearchResult = (item: DisambiguationResult, index: number) => (
@@ -310,79 +350,6 @@ const MainContainer: React.FC = () => {
     </div>
   );
 
-  const renderConceptTable = () => {
-    if (conceptLoading) {
-      return (
-        <div className="mt-6 p-4">
-          <Skeleton className="h-8 w-1/4 mb-4" />
-          <Skeleton className="h-10 w-full mb-2" />
-          <Skeleton className="h-10 w-full mb-2" />
-          <Skeleton className="h-10 w-full mb-2" />
-        </div>
-      );
-    }
-
-    if (conceptTable.length === 0 && selectedSynonym) {
-      return (
-        <div className="mt-6 p-6 rounded-lg bg-accent/5 border border-accent/10">
-          <p className="text-center text-muted-foreground">
-            {t("noConceptsFound", { synonym: selectedSynonym })}
-          </p>
-        </div>
-      );
-    }
-
-    if (conceptTable.length === 0) return null;
-
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="mt-6 p-6 rounded-lg bg-accent/5 border border-accent/10"
-      >
-        <h3 className="text-xl font-semibold mb-4 text-primary">
-          {t("conceptTable")}
-        </h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-base text-left text-foreground">
-            <thead className="text-xs text-foreground uppercase bg-accent/10">
-              <tr>
-                <th className="px-6 py-3">{t("conceptId")}</th>
-                <th className="px-6 py-3">{t("name")}</th>
-                <th className="px-6 py-3">{t("domain")}</th>
-                <th className="px-6 py-3">{t("vocabulary")}</th>
-                <th className="px-6 py-3">{t("standardConcept")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {conceptTable.map((row, index) => (
-                <tr key={index} className="bg-background border-b">
-                  <td className="px-6 py-4">
-                    <a
-                      href={`https://athena.ohdsi.org/search-terms/terms/${row.concept_id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center text-primary-500 hover:text-primary-700 underline font-semibold"
-                      aria-label={`Open concept ${row.concept_id} in Athena OHDSI`}
-                    >
-                      {row.concept_id}
-                      <ExternalLink className="ml-1 h-4 w-4 text-primary-500" />
-                    </a>
-                  </td>
-                  <td className="px-6 py-4">{row.name}</td>
-                  <td className="px-6 py-4">{row.domain}</td>
-                  <td className="px-6 py-4">{row.vocabulary}</td>
-                  <td className="px-6 py-4">{row.standard_concept}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </motion.div>
-    );
-  };
-
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
@@ -446,7 +413,7 @@ const MainContainer: React.FC = () => {
                             defaultValue: "Retrieving concepts...",
                           })
                   }
-                  size="lg"
+                  size={loadingSize} // Use responsive size
                   showAdditionalInfo={conceptLoading} // Show additional info only during concept loading
                   additionalInfoText={
                     conceptLoading
@@ -456,16 +423,16 @@ const MainContainer: React.FC = () => {
                         })
                       : undefined
                   }
-                  primaryColor="border-primary" // Customize colors as needed
-                  accentColor="border-accent"
-                  secondaryColor="border-secondary"
+                  primaryColor="primary" // Update to match Tailwind config (without 'border-' prefix)
+                  accentColor="accent"
+                  secondaryColor="secondary"
                 />
               )}
 
               {/* Conditional Rendering based on loading and error states */}
               {!initialLoading && !synonymLoading && !conceptLoading && (
                 <>
-                  {loading ? null : error ? ( // Removed existing skeletons and loading messages // LoadingComponent is handling the loading state
+                  {loading ? null : error ? (
                     <div className="text-center text-destructive">
                       <p>{error}</p>
                       <Button onClick={handleRetry} className="mt-4">
