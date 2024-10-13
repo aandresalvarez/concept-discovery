@@ -191,7 +191,7 @@ const MainContainer: React.FC = () => {
 
     if (conceptTable.length === 0 && selectedSynonym) {
       return (
-        <div className="mt-6 p-6 rounded-lg bg-accent/5 border border-accent/10">
+        <div className="mt-6 p-6 rounded-lg   border border-accent/10">
           <p className="text-center text-muted-foreground">
             {t("noConceptsFound", { synonym: selectedSynonym })}
           </p>
@@ -203,10 +203,10 @@ const MainContainer: React.FC = () => {
 
     return (
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="mt-6 p-6 rounded-lg bg-accent/5 border border-accent/10"
+        initial={{ opacity: 0, y: 50 }} // Start below the view
+        animate={{ opacity: 1, y: 0 }} // Slide to the top
+        transition={{ type: "spring", stiffness: 50, duration: 0.7 }} // Adjusts smoothness
+        className="mt-6 p-6 rounded-lg   border border-accent/10"
       >
         <h3 className="text-xl font-semibold mb-4 text-primary">
           {t("conceptTable")}
