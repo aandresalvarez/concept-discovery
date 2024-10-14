@@ -105,7 +105,8 @@ def disambiguate(term: str, language: str = "en") -> str:
               "term": "<The medical term>",
               "definition": "<Definition of the medical term in {language}>",
               "usage": "<How the medical term is used. in {language}>",
-              "context": "<Medical context or specialty where the term is commonly used in {language}>"
+              "context": "<Medical context or specialty where the term is commonly used in {language}>",
+              "category": "<Category of the medical term. e.g. disease, condition, etc. in {language}>"
             }}
             ```
             """),

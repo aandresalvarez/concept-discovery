@@ -32,6 +32,7 @@ class DisambiguationResult(BaseModel):
     definition: str
     usage: str
     context: str
+    category: str
 
 
 class SearchResponse(BaseModel):
