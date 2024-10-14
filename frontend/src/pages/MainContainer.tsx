@@ -280,6 +280,8 @@ const MainContainer: React.FC = () => {
                       initialStep={currentStep}
                       onStepChange={handleStepChange}
                       onFinish={handleStepperFinish}
+                      activeColor="bg-primary"
+                      inactiveColor="bg-secondary"
                     />
                   ) : (
                     <div className="text-center text-muted-foreground">

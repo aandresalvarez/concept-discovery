@@ -1,9 +1,7 @@
-// src/components/Stepper.tsx
-
 import React, { useState, useMemo, KeyboardEvent } from "react";
 import { ChevronRight, ChevronLeft, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "../lib/utils"; // Adjust the path according to the actual location
+import { cn } from "../lib/utils";
 
 interface Step {
   id?: string | number;
@@ -56,7 +54,6 @@ const Stepper: React.FC<StepperProps> = ({
 
   const handleStepClick = (index: number) => {
     if (index <= currentStep + 1) {
-      // Allow navigation to next step if previous steps are completed
       setCurrentStep(index);
       onStepChange(index);
     }
@@ -70,14 +67,14 @@ const Stepper: React.FC<StepperProps> = ({
       return (
         <div
           key={step.id ?? index}
-          className="flex-1 flex items-center relative"
+          className="flex-1 flex flex-col items-center relative"
         >
           {/* Step Indicator */}
           <button
             type="button"
             onClick={() => handleStepClick(index)}
             className={cn(
-              "w-10 h-10 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2",
+              "w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2",
               isCompleted || isActive ? activeColor : inactiveColor,
               "hover:ring-2 hover:ring-offset-2 hover:ring-blue-500",
             )}
@@ -90,22 +87,17 @@ const Stepper: React.FC<StepperProps> = ({
               }
             }}
           >
-            {isCompleted ? <Check size={20} /> : index + 1}
+            {isCompleted ? <Check size={12} /> : index + 1}
           </button>
 
-          {/* Step Details */}
-          <div className="ml-4">
-            <div className={cn("text-sm font-medium")}>{step.title}</div>
-            {step.description && (
-              <div className={cn("text-xs text-gray-500")}>
-                {step.description}
-              </div>
-            )}
+          {/* Step Title */}
+          <div className="mt-1 text-xs sm:text-sm font-medium">
+            {step.title}
           </div>
 
           {/* Connector Line */}
           {index < steps.length - 1 && (
-            <div className="flex-1 h-0.5 bg-gray-200 mx-4 hidden sm:block">
+            <div className="absolute top-3 sm:top-4 left-1/2 w-full h-0.5 bg-gray-200">
               <div
                 className={cn(
                   "h-full transition-all duration-300",
@@ -127,18 +119,16 @@ const Stepper: React.FC<StepperProps> = ({
       aria-label="Step Progress"
     >
       {/* Step Indicators */}
-      <div className="mb-8">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center">
-          {renderSteps}
-        </div>
+      <div className="mb-4 sm:mb-8">
+        <div className="flex items-center justify-between">{renderSteps}</div>
       </div>
 
       {/* Step Content */}
-      <div className="mb-8">
-        <h2 className={cn("text-2xl font-bold mb-4")}>
+      <div className="mb-4 sm:mb-8">
+        <h2 className={cn("text-lg sm:text-2xl font-bold mb-2 sm:mb-4")}>
           {steps[currentStep].title}
         </h2>
-        <div className={cn("border p-4 rounded-lg")}>
+        <div className={cn("border p-2 sm:p-4 rounded-lg")}>
           {steps[currentStep].content}
         </div>
       </div>
@@ -150,23 +140,23 @@ const Stepper: React.FC<StepperProps> = ({
           disabled={isFirstStep}
           variant="outline"
           className={cn(
-            "flex items-center",
+            "flex items-center text-xs sm:text-sm",
             isFirstStep && "opacity-50 cursor-not-allowed",
           )}
         >
-          <ChevronLeft className={cn("mr-2")} size={16} />
+          <ChevronLeft className={cn("mr-1 sm:mr-2")} size={16} />
           Back
         </Button>
         <Button
           onClick={handleNext}
           disabled={currentStep >= steps.length}
           className={cn(
-            "flex items-center",
+            "flex items-center text-xs sm:text-sm",
             currentStep >= steps.length && "opacity-50 cursor-not-allowed",
           )}
         >
           {isLastStep ? "Finish" : "Next"}
-          <ChevronRight className={cn("ml-2")} size={16} />
+          <ChevronRight className={cn("ml-1 sm:ml-2")} size={16} />
         </Button>
       </div>
     </div>
