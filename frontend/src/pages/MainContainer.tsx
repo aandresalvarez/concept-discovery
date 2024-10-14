@@ -1,29 +1,17 @@
-// src/components/MainContainer.tsx
+// src/pages/MainContainer.tsx
 
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import { SearchBox, Header, LoadingComponent } from "@/components";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
-
-import {
-  ChevronRight,
-  Tag,
-  Info,
-  Book,
-  ChevronLeft,
-  ArrowRight,
-} from "lucide-react";
-import axios from "axios";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import Stepper from "@/components/Stepper";
+import StepDisambiguation from "@/components/steps/StepDisambiguation";
+import StepSynonyms from "@/components/steps/StepSynonyms";
+import StepTableResults from "@/components/steps/StepTableResults";
 import ForcedLanguageSelector from "@/components/ForcedLanguageSelector";
-
-import ConceptTable from "@/components/ConceptTable"; // Import ConceptTable
-import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
-
-import { useMediaQuery } from "@/hooks/useMediaQuery"; // Import the useMediaQuery hook
+import axios from "axios";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 interface DisambiguationResult {
   term: string;
@@ -31,10 +19,6 @@ interface DisambiguationResult {
   category: string;
   usage: string;
   context: string;
-}
-
-interface SynonymResult {
-  synonym: string;
 }
 
 interface ConceptTableRow {
@@ -50,31 +34,28 @@ const MainContainer: React.FC = () => {
   const [searchResults, setSearchResults] = useState<DisambiguationResult[]>(
     [],
   );
-  const [synonyms, setSynonyms] = useState<SynonymResult[]>([]);
+  const [synonyms, setSynonyms] = useState<string[]>([]);
   const [conceptTable, setConceptTable] = useState<ConceptTableRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [conceptLoading, setConceptLoading] = useState<boolean>(false);
-  const [initialLoading, setInitialLoading] = useState<boolean>(false); // New state
-  const [synonymLoading, setSynonymLoading] = useState<boolean>(false); // New state
+  const [initialLoading, setInitialLoading] = useState<boolean>(false);
+  const [synonymLoading, setSynonymLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState<boolean>(false);
   const [selectedTerm, setSelectedTerm] = useState<DisambiguationResult | null>(
     null,
   );
-  const [selectedSynonym, setSelectedSynonym] = useState<string | null>(null);
   const [lastSearchTerm, setLastSearchTerm] = useState<string>("");
   const [languageSelected, setLanguageSelected] = useState<boolean>(false);
+  const [currentStep, setCurrentStep] = useState<number>(0);
 
-  // Use the useMediaQuery hook to determine screen size
-  const isSmallScreen = useMediaQuery("(max-width: 767px)"); // Tailwind's 'md' breakpoint is 768px
+  const isSmallScreen = useMediaQuery("(max-width: 767px)");
   const loadingSize: "sm" | "md" = isSmallScreen ? "sm" : "md";
 
-  // Handle language change from SearchBox (optional: allows changing language later)
   const handleLanguageChange = (lang: string) => {
     i18n.changeLanguage(lang);
   };
 
-  // Handle retry after error
   const handleRetry = () => {
     if (lastSearchTerm) {
       handleSearch(lastSearchTerm);
@@ -86,14 +67,14 @@ const MainContainer: React.FC = () => {
   };
 
   const handleSearch = async (term: string) => {
-    setInitialLoading(true); // Start initial loading
+    setInitialLoading(true);
     setLoading(true);
     setError(null);
     setLastSearchTerm(term);
     setHasSearched(true);
     setSelectedTerm(null);
-    setSelectedSynonym(null);
     setConceptTable([]);
+    setCurrentStep(0);
 
     try {
       const response = await axios.get(`/api/search`, {
@@ -104,16 +85,15 @@ const MainContainer: React.FC = () => {
       handleError(err);
     } finally {
       setLoading(false);
-      setInitialLoading(false); // End initial loading
+      setInitialLoading(false);
     }
   };
 
   const handleDisambiguationSelect = async (term: DisambiguationResult) => {
-    setSynonymLoading(true); // Start synonym loading
+    setSynonymLoading(true);
     setLoading(true);
     setError(null);
     setSelectedTerm(term);
-    setSelectedSynonym(null);
     setConceptTable([]);
 
     try {
@@ -124,19 +104,21 @@ const MainContainer: React.FC = () => {
           language: i18n.language,
         },
       });
-      setSynonyms(response.data.synonyms);
+      setSynonyms(
+        response.data.synonyms.map((s: { synonym: string }) => s.synonym),
+      );
+      setCurrentStep(1); // Move to the synonyms step
     } catch (err: any) {
       handleError(err);
     } finally {
       setLoading(false);
-      setSynonymLoading(false); // End synonym loading
+      setSynonymLoading(false);
     }
   };
 
   const handleSynonymClick = async (synonym: string) => {
     setConceptLoading(true);
     setError(null);
-    setSelectedSynonym(synonym);
 
     try {
       const response = await axios.get(`/api/concept_lookup`, {
@@ -145,6 +127,7 @@ const MainContainer: React.FC = () => {
 
       if (response.data.concepts && response.data.concepts.length > 0) {
         setConceptTable(response.data.concepts);
+        setCurrentStep(2); // Move to the results step
       } else {
         setConceptTable([]);
       }
@@ -153,12 +136,6 @@ const MainContainer: React.FC = () => {
     } finally {
       setConceptLoading(false);
     }
-  };
-
-  const handleBack = () => {
-    setSelectedTerm(null);
-    setSelectedSynonym(null);
-    setConceptTable([]);
   };
 
   const handleError = (err: any) => {
@@ -176,179 +153,39 @@ const MainContainer: React.FC = () => {
     }
   };
 
-  // Define the renderConceptTable function inside the MainContainer component
-  const renderConceptTable = () => {
-    if (conceptLoading) {
-      return (
-        <div className="mt-6 p-4">
-          <Skeleton className="h-8 w-1/4 mb-4" />
-          <Skeleton className="h-10 w-full mb-2" />
-          <Skeleton className="h-10 w-full mb-2" />
-          <Skeleton className="h-10 w-full mb-2" />
-        </div>
-      );
-    }
+  const steps = [
+    {
+      title: "Disambiguation",
+      content: (
+        <StepDisambiguation
+          searchResults={searchResults}
+          onSelect={handleDisambiguationSelect}
+        />
+      ),
+    },
+    {
+      title: "Synonyms",
+      content: (
+        <StepSynonyms
+          synonyms={synonyms}
+          onSynonymClick={handleSynonymClick}
+          selectedTerm={selectedTerm}
+        />
+      ),
+    },
+    {
+      title: "Results",
+      content: <StepTableResults conceptTable={conceptTable} />,
+    },
+  ];
 
-    if (conceptTable.length === 0 && selectedSynonym) {
-      return (
-        <div className="mt-6 p-6 rounded-lg   border border-accent/10">
-          <p className="text-center text-muted-foreground">
-            {t("noConceptsFound", { synonym: selectedSynonym })}
-          </p>
-        </div>
-      );
-    }
-
-    if (conceptTable.length === 0) return null;
-
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 50 }} // Start below the view
-        animate={{ opacity: 1, y: 0 }} // Slide to the top
-        transition={{ type: "spring", stiffness: 50, duration: 0.7 }} // Adjusts smoothness
-        className="mt-6 p-6 rounded-lg   border border-accent/10"
-      >
-        <h3 className="text-xl font-semibold mb-4 text-primary">
-          {t("conceptTable")}
-        </h3>
-        <div className="overflow-x-auto">
-          <ConceptTable data={conceptTable} />
-        </div>
-      </motion.div>
-    );
+  const handleStepChange = (step: number) => {
+    setCurrentStep(step);
   };
 
-  const renderSearchResult = (item: DisambiguationResult, index: number) => (
-    <Card
-      key={index}
-      className="hover:shadow-lg transition-shadow duration-300 overflow-hidden border-border mb-6"
-      onClick={() => handleDisambiguationSelect(item)}
-    >
-      <CardHeader className="bg-secondary pb-2">
-        <CardTitle className="flex items-center justify-between">
-          <span className="text-2xl font-bold text-foreground font-serif hover:text-[#007C92] hover:underline transition-colors duration-200">
-            {item.term}
-          </span>
-          <Badge
-            variant="outline"
-            className="text-sm px-2 py-1 bg-accent text-accent-foreground"
-          >
-            {item.category}
-          </Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-4 bg-card text-card-foreground">
-        <div className="text-base mb-4 flex items-start font-sans">
-          <Book className="mr-2 h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
-          <span>{item.definition}</span>
-        </div>
-        <Separator className="my-4 bg-border" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-sans">
-          <div className="flex items-start">
-            <Tag className="mr-2 h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
-            <p>
-              <strong>{t("usage")}:</strong> {item.usage}
-            </p>
-          </div>
-          <div className="flex items-start">
-            <Info className="mr-2 h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
-            <p>
-              <strong>{t("context")}:</strong> {item.context}
-            </p>
-          </div>
-        </div>
-        <Button className="mt-6 w-full bg-[#8C1515] hover:bg-[#8C1515]/90 text-white transition-colors duration-200 font-sans">
-          {t("viewDetails", { ns: "common" })}
-          <ChevronRight className="ml-2 h-4 w-4" />
-        </Button>
-      </CardContent>
-    </Card>
-  );
-
-  const renderDisambiguationScreen = () => (
-    <div className="space-y-6 max-w-4xl mx-auto p-4">
-      {/* Back Button */}
-      <Button
-        onClick={handleBack}
-        variant="outline"
-        className="mb-4 text-foreground hover:text-primary transition-colors duration-200"
-      >
-        <ChevronLeft className="mr-2 h-4 w-4" />
-        Volver a los Resultados
-      </Button>
-
-      {/* Term Details Card */}
-      {selectedTerm && (
-        <Card className="border-border overflow-hidden shadow-md">
-          <CardHeader className="bg-secondary pb-2">
-            <CardTitle className="flex items-center justify-between">
-              <span className="text-3xl font-bold text-primary font-serif">
-                {selectedTerm.term}
-              </span>
-              <Badge
-                variant="outline"
-                className="text-sm px-2 py-1 bg-accent text-accent-foreground"
-              >
-                Término Médico
-              </Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-4 bg-card text-card-foreground">
-            <div className="space-y-4">
-              <div className="flex items-start">
-                <Book className="mr-2 h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
-                <p className="text-base">{selectedTerm.definition}</p>
-              </div>
-              <Separator className="my-2 bg-border" />
-              <div className="flex items-start">
-                <Tag className="mr-2 h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
-                <div>
-                  <strong className="font-semibold">Uso:</strong>{" "}
-                  {selectedTerm.usage}
-                </div>
-              </div>
-              <div className="flex items-start">
-                <Info className="mr-2 h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
-                <div>
-                  <strong className="font-semibold">Contexto:</strong>{" "}
-                  {selectedTerm.context}
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Synonyms Selection Card */}
-      <Card className="border-border shadow-md bg-accent/10">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold text-primary font-serif flex items-center">
-            <ArrowRight className="mr-2 h-6 w-6" />
-            Seleccione un sinónimo para '{selectedTerm?.term}'
-          </CardTitle>
-          <p className="text-muted-foreground font-medium">
-            Para continuar, elija uno de los siguientes sinónimos. Esto nos
-            ayudará a refinar su búsqueda y proporcionar resultados más
-            precisos.
-          </p>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap gap-2">
-            {synonyms.map((synonym, index) => (
-              <Button
-                key={index}
-                onClick={() => handleSynonymClick(synonym.synonym)}
-                variant="outline"
-                className="bg-background text-foreground hover:bg-primary hover:text-primary-foreground transition-colors duration-200 border-2 border-primary"
-              >
-                {synonym.synonym}
-              </Button>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
+  const handleStepperFinish = () => {
+    console.log("Stepper finished");
+  };
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -394,7 +231,6 @@ const MainContainer: React.FC = () => {
                 />
               </div>
 
-              {/* Loading States Integration */}
               {(initialLoading || synonymLoading || conceptLoading) && (
                 <LoadingComponent
                   loadingText={
@@ -413,8 +249,8 @@ const MainContainer: React.FC = () => {
                             defaultValue: "Retrieving concepts...",
                           })
                   }
-                  size={loadingSize} // Use responsive size
-                  showAdditionalInfo={conceptLoading} // Show additional info only during concept loading
+                  size={loadingSize}
+                  showAdditionalInfo={conceptLoading}
                   additionalInfoText={
                     conceptLoading
                       ? t("loadingAdditionalInfo", {
@@ -423,13 +259,12 @@ const MainContainer: React.FC = () => {
                         })
                       : undefined
                   }
-                  primaryColor="primary" // Update to match Tailwind config (without 'border-' prefix)
+                  primaryColor="primary"
                   accentColor="accent"
                   secondaryColor="secondary"
                 />
               )}
 
-              {/* Conditional Rendering based on loading and error states */}
               {!initialLoading && !synonymLoading && !conceptLoading && (
                 <>
                   {loading ? null : error ? (
@@ -439,20 +274,13 @@ const MainContainer: React.FC = () => {
                         {t("retry", { ns: "common" })}
                       </Button>
                     </div>
-                  ) : selectedTerm ? (
-                    <>
-                      {renderDisambiguationScreen()}
-                      {renderConceptTable()}
-                    </>
                   ) : searchResults.length > 0 ? (
-                    <>
-                      <h2 className="text-xl font-semibold mb-4 text-foreground">
-                        {t("results", { ns: "mainContainer" })}
-                      </h2>
-                      {searchResults.map((item, index) =>
-                        renderSearchResult(item, index),
-                      )}
-                    </>
+                    <Stepper
+                      steps={steps}
+                      initialStep={currentStep}
+                      onStepChange={handleStepChange}
+                      onFinish={handleStepperFinish}
+                    />
                   ) : (
                     <div className="text-center text-muted-foreground">
                       {t("noResults", { ns: "mainContainer" })}

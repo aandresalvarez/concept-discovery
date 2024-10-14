@@ -1,7 +1,9 @@
+// src/components/Stepper.tsx
+
 import React, { useState, useMemo, KeyboardEvent } from "react";
 import { ChevronRight, ChevronLeft, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import clsx from "clsx";
+import { cn } from "../lib/utils"; // Adjust the path according to the actual location
 
 interface Step {
   id?: string | number;
@@ -35,17 +37,17 @@ const Stepper: React.FC<StepperProps> = ({
   const isFirstStep = currentStep === 0;
 
   const handleNext = () => {
-    if (currentStep < steps.length - 1) {
+    if (isLastStep) {
+      onFinish(currentStep);
+    } else {
       const nextStep = currentStep + 1;
       setCurrentStep(nextStep);
       onStepChange(nextStep);
-    } else {
-      onFinish(currentStep);
     }
   };
 
   const handleBack = () => {
-    if (currentStep > 0) {
+    if (!isFirstStep) {
       const prevStep = currentStep - 1;
       setCurrentStep(prevStep);
       onStepChange(prevStep);
@@ -74,7 +76,7 @@ const Stepper: React.FC<StepperProps> = ({
           <button
             type="button"
             onClick={() => handleStepClick(index)}
-            className={clsx(
+            className={cn(
               "w-10 h-10 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2",
               isCompleted || isActive ? activeColor : inactiveColor,
               "hover:ring-2 hover:ring-offset-2 hover:ring-blue-500",
@@ -93,9 +95,11 @@ const Stepper: React.FC<StepperProps> = ({
 
           {/* Step Details */}
           <div className="ml-4">
-            <div className="text-sm font-medium">{step.title}</div>
+            <div className={cn("text-sm font-medium")}>{step.title}</div>
             {step.description && (
-              <div className="text-xs text-gray-500">{step.description}</div>
+              <div className={cn("text-xs text-gray-500")}>
+                {step.description}
+              </div>
             )}
           </div>
 
@@ -103,7 +107,7 @@ const Stepper: React.FC<StepperProps> = ({
           {index < steps.length - 1 && (
             <div className="flex-1 h-0.5 bg-gray-200 mx-4 hidden sm:block">
               <div
-                className={clsx(
+                className={cn(
                   "h-full transition-all duration-300",
                   isCompleted ? activeColor : "bg-gray-200",
                 )}
@@ -114,11 +118,11 @@ const Stepper: React.FC<StepperProps> = ({
         </div>
       );
     });
-  }, [steps, currentStep, activeColor, inactiveColor]);
+  }, [steps, currentStep, activeColor, inactiveColor, handleStepClick]);
 
   return (
     <div
-      className={clsx("w-full max-w-4xl mx-auto p-4", className)}
+      className={cn("w-full", className)}
       role="navigation"
       aria-label="Step Progress"
     >
@@ -131,8 +135,10 @@ const Stepper: React.FC<StepperProps> = ({
 
       {/* Step Content */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-4">{steps[currentStep].title}</h2>
-        <div className="border p-4 rounded-lg">
+        <h2 className={cn("text-2xl font-bold mb-4")}>
+          {steps[currentStep].title}
+        </h2>
+        <div className={cn("border p-4 rounded-lg")}>
           {steps[currentStep].content}
         </div>
       </div>
@@ -143,18 +149,24 @@ const Stepper: React.FC<StepperProps> = ({
           onClick={handleBack}
           disabled={isFirstStep}
           variant="outline"
-          className="flex items-center disabled:opacity-50"
+          className={cn(
+            "flex items-center",
+            isFirstStep && "opacity-50 cursor-not-allowed",
+          )}
         >
-          <ChevronLeft className="mr-2" size={16} />
+          <ChevronLeft className={cn("mr-2")} size={16} />
           Back
         </Button>
         <Button
           onClick={handleNext}
           disabled={currentStep >= steps.length}
-          className="flex items-center"
+          className={cn(
+            "flex items-center",
+            currentStep >= steps.length && "opacity-50 cursor-not-allowed",
+          )}
         >
           {isLastStep ? "Finish" : "Next"}
-          <ChevronRight className="ml-2" size={16} />
+          <ChevronRight className={cn("ml-2")} size={16} />
         </Button>
       </div>
     </div>

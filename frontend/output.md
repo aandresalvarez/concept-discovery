@@ -31,6 +31,433 @@ export default tseslint.config(
 
 ```
 
+## File: /home/runner/workspace/frontend/README.md
+```
+Certainly! We can modify your `.replit` file to accommodate both development and production server runs, as well as include commands for managing your frontend. Here's an updated version of your `.replit` file that includes these features:
+
+
+
+```toml
+# .replit file
+
+# Default run command (development mode)
+run = "bash run_dev.sh"
+
+# Modules
+modules = ["nodejs-20:v20-20230623-f4a2d2a", "python-3.11:v18-20230807-322e88b"]
+
+# Hidden files/directories
+hidden = [".pythonlibs", "frontend/node_modules", "frontend/dist"]
+
+# Nix configuration
+[nix]
+channel = "stable-24_05"
+
+# Deployment configuration
+[deployment]
+run = "bash run_prod.sh"
+deploymentTarget = "cloudrun"
+
+# Port configuration
+[[ports]]
+localPort = 8000
+externalPort = 80
+
+# Commands
+[commands]
+# Start development servers
+dev = "bash run_dev.sh"
+# Start production server
+prod = "bash run_prod.sh"
+# Install dependencies
+install = "pip install -r requirements.txt && cd frontend && npm install"
+# Build frontend
+build = "cd frontend && npm run build"
+
+```
+
+Now, let's create two shell scripts to handle the development and production server runs:
+
+```bash
+#!/bin/bash
+
+# Start FastAPI server
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload &
+
+# Navigate to frontend directory
+cd frontend
+
+# Start Vite dev server
+npm run dev &
+
+# Wait for all background jobs to finish
+wait
+
+```
+
+```bash
+#!/bin/bash
+
+# Build the frontend
+cd frontend
+npm run build
+
+# Navigate back to the root directory
+cd ..
+
+# Start FastAPI server in production mode
+uvicorn main:app --host 0.0.0.0 --port 8000
+
+```
+
+Here's an explanation of the changes and additions:
+
+1. `.replit` file:
+   - The default `run` command now uses a shell script for development mode.
+   - We've added commands for development (`dev`), production (`prod`), installing dependencies (`install`), and building the frontend (`build`).
+   - The `deployment` section now uses a production shell script.
+
+2. `run_dev.sh`:
+   - This script starts both the FastAPI server and the Vite development server.
+   - It runs both servers in the background and waits for them to finish.
+
+3. `run_prod.sh`:
+   - This script builds the frontend and then starts the FastAPI server in production mode.
+
+To use these new configurations:
+
+1. Save the `.replit` file in your project root.
+2. Create `run_dev.sh` and `run_prod.sh` in your project root.
+3. Make the scripts executable:
+   ```bash
+   chmod +x run_dev.sh run_prod.sh
+   ```
+
+I apologize for the confusion. It seems the `run` command in Replit doesn't work as expected with our custom commands. Let's adjust our approach to use Replit's built-in run button and console commands instead. We'll modify the `.replit` file to make it easier to run different commands.
+
+
+
+```toml
+# .replit file
+
+# Default run command (development mode)
+run = "bash run_dev.sh"
+
+# Modules
+modules = ["nodejs-20:v20-20230623-f4a2d2a", "python-3.11:v18-20230807-322e88b"]
+
+# Hidden files/directories
+hidden = [".pythonlibs", "frontend/node_modules", "frontend/dist"]
+
+# Nix configuration
+[nix]
+channel = "stable-24_05"
+
+# Deployment configuration
+[deployment]
+run = "bash run_prod.sh"
+deploymentTarget = "cloudrun"
+
+# Port configuration
+[[ports]]
+localPort = 8000
+externalPort = 80
+
+# Commands
+[commands]
+dev = "bash run_dev.sh"
+prod = "bash run_prod.sh"
+install = "pip install -r requirements.txt && cd frontend && npm install"
+build = "cd frontend && npm run build"
+
+```
+
+Now, let's update our shell scripts to make sure they work in the Replit environment:
+
+```bash
+#!/bin/bash
+
+# Start FastAPI server
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload &
+
+# Navigate to frontend directory
+cd frontend
+
+# Start Vite dev server
+npm run dev &
+
+# Keep the script running
+wait
+
+```
+
+```bash
+#!/bin/bash
+
+# Build the frontend
+cd frontend
+npm run build
+
+# Navigate back to the root directory
+cd ..
+
+# Start FastAPI server in production mode
+uvicorn main:app --host 0.0.0.0 --port 8000
+
+```
+
+With these changes, here's how you can run different commands in Replit:
+
+1. Development mode:
+   - Click the "Run" button in Replit, or
+   - In the Replit shell, type: `bash run_dev.sh`
+
+2. Production mode:
+   - In the Replit shell, type: `bash run_prod.sh`
+
+3. Install dependencies:
+   - In the Replit shell, type: `pip install -r requirements.txt && cd frontend && npm install`
+
+4. Build frontend:
+   - In the Replit shell, type: `cd frontend && npm run build`
+
+These commands should work directly in the Replit environment without needing to use the `run` command that was causing issues.
+
+To use this setup:
+
+1. Update your `.replit` file with the content provided above.
+2. Update your `run_dev.sh` and `run_prod.sh` scripts with the content provided above.
+3. Make sure the scripts are executable:
+   ```bash
+   chmod +x run_dev.sh run_prod.sh
+   ```
+
+Now, when you click the "Run" button in Replit, it will start your development servers. You can use the shell commands for other operations like running in production mode, installing dependencies, or building the frontend.
+
+This setup should work more smoothly within the Replit environment. If you encounter any issues or need further adjustments, please let me know!
+
+
+Here are the URLs where you can access your services:
+
+Frontend: http://localhost:5175
+Backend: http://localhost:8001
+```
+
+## File: /home/runner/workspace/frontend/components.json
+```
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "default",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "tailwind.config.js",
+    "css": "src/index.css",
+    "baseColor": "slate",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui"
+  }
+}
+
+```
+
+## File: /home/runner/workspace/frontend/postcss.config.js
+```
+export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+
+```
+
+## File: /home/runner/workspace/frontend/tsconfig.json
+```
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"]
+}
+
+```
+
+## File: /home/runner/workspace/frontend/vite.config.ts
+```
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
+
+export default defineConfig({
+  plugins: [react()],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+  server: {
+    port: 5174,
+    strictPort: false,
+    proxy: {
+      "/api": {
+        target: "http://localhost:8000",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
+  },
+});
+
+```
+
+## File: /home/runner/workspace/frontend/index.html
+```
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Medical Concept Discovery</title>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
+```
+
+## File: /home/runner/workspace/frontend/tailwind.config.js
+```
+// tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+export default {
+  darkMode: ["class"], // Enables dark mode using a CSS class
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"], // Specifies the paths to all of your template files
+  safelist: [
+    {
+      // Safelists dynamic border and text color classes used in LoadingComponent
+      pattern:
+        /^(border|text)-(primary|accent|secondary|muted|destructive|popover|card)(-foreground)?$/,
+    },
+  ],
+  theme: {
+    container: {
+      center: true, // Centers the container
+      padding: "2rem", // Adds 2rem padding on all sides
+      screens: {
+        "2xl": "1400px", // Customizes the 2xl breakpoint
+      },
+    },
+    extend: {
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+      },
+      borderRadius: {
+        lg: "var(--radius)", // Large border radius
+        md: "calc(var(--radius) - 2px)", // Medium border radius
+        sm: "calc(var(--radius) - 4px)", // Small border radius
+      },
+      keyframes: {
+        "accordion-down": {
+          from: { height: 0 },
+          to: { height: "var(--radix-accordion-content-height)" },
+        },
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: 0 },
+        },
+        blink: {
+          "0%, 100%": { opacity: 1 },
+          "50%": { opacity: 0 },
+        },
+        pingSlow: {
+          "75%, 100%": { transform: "scale(2)", opacity: "0" },
+        },
+        pingSlower: {
+          "75%, 100%": { transform: "scale(2)", opacity: "0" },
+        },
+        pingSlowest: {
+          "75%, 100%": { transform: "scale(2)", opacity: "0" },
+        },
+        scaleAnimation: {
+          "0%, 100%": { transform: "scale(1)" },
+          "50%": { transform: "scale(1.05)" },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+        blink: "blink 1s step-end infinite",
+        "ping-slow": "pingSlow 2s cubic-bezier(0, 0, 0.2, 1) infinite",
+        "ping-slower": "pingSlower 2s cubic-bezier(0, 0, 0.2, 1) infinite",
+        "ping-slowest": "pingSlowest 2s cubic-bezier(0, 0, 0.2, 1) infinite",
+        scale: "scaleAnimation 1s infinite",
+      },
+    },
+  },
+  plugins: [require("tailwindcss-animate")], // Includes the tailwindcss-animate plugin for additional animations
+};
+
+```
+
 ## File: /home/runner/workspace/frontend/package-lock.json
 ```
 {
@@ -51,6 +478,7 @@ export default tseslint.config(
         "@radix-ui/react-tabs": "^1.1.1",
         "@radix-ui/react-toggle": "^1.1.0",
         "@radix-ui/react-toggle-group": "^1.1.0",
+        "@tanstack/react-table": "^8.20.5",
         "class-variance-authority": "^0.7.0",
         "clsx": "^2.1.1",
         "framer-motion": "^11.11.1",
@@ -2204,6 +2632,39 @@ export default tseslint.config(
       "license": "MIT",
       "engines": {
         "node": ">=14"
+      }
+    },
+    "node_modules/@tanstack/react-table": {
+      "version": "8.20.5",
+      "resolved": "https://registry.npmjs.org/@tanstack/react-table/-/react-table-8.20.5.tgz",
+      "integrity": "sha512-WEHopKw3znbUZ61s9i0+i9g8drmDo6asTWbrQh8Us63DAk/M0FkmIqERew6P71HI75ksZ2Pxyuf4vvKh9rAkiA==",
+      "license": "MIT",
+      "dependencies": {
+        "@tanstack/table-core": "8.20.5"
+      },
+      "engines": {
+        "node": ">=12"
+      },
+      "funding": {
+        "type": "github",
+        "url": "https://github.com/sponsors/tannerlinsley"
+      },
+      "peerDependencies": {
+        "react": ">=16.8",
+        "react-dom": ">=16.8"
+      }
+    },
+    "node_modules/@tanstack/table-core": {
+      "version": "8.20.5",
+      "resolved": "https://registry.npmjs.org/@tanstack/table-core/-/table-core-8.20.5.tgz",
+      "integrity": "sha512-P9dF7XbibHph2PFRz8gfBKEXEY/HJPOhym8CHmjF8y3q5mWpKx9xtZapXQUWCgkqvsK0R46Azuz+VaxD4Xl+Tg==",
+      "license": "MIT",
+      "engines": {
+        "node": ">=12"
+      },
+      "funding": {
+        "type": "github",
+        "url": "https://github.com/sponsors/tannerlinsley"
       }
     },
     "node_modules/@types/axios": {
@@ -6457,6 +6918,7 @@ export default tseslint.config(
     "@radix-ui/react-tabs": "^1.1.1",
     "@radix-ui/react-toggle": "^1.1.0",
     "@radix-ui/react-toggle-group": "^1.1.0",
+    "@tanstack/react-table": "^8.20.5",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "framer-motion": "^11.11.1",
@@ -6493,426 +6955,6 @@ export default tseslint.config(
     "vite": "^5.4.1"
   }
 }
-
-```
-
-## File: /home/runner/workspace/frontend/README.md
-```
-Certainly! We can modify your `.replit` file to accommodate both development and production server runs, as well as include commands for managing your frontend. Here's an updated version of your `.replit` file that includes these features:
-
-
-
-```toml
-# .replit file
-
-# Default run command (development mode)
-run = "bash run_dev.sh"
-
-# Modules
-modules = ["nodejs-20:v20-20230623-f4a2d2a", "python-3.11:v18-20230807-322e88b"]
-
-# Hidden files/directories
-hidden = [".pythonlibs", "frontend/node_modules", "frontend/dist"]
-
-# Nix configuration
-[nix]
-channel = "stable-24_05"
-
-# Deployment configuration
-[deployment]
-run = "bash run_prod.sh"
-deploymentTarget = "cloudrun"
-
-# Port configuration
-[[ports]]
-localPort = 8000
-externalPort = 80
-
-# Commands
-[commands]
-# Start development servers
-dev = "bash run_dev.sh"
-# Start production server
-prod = "bash run_prod.sh"
-# Install dependencies
-install = "pip install -r requirements.txt && cd frontend && npm install"
-# Build frontend
-build = "cd frontend && npm run build"
-
-```
-
-Now, let's create two shell scripts to handle the development and production server runs:
-
-```bash
-#!/bin/bash
-
-# Start FastAPI server
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload &
-
-# Navigate to frontend directory
-cd frontend
-
-# Start Vite dev server
-npm run dev &
-
-# Wait for all background jobs to finish
-wait
-
-```
-
-```bash
-#!/bin/bash
-
-# Build the frontend
-cd frontend
-npm run build
-
-# Navigate back to the root directory
-cd ..
-
-# Start FastAPI server in production mode
-uvicorn main:app --host 0.0.0.0 --port 8000
-
-```
-
-Here's an explanation of the changes and additions:
-
-1. `.replit` file:
-   - The default `run` command now uses a shell script for development mode.
-   - We've added commands for development (`dev`), production (`prod`), installing dependencies (`install`), and building the frontend (`build`).
-   - The `deployment` section now uses a production shell script.
-
-2. `run_dev.sh`:
-   - This script starts both the FastAPI server and the Vite development server.
-   - It runs both servers in the background and waits for them to finish.
-
-3. `run_prod.sh`:
-   - This script builds the frontend and then starts the FastAPI server in production mode.
-
-To use these new configurations:
-
-1. Save the `.replit` file in your project root.
-2. Create `run_dev.sh` and `run_prod.sh` in your project root.
-3. Make the scripts executable:
-   ```bash
-   chmod +x run_dev.sh run_prod.sh
-   ```
-
-I apologize for the confusion. It seems the `run` command in Replit doesn't work as expected with our custom commands. Let's adjust our approach to use Replit's built-in run button and console commands instead. We'll modify the `.replit` file to make it easier to run different commands.
-
-
-
-```toml
-# .replit file
-
-# Default run command (development mode)
-run = "bash run_dev.sh"
-
-# Modules
-modules = ["nodejs-20:v20-20230623-f4a2d2a", "python-3.11:v18-20230807-322e88b"]
-
-# Hidden files/directories
-hidden = [".pythonlibs", "frontend/node_modules", "frontend/dist"]
-
-# Nix configuration
-[nix]
-channel = "stable-24_05"
-
-# Deployment configuration
-[deployment]
-run = "bash run_prod.sh"
-deploymentTarget = "cloudrun"
-
-# Port configuration
-[[ports]]
-localPort = 8000
-externalPort = 80
-
-# Commands
-[commands]
-dev = "bash run_dev.sh"
-prod = "bash run_prod.sh"
-install = "pip install -r requirements.txt && cd frontend && npm install"
-build = "cd frontend && npm run build"
-
-```
-
-Now, let's update our shell scripts to make sure they work in the Replit environment:
-
-```bash
-#!/bin/bash
-
-# Start FastAPI server
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload &
-
-# Navigate to frontend directory
-cd frontend
-
-# Start Vite dev server
-npm run dev &
-
-# Keep the script running
-wait
-
-```
-
-```bash
-#!/bin/bash
-
-# Build the frontend
-cd frontend
-npm run build
-
-# Navigate back to the root directory
-cd ..
-
-# Start FastAPI server in production mode
-uvicorn main:app --host 0.0.0.0 --port 8000
-
-```
-
-With these changes, here's how you can run different commands in Replit:
-
-1. Development mode:
-   - Click the "Run" button in Replit, or
-   - In the Replit shell, type: `bash run_dev.sh`
-
-2. Production mode:
-   - In the Replit shell, type: `bash run_prod.sh`
-
-3. Install dependencies:
-   - In the Replit shell, type: `pip install -r requirements.txt && cd frontend && npm install`
-
-4. Build frontend:
-   - In the Replit shell, type: `cd frontend && npm run build`
-
-These commands should work directly in the Replit environment without needing to use the `run` command that was causing issues.
-
-To use this setup:
-
-1. Update your `.replit` file with the content provided above.
-2. Update your `run_dev.sh` and `run_prod.sh` scripts with the content provided above.
-3. Make sure the scripts are executable:
-   ```bash
-   chmod +x run_dev.sh run_prod.sh
-   ```
-
-Now, when you click the "Run" button in Replit, it will start your development servers. You can use the shell commands for other operations like running in production mode, installing dependencies, or building the frontend.
-
-This setup should work more smoothly within the Replit environment. If you encounter any issues or need further adjustments, please let me know!
-
-
-Here are the URLs where you can access your services:
-
-Frontend: http://localhost:5175
-Backend: http://localhost:8001
-```
-
-## File: /home/runner/workspace/frontend/components.json
-```
-{
-  "$schema": "https://ui.shadcn.com/schema.json",
-  "style": "default",
-  "rsc": false,
-  "tsx": true,
-  "tailwind": {
-    "config": "tailwind.config.js",
-    "css": "src/index.css",
-    "baseColor": "slate",
-    "cssVariables": true,
-    "prefix": ""
-  },
-  "aliases": {
-    "components": "@/components",
-    "utils": "@/lib/utils",
-    "ui": "@/components/ui"
-  }
-}
-
-```
-
-## File: /home/runner/workspace/frontend/postcss.config.js
-```
-export default {
-  plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
-  },
-}
-
-```
-
-## File: /home/runner/workspace/frontend/tsconfig.json
-```
-{
-  "compilerOptions": {
-    "target": "ES2020",
-    "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "module": "ESNext",
-    "skipLibCheck": true,
-    "moduleResolution": "bundler",
-    "allowImportingTsExtensions": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "noEmit": true,
-    "jsx": "react-jsx",
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    }
-  },
-  "include": ["src"]
-}
-
-```
-
-## File: /home/runner/workspace/frontend/vite.config.ts
-```
-import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react";
-import path from "path";
-
-export default defineConfig({
-  plugins: [react()],
-  resolve: {
-    alias: {
-      "@": path.resolve(__dirname, "./src"),
-    },
-  },
-  server: {
-    port: 5174,
-    strictPort: false,
-    proxy: {
-      "/api": {
-        target: "http://localhost:8000",
-        changeOrigin: true,
-        secure: false,
-      },
-    },
-  },
-});
-
-```
-
-## File: /home/runner/workspace/frontend/index.html
-```
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Medical Concept Discovery</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
-</html>
-
-```
-
-## File: /home/runner/workspace/frontend/tailwind.config.js
-```
-// tailwind.config.js
-/** @type {import('tailwindcss').Config} */
-export default {
-  darkMode: ["class"],
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
-  theme: {
-    container: {
-      center: true,
-      padding: "2rem",
-      screens: {
-        "2xl": "1400px",
-      },
-    },
-    extend: {
-      colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
-        },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
-        },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
-        },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
-        },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
-        },
-      },
-      borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
-      },
-      keyframes: {
-        "accordion-down": {
-          from: { height: 0 },
-          to: { height: "var(--radix-accordion-content-height)" },
-        },
-        "accordion-up": {
-          from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: 0 },
-        },
-        blink: {
-          "0%, 100%": { opacity: 1 },
-          "50%": { opacity: 0 },
-        },
-        pingSlow: {
-          "75%, 100%": { transform: "scale(2)", opacity: "0" },
-        },
-        pingSlower: {
-          "75%, 100%": { transform: "scale(2)", opacity: "0" },
-        },
-        pingSlowest: {
-          "75%, 100%": { transform: "scale(2)", opacity: "0" },
-        },
-        scaleAnimation: {
-          "0%, 100%": { transform: "scale(1)" },
-          "50%": { transform: "scale(1.05)" },
-        },
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-        blink: "blink 1s step-end infinite",
-        "ping-slow": "pingSlow 2s cubic-bezier(0, 0, 0.2, 1) infinite",
-        "ping-slower": "pingSlower 2s cubic-bezier(0, 0, 0.2, 1) infinite",
-        "ping-slowest": "pingSlowest 2s cubic-bezier(0, 0, 0.2, 1) infinite",
-        scale: "scaleAnimation 1s infinite",
-      },
-    },
-  },
-  plugins: [require("tailwindcss-animate")],
-};
 
 ```
 
@@ -7318,28 +7360,6 @@ h1, h2, h3, h4, h5, h6 {
 
 ```
 
-## File: /home/runner/workspace/frontend/src/App.tsx
-```
-// src/App.tsx
-import React, { Suspense } from "react";
-import { I18nextProvider } from "react-i18next";
-import i18n from "./i18n";
-import MainContainer from "./pages/MainContainer";
-
-const App: React.FC = () => {
-  return (
-    <I18nextProvider i18n={i18n}>
-      <Suspense fallback={<div>Loading...</div>}>
-        <MainContainer />
-      </Suspense>
-    </I18nextProvider>
-  );
-};
-
-export default App;
-
-```
-
 ## File: /home/runner/workspace/frontend/src/i18n.ts
 ```
 import i18n from "i18next";
@@ -7370,14 +7390,25 @@ export default i18n;
 
 ```
 
-## File: /home/runner/workspace/frontend/src/lib/utils.ts
+## File: /home/runner/workspace/frontend/src/App.tsx
 ```
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+// src/App.tsx
+import React, { Suspense } from "react";
+import { I18nextProvider } from "react-i18next";
+import i18n from "./i18n";
+import MainContainer from "./pages/MainContainer";
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
+const App: React.FC = () => {
+  return (
+    <I18nextProvider i18n={i18n}>
+      <Suspense fallback={<div>Loading...</div>}>
+        <MainContainer />
+      </Suspense>
+    </I18nextProvider>
+  );
+};
+
+export default App;
 
 ```
 
@@ -7385,6 +7416,19 @@ export function cn(...inputs: ClassValue[]) {
 ```
 import { type ClassValue } from "clsx";
 export declare function cn(...inputs: ClassValue[]): string;
+
+```
+
+## File: /home/runner/workspace/frontend/src/lib/utils.ts
+```
+// src/utils.ts
+
+import { clsx, type ClassValue } from "clsx";
+import { twMerge } from "tailwind-merge";
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
 
 ```
 
@@ -7893,6 +7937,143 @@ export { default as Recommendation } from "./Recommendation";
 export { default as Header } from "./Header";
 export { default as Footer } from "./Footer";
 export { default as LoadingComponent } from "./LoadingComponent";
+export { default as ConceptTable } from "./ConceptTable";
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/ConceptTable.tsx
+```
+// src/components/ConceptTable.tsx
+
+import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getSortedRowModel,
+  SortingState,
+  useReactTable,
+} from "@tanstack/react-table";
+import { ExternalLink } from "lucide-react";
+
+type Concept = {
+  concept_id: number;
+  name: string;
+  domain: string;
+  vocabulary: string;
+  standard_concept: string;
+};
+
+const columns: ColumnDef<Concept>[] = [
+  {
+    accessorKey: "concept_id",
+    header: "Concept ID",
+    cell: ({ row }) => {
+      const concept_id = row.getValue("concept_id") as number;
+      return (
+        <a
+          href={`https://athena.ohdsi.org/search-terms/terms/${concept_id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center text-primary-500 hover:text-primary-700 underline font-semibold group"
+          aria-label={`Open concept ${concept_id} in Athena OHDSI`}
+        >
+          {concept_id}
+          <ExternalLink className="ml-1 h-4 w-4 text-primary-500 group-hover:text-primary-700" />
+        </a>
+      );
+    },
+    enableSorting: true,
+  },
+  {
+    accessorKey: "name",
+    header: "Name",
+    enableSorting: true,
+  },
+  {
+    accessorKey: "domain",
+    header: "Domain",
+    enableSorting: true,
+  },
+  {
+    accessorKey: "vocabulary",
+    header: "Vocabulary",
+    enableSorting: true,
+  },
+  {
+    accessorKey: "standard_concept",
+    header: "Standard Concept",
+    enableSorting: true,
+  },
+];
+
+const ConceptTable: React.FC<{ data: Concept[] }> = ({ data }) => {
+  const [sorting, setSorting] = useState<SortingState>([]);
+
+  const table = useReactTable({
+    data,
+    columns,
+    state: {
+      sorting,
+    },
+    onSortingChange: setSorting,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+  });
+
+  return (
+    <Table>
+      <TableHeader>
+        {table.getHeaderGroups().map((headerGroup) => (
+          <TableRow key={headerGroup.id}>
+            {headerGroup.headers.map((header) => (
+              <TableHead
+                key={header.id}
+                onClick={header.column.getToggleSortingHandler()}
+                className="cursor-pointer select-none"
+              >
+                <div className="flex items-center">
+                  {flexRender(
+                    header.column.columnDef.header,
+                    header.getContext(),
+                  )}
+                  {header.column.getIsSorted() ? (
+                    header.column.getIsSorted() === "asc" ? (
+                      <span className="ml-1">▲</span>
+                    ) : (
+                      <span className="ml-1">▼</span>
+                    )
+                  ) : null}
+                </div>
+              </TableHead>
+            ))}
+          </TableRow>
+        ))}
+      </TableHeader>
+      <TableBody>
+        {table.getRowModel().rows.map((row) => (
+          <TableRow key={row.id}>
+            {row.getVisibleCells().map((cell) => (
+              <TableCell key={cell.id}>
+                {flexRender(cell.column.columnDef.cell, cell.getContext())}
+              </TableCell>
+            ))}
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+};
+
+export default ConceptTable;
 
 ```
 
@@ -7909,6 +8090,8 @@ interface LoadingComponentProps {
   primaryColor?: string;
   accentColor?: string;
   secondaryColor?: string;
+  className?: string; // Allows custom styling from parent components
+  textAlignment?: "center" | "left" | "right"; // Controls text alignment
 }
 
 type Size = "sm" | "md" | "lg";
@@ -7920,9 +8103,9 @@ const sizeClasses: Record<Size, string> = {
 };
 
 const textSizeClasses: Record<Size, string> = {
-  sm: "text-xl sm:text-2xl md:text-3xl",
-  md: "text-2xl sm:text-3xl md:text-4xl lg:text-5xl",
-  lg: "text-3xl sm:text-4xl md:text-5xl lg:text-6xl",
+  sm: "text-base sm:text-lg md:text-xl",
+  md: "text-lg sm:text-xl md:text-2xl lg:text-3xl",
+  lg: "text-xl sm:text-2xl md:text-3xl lg:text-4xl",
 };
 
 const LoadingComponent: React.FC<LoadingComponentProps> = ({
@@ -7930,52 +8113,63 @@ const LoadingComponent: React.FC<LoadingComponentProps> = ({
   loadingText = "Cargando...",
   showAdditionalInfo = true,
   additionalInfoText = "Por favor, espere mientras preparamos su contenido",
-  primaryColor = "border-primary",
-  accentColor = "border-accent",
-  secondaryColor = "border-secondary",
+  primaryColor = "primary",
+  accentColor = "accent",
+  secondaryColor = "secondary",
+  className = "",
+  textAlignment = "center",
 }) => {
   // Ensure the size is one of the defined sizes
   const validatedSize: Size = size in sizeClasses ? size : "md";
   const selectedSizeClass = sizeClasses[validatedSize];
   const selectedTextSizeClass = textSizeClasses[validatedSize];
 
+  // Construct color classes
+  const primaryBorderColor = `border-${primaryColor}`;
+  const accentBorderColor = `border-${accentColor}`;
+  const secondaryBorderColor = `border-${secondaryColor}`;
+  const textColorClass = `text-${primaryColor}`;
+
+  // Text alignment class
+  const alignmentClass = `text-${textAlignment}`;
+
   return (
     <div
-      className="relative min-h-screen w-full bg-background flex items-center justify-center overflow-hidden"
+      className={`w-full bg-background flex items-start justify-center pt-16 overflow-hidden ${className}`}
       role="status"
       aria-live="polite"
     >
-      <div className="relative z-10 flex flex-col items-center justify-center px-4 sm:px-6 md:px-8">
+      <div className="flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 space-y-4 max-w-xl">
         {/* Custom Loading Animation */}
-        <div className={`relative mb-8 ${selectedSizeClass}`}>
+        <div className={`relative ${selectedSizeClass}`}>
           <div
-            className={`absolute inset-0 ${primaryColor} border-4 rounded-full animate-ping-slow`}
+            className={`absolute inset-0 ${primaryBorderColor} border-4 rounded-full animate-ping-slow`}
             aria-hidden="true"
           ></div>
           <div
-            className={`absolute inset-3 ${accentColor} border-4 rounded-full animate-ping-slower`}
+            className={`absolute inset-3 ${accentBorderColor} border-4 rounded-full animate-ping-slower`}
             style={{ animationDelay: "0.5s" }}
             aria-hidden="true"
           ></div>
           <div
-            className={`absolute inset-6 ${secondaryColor} border-4 rounded-full animate-ping-slowest`}
+            className={`absolute inset-6 ${secondaryBorderColor} border-4 rounded-full animate-ping-slowest`}
             style={{ animationDelay: "1s" }}
             aria-hidden="true"
           ></div>
         </div>
         {/* Loading Text */}
-        <div className="text-center">
-          <h2
-            className={`font-serif font-bold text-primary foreground drop-shadow-lg ${selectedTextSizeClass} animate-scale`}
-          >
-            {loadingText}
-          </h2>
-        </div>
+        <h2
+          className={`font-serif font-bold ${textColorClass} drop-shadow-lg ${selectedTextSizeClass} animate-scale ${alignmentClass}`}
+        >
+          {loadingText}
+        </h2>
         {/* Additional Info */}
         {showAdditionalInfo && (
-          <div className="mt-4 text-muted-foreground text-center hidden md:block">
-            <p className="text-sm lg:text-base">{additionalInfoText}</p>
-          </div>
+          <p
+            className={`text-muted-foreground ${alignmentClass} text-sm lg:text-base max-w-md`}
+          >
+            {additionalInfoText}
+          </p>
         )}
       </div>
     </div>
@@ -7983,6 +8177,187 @@ const LoadingComponent: React.FC<LoadingComponentProps> = ({
 };
 
 export default LoadingComponent;
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/Stepper.tsx
+```
+// src/components/Stepper.tsx
+
+import React, { useState, useMemo, KeyboardEvent } from "react";
+import { ChevronRight, ChevronLeft, Check } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "../lib/utils"; // Adjust the path according to the actual location
+
+interface Step {
+  id?: string | number;
+  title: string;
+  description?: string;
+  content: React.ReactNode;
+}
+
+interface StepperProps {
+  steps: Step[];
+  initialStep?: number;
+  onStepChange?: (currentStep: number) => void;
+  onFinish?: (currentStep: number) => void;
+  activeColor?: string;
+  inactiveColor?: string;
+  className?: string;
+}
+
+const Stepper: React.FC<StepperProps> = ({
+  steps,
+  initialStep = 0,
+  onStepChange = () => {},
+  onFinish = () => {},
+  activeColor = "bg-blue-500",
+  inactiveColor = "bg-gray-300",
+  className = "",
+}) => {
+  const [currentStep, setCurrentStep] = useState<number>(initialStep);
+
+  const isLastStep = currentStep === steps.length - 1;
+  const isFirstStep = currentStep === 0;
+
+  const handleNext = () => {
+    if (isLastStep) {
+      onFinish(currentStep);
+    } else {
+      const nextStep = currentStep + 1;
+      setCurrentStep(nextStep);
+      onStepChange(nextStep);
+    }
+  };
+
+  const handleBack = () => {
+    if (!isFirstStep) {
+      const prevStep = currentStep - 1;
+      setCurrentStep(prevStep);
+      onStepChange(prevStep);
+    }
+  };
+
+  const handleStepClick = (index: number) => {
+    if (index <= currentStep + 1) {
+      // Allow navigation to next step if previous steps are completed
+      setCurrentStep(index);
+      onStepChange(index);
+    }
+  };
+
+  const renderSteps = useMemo(() => {
+    return steps.map((step, index) => {
+      const isCompleted = index < currentStep;
+      const isActive = index === currentStep;
+
+      return (
+        <div
+          key={step.id ?? index}
+          className="flex-1 flex items-center relative"
+        >
+          {/* Step Indicator */}
+          <button
+            type="button"
+            onClick={() => handleStepClick(index)}
+            className={cn(
+              "w-10 h-10 rounded-full flex items-center justify-center text-white font-bold transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2",
+              isCompleted || isActive ? activeColor : inactiveColor,
+              "hover:ring-2 hover:ring-offset-2 hover:ring-blue-500",
+            )}
+            aria-current={isActive ? "step" : undefined}
+            aria-label={`Step ${index + 1}: ${step.title}`}
+            tabIndex={0}
+            onKeyPress={(e: KeyboardEvent<HTMLButtonElement>) => {
+              if (e.key === "Enter" || e.key === " ") {
+                handleStepClick(index);
+              }
+            }}
+          >
+            {isCompleted ? <Check size={20} /> : index + 1}
+          </button>
+
+          {/* Step Details */}
+          <div className="ml-4">
+            <div className={cn("text-sm font-medium")}>{step.title}</div>
+            {step.description && (
+              <div className={cn("text-xs text-gray-500")}>
+                {step.description}
+              </div>
+            )}
+          </div>
+
+          {/* Connector Line */}
+          {index < steps.length - 1 && (
+            <div className="flex-1 h-0.5 bg-gray-200 mx-4 hidden sm:block">
+              <div
+                className={cn(
+                  "h-full transition-all duration-300",
+                  isCompleted ? activeColor : "bg-gray-200",
+                )}
+                style={{ width: isCompleted ? "100%" : "0%" }}
+              ></div>
+            </div>
+          )}
+        </div>
+      );
+    });
+  }, [steps, currentStep, activeColor, inactiveColor, handleStepClick]);
+
+  return (
+    <div
+      className={cn("w-full", className)}
+      role="navigation"
+      aria-label="Step Progress"
+    >
+      {/* Step Indicators */}
+      <div className="mb-8">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center">
+          {renderSteps}
+        </div>
+      </div>
+
+      {/* Step Content */}
+      <div className="mb-8">
+        <h2 className={cn("text-2xl font-bold mb-4")}>
+          {steps[currentStep].title}
+        </h2>
+        <div className={cn("border p-4 rounded-lg")}>
+          {steps[currentStep].content}
+        </div>
+      </div>
+
+      {/* Navigation Buttons */}
+      <div className="flex justify-between">
+        <Button
+          onClick={handleBack}
+          disabled={isFirstStep}
+          variant="outline"
+          className={cn(
+            "flex items-center",
+            isFirstStep && "opacity-50 cursor-not-allowed",
+          )}
+        >
+          <ChevronLeft className={cn("mr-2")} size={16} />
+          Back
+        </Button>
+        <Button
+          onClick={handleNext}
+          disabled={currentStep >= steps.length}
+          className={cn(
+            "flex items-center",
+            currentStep >= steps.length && "opacity-50 cursor-not-allowed",
+          )}
+        >
+          {isLastStep ? "Finish" : "Next"}
+          <ChevronRight className={cn("ml-2")} size={16} />
+        </Button>
+      </div>
+    </div>
+  );
+};
+
+export default Stepper;
 
 ```
 
@@ -9081,6 +9456,24 @@ export { Badge, badgeVariants }
 
 ```
 
+## File: /home/runner/workspace/frontend/src/components/steps/StepDisambiguation.tsx
+```
+// src/components/steps/StepDisambiguation.tsx
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/steps/StepSynonyms.tsx
+```
+// src/components/steps/StepSynonyms.tsx
+
+```
+
+## File: /home/runner/workspace/frontend/src/components/steps/StepTableResults.tsx
+```
+// src/components/steps/StepTableResults.tsx
+
+```
+
 ## File: /home/runner/workspace/frontend/src/types/index.ts
 ```
 // src/types/index.ts
@@ -9137,13 +9530,13 @@ export interface SearchResults {
 ```
 // src/components/MainContainer.tsx
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { SearchBox, Header, LoadingComponent } from "@/components"; // Ensure LoadingComponent is correctly imported
+import { SearchBox, Header, LoadingComponent } from "@/components";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
-import { Skeleton } from "@/components/ui/skeleton";
+
 import {
   ChevronRight,
   Tag,
@@ -9151,12 +9544,16 @@ import {
   Book,
   ChevronLeft,
   ArrowRight,
-  ExternalLink,
 } from "lucide-react";
 import axios from "axios";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import ForcedLanguageSelector from "@/components/ForcedLanguageSelector";
+
+import ConceptTable from "@/components/ConceptTable"; // Import ConceptTable
+import { Skeleton } from "@/components/ui/skeleton"; // Import Skeleton
+
+import { useMediaQuery } from "@/hooks/useMediaQuery"; // Import the useMediaQuery hook
 
 interface DisambiguationResult {
   term: string;
@@ -9198,15 +9595,9 @@ const MainContainer: React.FC = () => {
   const [lastSearchTerm, setLastSearchTerm] = useState<string>("");
   const [languageSelected, setLanguageSelected] = useState<boolean>(false);
 
-  // Optional: Simulate initial loading (remove in production)
-  useEffect(() => {
-    // If you have an actual initial API call, place it here instead
-    // For demonstration, we'll simulate a delay
-    // setInitialLoading(true);
-    // setTimeout(() => {
-    //   setInitialLoading(false);
-    // }, 1000);
-  }, []);
+  // Use the useMediaQuery hook to determine screen size
+  const isSmallScreen = useMediaQuery("(max-width: 767px)"); // Tailwind's 'md' breakpoint is 768px
+  const loadingSize: "sm" | "md" = isSmallScreen ? "sm" : "md";
 
   // Handle language change from SearchBox (optional: allows changing language later)
   const handleLanguageChange = (lang: string) => {
@@ -9313,6 +9704,48 @@ const MainContainer: React.FC = () => {
     } else {
       setError(`${t("genericError", { ns: "common" })}: ${err.message}`);
     }
+  };
+
+  // Define the renderConceptTable function inside the MainContainer component
+  const renderConceptTable = () => {
+    if (conceptLoading) {
+      return (
+        <div className="mt-6 p-4">
+          <Skeleton className="h-8 w-1/4 mb-4" />
+          <Skeleton className="h-10 w-full mb-2" />
+          <Skeleton className="h-10 w-full mb-2" />
+          <Skeleton className="h-10 w-full mb-2" />
+        </div>
+      );
+    }
+
+    if (conceptTable.length === 0 && selectedSynonym) {
+      return (
+        <div className="mt-6 p-6 rounded-lg   border border-accent/10">
+          <p className="text-center text-muted-foreground">
+            {t("noConceptsFound", { synonym: selectedSynonym })}
+          </p>
+        </div>
+      );
+    }
+
+    if (conceptTable.length === 0) return null;
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 50 }} // Start below the view
+        animate={{ opacity: 1, y: 0 }} // Slide to the top
+        transition={{ type: "spring", stiffness: 50, duration: 0.7 }} // Adjusts smoothness
+        className="mt-6 p-6 rounded-lg   border border-accent/10"
+      >
+        <h3 className="text-xl font-semibold mb-4 text-primary">
+          {t("conceptTable")}
+        </h3>
+        <div className="overflow-x-auto">
+          <ConceptTable data={conceptTable} />
+        </div>
+      </motion.div>
+    );
   };
 
   const renderSearchResult = (item: DisambiguationResult, index: number) => (
@@ -9447,79 +9880,6 @@ const MainContainer: React.FC = () => {
     </div>
   );
 
-  const renderConceptTable = () => {
-    if (conceptLoading) {
-      return (
-        <div className="mt-6 p-4">
-          <Skeleton className="h-8 w-1/4 mb-4" />
-          <Skeleton className="h-10 w-full mb-2" />
-          <Skeleton className="h-10 w-full mb-2" />
-          <Skeleton className="h-10 w-full mb-2" />
-        </div>
-      );
-    }
-
-    if (conceptTable.length === 0 && selectedSynonym) {
-      return (
-        <div className="mt-6 p-6 rounded-lg bg-accent/5 border border-accent/10">
-          <p className="text-center text-muted-foreground">
-            {t("noConceptsFound", { synonym: selectedSynonym })}
-          </p>
-        </div>
-      );
-    }
-
-    if (conceptTable.length === 0) return null;
-
-    return (
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.3 }}
-        className="mt-6 p-6 rounded-lg bg-accent/5 border border-accent/10"
-      >
-        <h3 className="text-xl font-semibold mb-4 text-primary">
-          {t("conceptTable")}
-        </h3>
-        <div className="overflow-x-auto">
-          <table className="w-full text-base text-left text-foreground">
-            <thead className="text-xs text-foreground uppercase bg-accent/10">
-              <tr>
-                <th className="px-6 py-3">{t("conceptId")}</th>
-                <th className="px-6 py-3">{t("name")}</th>
-                <th className="px-6 py-3">{t("domain")}</th>
-                <th className="px-6 py-3">{t("vocabulary")}</th>
-                <th className="px-6 py-3">{t("standardConcept")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {conceptTable.map((row, index) => (
-                <tr key={index} className="bg-background border-b">
-                  <td className="px-6 py-4">
-                    <a
-                      href={`https://athena.ohdsi.org/search-terms/terms/${row.concept_id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center text-primary-500 hover:text-primary-700 underline font-semibold"
-                      aria-label={`Open concept ${row.concept_id} in Athena OHDSI`}
-                    >
-                      {row.concept_id}
-                      <ExternalLink className="ml-1 h-4 w-4 text-primary-500" />
-                    </a>
-                  </td>
-                  <td className="px-6 py-4">{row.name}</td>
-                  <td className="px-6 py-4">{row.domain}</td>
-                  <td className="px-6 py-4">{row.vocabulary}</td>
-                  <td className="px-6 py-4">{row.standard_concept}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </motion.div>
-    );
-  };
-
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
@@ -9583,7 +9943,7 @@ const MainContainer: React.FC = () => {
                             defaultValue: "Retrieving concepts...",
                           })
                   }
-                  size="lg"
+                  size={loadingSize} // Use responsive size
                   showAdditionalInfo={conceptLoading} // Show additional info only during concept loading
                   additionalInfoText={
                     conceptLoading
@@ -9593,16 +9953,16 @@ const MainContainer: React.FC = () => {
                         })
                       : undefined
                   }
-                  primaryColor="border-primary" // Customize colors as needed
-                  accentColor="border-accent"
-                  secondaryColor="border-secondary"
+                  primaryColor="primary" // Update to match Tailwind config (without 'border-' prefix)
+                  accentColor="accent"
+                  secondaryColor="secondary"
                 />
               )}
 
               {/* Conditional Rendering based on loading and error states */}
               {!initialLoading && !synonymLoading && !conceptLoading && (
                 <>
-                  {loading ? null : error ? ( // Removed existing skeletons and loading messages // LoadingComponent is handling the loading state
+                  {loading ? null : error ? (
                     <div className="text-center text-destructive">
                       <p>{error}</p>
                       <Button onClick={handleRetry} className="mt-4">
@@ -9652,20 +10012,26 @@ export default MainContainer;
 
 import { useState, useEffect } from "react";
 
-export function useMediaQuery(query: string): boolean {
+export function useMediaQuery(query: string, delay: number = 150): boolean {
   const [matches, setMatches] = useState(false);
 
   useEffect(() => {
     const media = window.matchMedia(query);
-    if (media.matches !== matches) {
-      setMatches(media.matches);
-    }
+    const handleChange = () => {
+      setTimeout(() => {
+        setMatches(media.matches);
+      }, delay);
+    };
 
-    const listener = () => setMatches(media.matches);
-    media.addEventListener("change", listener); // Updated line
+    // Set initial value
+    setMatches(media.matches);
 
-    return () => media.removeEventListener("change", listener); // Updated line
-  }, [matches, query]);
+    // Add event listener
+    media.addEventListener("change", handleChange);
+
+    // Cleanup event listener on unmount
+    return () => media.removeEventListener("change", handleChange);
+  }, [query, delay]);
 
   return matches;
 }
@@ -9677,14 +10043,21 @@ export function useMediaQuery(query: string): boolean {
 // tailwind.config.js
 /** @type {import('tailwindcss').Config} */
 export default {
-  darkMode: ["class"],
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  darkMode: ["class"], // Enables dark mode using a CSS class
+  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"], // Specifies the paths to all of your template files
+  safelist: [
+    {
+      // Safelists dynamic border and text color classes used in LoadingComponent
+      pattern:
+        /^(border|text)-(primary|accent|secondary|muted|destructive|popover|card)(-foreground)?$/,
+    },
+  ],
   theme: {
     container: {
-      center: true,
-      padding: "2rem",
+      center: true, // Centers the container
+      padding: "2rem", // Adds 2rem padding on all sides
       screens: {
-        "2xl": "1400px",
+        "2xl": "1400px", // Customizes the 2xl breakpoint
       },
     },
     extend: {
@@ -9724,9 +10097,9 @@ export default {
         },
       },
       borderRadius: {
-        lg: "var(--radius)",
-        md: "calc(var(--radius) - 2px)",
-        sm: "calc(var(--radius) - 4px)",
+        lg: "var(--radius)", // Large border radius
+        md: "calc(var(--radius) - 2px)", // Medium border radius
+        sm: "calc(var(--radius) - 4px)", // Small border radius
       },
       keyframes: {
         "accordion-down": {
@@ -9766,7 +10139,7 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [require("tailwindcss-animate")], // Includes the tailwindcss-animate plugin for additional animations
 };
 
 ```
