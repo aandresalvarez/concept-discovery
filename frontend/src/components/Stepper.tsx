@@ -59,24 +59,22 @@ const Stepper: React.FC<StepperProps> = ({
     }
   };
 
-  const renderSteps = useMemo(() => {
+  const renderStepIndicators = useMemo(() => {
     return steps.map((step, index) => {
       const isCompleted = index < currentStep;
       const isActive = index === currentStep;
 
       return (
-        <div
-          key={step.id ?? index}
-          className="flex-1 flex flex-col items-center relative"
-        >
+        <React.Fragment key={`step-${index}`}>
           {/* Step Indicator */}
           <button
             type="button"
             onClick={() => handleStepClick(index)}
             className={cn(
-              "w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-white font-bold text-xs sm:text-sm transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2",
+              "w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-base transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2",
               isCompleted || isActive ? activeColor : inactiveColor,
               "hover:ring-2 hover:ring-offset-2 hover:ring-blue-500",
+              "z-10",
             )}
             aria-current={isActive ? "step" : undefined}
             aria-label={`Step ${index + 1}: ${step.title}`}
@@ -87,30 +85,34 @@ const Stepper: React.FC<StepperProps> = ({
               }
             }}
           >
-            {isCompleted ? <Check size={12} /> : index + 1}
+            {isCompleted ? <Check size={16} /> : index + 1}
           </button>
 
-          {/* Step Title */}
-          <div className="mt-1 text-xs sm:text-sm font-medium">
-            {step.title}
-          </div>
-
-          {/* Connector Line */}
+          {/* Connector Line (except after the last step) */}
           {index < steps.length - 1 && (
-            <div className="absolute top-3 sm:top-4 left-1/2 w-full h-0.5 bg-gray-200">
-              <div
-                className={cn(
-                  "h-full transition-all duration-300",
-                  isCompleted ? activeColor : "bg-gray-200",
-                )}
-                style={{ width: isCompleted ? "100%" : "0%" }}
-              ></div>
-            </div>
+            <div
+              key={`connector-${index}`}
+              className={cn(
+                "flex-grow h-1 sm:h-1.5",
+                isCompleted ? activeColor : "bg-gray-200",
+              )}
+            ></div>
           )}
-        </div>
+        </React.Fragment>
       );
     });
   }, [steps, currentStep, activeColor, inactiveColor, handleStepClick]);
+
+  const renderStepTitles = useMemo(() => {
+    return steps.map((step, index) => (
+      <div
+        key={`title-${index}`}
+        className="text-xs sm:text-sm text-center w-8 sm:w-10 mt-2"
+      >
+        {step.title}
+      </div>
+    ));
+  }, [steps]);
 
   return (
     <div
@@ -118,45 +120,57 @@ const Stepper: React.FC<StepperProps> = ({
       role="navigation"
       aria-label="Step Progress"
     >
-      {/* Step Indicators */}
-      <div className="mb-4 sm:mb-8">
-        <div className="flex items-center justify-between">{renderSteps}</div>
+      {/* Step Indicators and Connectors */}
+      <div className="flex flex-col items-center">
+        <div className="flex items-center justify-between w-full">
+          {renderStepIndicators}
+        </div>
+        {/* Step Titles */}
+        <div className="flex items-center justify-between w-full mt-2">
+          {renderStepTitles}
+        </div>
       </div>
 
       {/* Step Content */}
-      <div className="mb-4 sm:mb-8">
-        <h2 className={cn("text-lg sm:text-2xl font-bold mb-2 sm:mb-4")}>
+      <div className="mb-6 sm:mb-8 px-4">
+        <h2
+          className={cn(
+            "text-lg sm:text-2xl font-bold mb-2 sm:mb-4 text-center",
+          )}
+        >
           {steps[currentStep].title}
         </h2>
-        <div className={cn("border p-2 sm:p-4 rounded-lg")}>
+        <div className={cn("border p-4 sm:p-6 rounded-lg")}>
           {steps[currentStep].content}
         </div>
       </div>
 
       {/* Navigation Buttons */}
-      <div className="flex justify-between">
+      <div className="flex justify-between px-4">
         <Button
           onClick={handleBack}
           disabled={isFirstStep}
           variant="outline"
           className={cn(
             "flex items-center text-xs sm:text-sm",
-            isFirstStep && "opacity-50 cursor-not-allowed",
+            isFirstStep ? "opacity-50 cursor-not-allowed" : "",
           )}
         >
-          <ChevronLeft className={cn("mr-1 sm:mr-2")} size={16} />
+          <ChevronLeft className="mr-1 sm:mr-2" size={16} />
           Back
         </Button>
         <Button
           onClick={handleNext}
-          disabled={currentStep >= steps.length}
+          disabled={isLastStep && currentStep === steps.length - 1}
           className={cn(
             "flex items-center text-xs sm:text-sm",
-            currentStep >= steps.length && "opacity-50 cursor-not-allowed",
+            isLastStep && currentStep === steps.length - 1
+              ? "opacity-50 cursor-not-allowed"
+              : "",
           )}
         >
           {isLastStep ? "Finish" : "Next"}
-          <ChevronRight className={cn("ml-1 sm:ml-2")} size={16} />
+          <ChevronRight className="ml-1 sm:ml-2" size={16} />
         </Button>
       </div>
     </div>
