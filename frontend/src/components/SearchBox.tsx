@@ -16,6 +16,8 @@ const SearchBox: React.FC<SearchBoxProps> = ({
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   const handleSearch = () => {
+    // Prevent triggering search if the search term is empty
+    if (searchTerm.trim() === "") return;
     onSearch(searchTerm.trim());
   };
 
