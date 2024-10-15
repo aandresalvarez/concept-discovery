@@ -4,6 +4,13 @@
   "unknownError": "Erreur inconnue",
   "noResponseError": "Aucune réponse reçue du serveur. Veuillez réessayer.",
   "genericError": "Une erreur s'est produite",
-  "backToResults": "Retour aux Résultats",
-  "selectYourLanguage": "Sélectionnez votre langue"
+  "backToResults": "Retour aux résultats",
+  "selectYourLanguage": "Sélectionnez votre langue",
+  "stepAria": "Étape {{number}} : {{title}}",
+  "stepperNavigation": "Progression des étapes",
+  "back": "Retour",
+  "next": "Suivant",
+  "finish": "Terminer",
+  "loading": "Chargement...",
+  "loadingAdditionalInfo": "Veuillez patienter pendant que nous préparons votre contenu"
 }

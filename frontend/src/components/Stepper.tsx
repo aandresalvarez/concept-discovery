@@ -1,7 +1,8 @@
 import React, { useState, useMemo, KeyboardEvent } from "react";
+import { useTranslation } from "react-i18next";
 import { ChevronRight, ChevronLeft, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { cn } from "../lib/utils";
+import { cn } from "@/lib/utils";
 
 interface Step {
   id?: string | number;
@@ -25,10 +26,11 @@ const Stepper: React.FC<StepperProps> = ({
   initialStep = 0,
   onStepChange = () => {},
   onFinish = () => {},
-  activeColor = "bg-blue-500",
-  inactiveColor = "bg-gray-300",
+  activeColor = "bg-primary",
+  inactiveColor = "bg-secondary",
   className = "",
 }) => {
+  const { t } = useTranslation("common");
   const [currentStep, setCurrentStep] = useState<number>(initialStep);
 
   const isLastStep = currentStep === steps.length - 1;
@@ -73,11 +75,11 @@ const Stepper: React.FC<StepperProps> = ({
             className={cn(
               "w-8 h-8 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-white font-bold text-sm sm:text-base transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-offset-2",
               isCompleted || isActive ? activeColor : inactiveColor,
-              "hover:ring-2 hover:ring-offset-2 hover:ring-blue-500",
+              "hover:ring-2 hover:ring-offset-2 hover:ring-primary",
               "z-10",
             )}
             aria-current={isActive ? "step" : undefined}
-            aria-label={`Step ${index + 1}: ${step.title}`}
+            aria-label={t("stepAria", { number: index + 1, title: step.title })}
             tabIndex={0}
             onKeyPress={(e: KeyboardEvent<HTMLButtonElement>) => {
               if (e.key === "Enter" || e.key === " ") {
@@ -94,14 +96,14 @@ const Stepper: React.FC<StepperProps> = ({
               key={`connector-${index}`}
               className={cn(
                 "flex-grow h-1 sm:h-1.5",
-                isCompleted ? activeColor : "bg-gray-200",
+                isCompleted ? activeColor : "bg-muted",
               )}
             ></div>
           )}
         </React.Fragment>
       );
     });
-  }, [steps, currentStep, activeColor, inactiveColor, handleStepClick]);
+  }, [steps, currentStep, activeColor, inactiveColor, handleStepClick, t]);
 
   const renderStepTitles = useMemo(() => {
     return steps.map((step, index) => (
@@ -118,7 +120,7 @@ const Stepper: React.FC<StepperProps> = ({
     <div
       className={cn("w-full", className)}
       role="navigation"
-      aria-label="Step Progress"
+      aria-label={t("stepperNavigation")}
     >
       {/* Step Indicators and Connectors */}
       <div className="flex flex-col items-center">
@@ -157,7 +159,7 @@ const Stepper: React.FC<StepperProps> = ({
           )}
         >
           <ChevronLeft className="mr-1 sm:mr-2" size={16} />
-          Back
+          {t("back")}
         </Button>
         <Button
           onClick={handleNext}
@@ -169,7 +171,7 @@ const Stepper: React.FC<StepperProps> = ({
               : "",
           )}
         >
-          {isLastStep ? "Finish" : "Next"}
+          {isLastStep ? t("finish") : t("next")}
           <ChevronRight className="ml-1 sm:ml-2" size={16} />
         </Button>
       </div>

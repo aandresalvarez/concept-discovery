@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
@@ -21,21 +22,22 @@ interface DisambiguationResult {
 
 interface StepDisambiguationProps {
   searchResults: DisambiguationResult[];
-  onSelect: (term: DisambiguationResult) => void;
+  onSelect: (result: DisambiguationResult) => void;
 }
 
 const StepDisambiguation: React.FC<StepDisambiguationProps> = ({
   searchResults,
   onSelect,
 }) => {
+  const { t } = useTranslation("mainContainer");
+
   return (
     <div className="space-y-6">
-      {searchResults.map((item, index) => (
+      {searchResults.map((item: DisambiguationResult, index: number) => (
         <Card
           key={index}
           className="p-4 hover:shadow-lg transition-shadow duration-300"
         >
-          {/* Main content (always visible) */}
           <div className="flex justify-between items-start">
             <h3 className="text-lg font-semibold mb-2">{item.term}</h3>
             <span className="text-sm text-right text-gray-500">
@@ -44,17 +46,15 @@ const StepDisambiguation: React.FC<StepDisambiguationProps> = ({
           </div>
           <p className="text-sm mb-2">{item.definition}</p>
 
-          {/* Conditional Dialog for mobile with added padding */}
           <div className="pb-2">
             <ResponsiveDetails item={item} />
           </div>
 
-          {/* Button (always at the bottom) */}
           <Button
             className="w-full bg-primary hover:bg-primary/90 text-white"
             onClick={() => onSelect(item)}
           >
-            Select
+            {t("select")}
             <ChevronRight className="ml-2 h-4 w-4" />
           </Button>
         </Card>
@@ -67,30 +67,29 @@ const ResponsiveDetails: React.FC<{ item: DisambiguationResult }> = ({
   item,
 }) => {
   const [showDetails, setShowDetails] = useState(false);
+  const { t } = useTranslation("mainContainer");
 
   return (
     <div className="space-y-2">
-      {/* "More Details" Button and Dialog only visible on small screens */}
       <div className="block md:hidden">
         <Button
           variant="outline"
-          size="ssm"
+          size="sm"
           onClick={() => setShowDetails(true)}
         >
-          More Details
+          {t("moreDetails")}
         </Button>
 
-        {/* Dialog for showing Usage and Context */}
         <Dialog open={showDetails} onOpenChange={setShowDetails}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Details</DialogTitle>
+              <DialogTitle>{t("details")}</DialogTitle>
               <DialogDescription>
                 <p className="text-sm mb-2">
-                  <strong>Usage:</strong> {item.usage}
+                  <strong>{t("usage")}:</strong> {item.usage}
                 </p>
                 <p className="text-sm mb-4">
-                  <strong>Context:</strong> {item.context}
+                  <strong>{t("context")}:</strong> {item.context}
                 </p>
               </DialogDescription>
             </DialogHeader>
@@ -99,20 +98,19 @@ const ResponsiveDetails: React.FC<{ item: DisambiguationResult }> = ({
                 className="mt-6 w-full bg-primary hover:bg-primary/90"
                 onClick={() => setShowDetails(false)}
               >
-                Close
+                {t("close")}
               </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
       </div>
 
-      {/* Always visible on large screens */}
       <div className="hidden md:block">
         <p className="text-sm mb-2">
-          <strong>Usage:</strong> {item.usage}
+          <strong>{t("usage")}:</strong> {item.usage}
         </p>
         <p className="text-sm mb-4">
-          <strong>Context:</strong> {item.context}
+          <strong>{t("context")}:</strong> {item.context}
         </p>
       </div>
     </div>

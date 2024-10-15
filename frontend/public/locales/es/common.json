@@ -2,8 +2,15 @@
     "retry": "Reintentar",
     "serverError": "Error del servidor",
     "unknownError": "Error desconocido",
-    "noResponseError": "No se recibió respuesta del servidor. Por favor, inténtelo de nuevo.",
+    "noResponseError": "No se recibió respuesta del servidor. Inténtalo de nuevo.",
     "genericError": "Ocurrió un error",
-    "backToResults": "Volver a los Resultados",
-    "selectYourLanguage": "Seleccione su idioma"
+    "backToResults": "Volver a los resultados",
+    "selectYourLanguage": "Selecciona tu idioma",
+    "stepAria": "Paso {{number}}: {{title}}",
+    "stepperNavigation": "Progreso del paso",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "finish": "Finalizar",
+    "loading": "Cargando...",
+    "loadingAdditionalInfo": "Por favor, espera mientras preparamos tu contenido"
 }

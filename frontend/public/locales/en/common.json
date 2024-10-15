@@ -5,5 +5,12 @@
   "noResponseError": "No response received from server. Please try again.",
   "genericError": "An error occurred",
   "backToResults": "Back to Results",
-  "selectYourLanguage": "Select your language"
+  "selectYourLanguage": "Select your language",
+  "stepAria": "Step {{number}}: {{title}}",
+  "stepperNavigation": "Step Progress",
+  "back": "Back",
+  "next": "Next",
+  "finish": "Finish",
+  "loading": "Loading...",
+  "loadingAdditionalInfo": "Please wait while we prepare your content"
 }

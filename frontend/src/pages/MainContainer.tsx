@@ -1,8 +1,7 @@
-// src/pages/MainContainer.tsx
-
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
+import axios from "axios";
 import { SearchBox, Header, LoadingComponent } from "@/components";
 import { Button } from "@/components/ui/button";
 import Stepper from "@/components/Stepper";
@@ -10,7 +9,6 @@ import StepDisambiguation from "@/components/steps/StepDisambiguation";
 import StepSynonyms from "@/components/steps/StepSynonyms";
 import StepTableResults from "@/components/steps/StepTableResults";
 import ForcedLanguageSelector from "@/components/ForcedLanguageSelector";
-import axios from "axios";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 interface DisambiguationResult {
@@ -56,110 +54,134 @@ const MainContainer: React.FC = () => {
   const isSmallScreen = useMediaQuery("(max-width: 767px)");
   const loadingSize: "sm" | "md" = isSmallScreen ? "sm" : "md";
 
-  const handleLanguageChange = (lang: string) => {
-    i18n.changeLanguage(lang);
-  };
+  const handleLanguageChange = useCallback(
+    (lang: string) => {
+      i18n.changeLanguage(lang);
+    },
+    [i18n],
+  );
 
-  const handleRetry = () => {
+  const handleRetry = useCallback(() => {
     if (lastSearchTerm) {
       handleSearch(lastSearchTerm);
     }
-  };
+  }, [lastSearchTerm]);
 
-  const handleLanguageSelected = () => {
+  const handleLanguageSelected = useCallback(() => {
     setLanguageSelected(true);
-  };
+  }, []);
 
-  const handleSearch = async (term: string) => {
-    setInitialLoading(true);
-    setLoading(true);
-    setError(null);
-    setLastSearchTerm(term);
-    setHasSearched(true);
-    setSelectedTerm(null);
-    setConceptTable([]);
-    setCurrentStep(0);
-
-    try {
-      const response = await axios.get(`/api/search`, {
-        params: { term, language: i18n.language },
-      });
-      setSearchResults(response.data.results);
-    } catch (err: any) {
-      handleError(err);
-    } finally {
-      setLoading(false);
-      setInitialLoading(false);
-    }
-  };
-
-  const handleDisambiguationSelect = async (term: DisambiguationResult) => {
-    setSynonymLoading(true);
-    setLoading(true);
-    setError(null);
-    setSelectedTerm(term);
-    setConceptTable([]);
-
-    try {
-      const response = await axios.get(`/api/synonyms`, {
-        params: {
-          term: term.term,
-          context: term.definition,
-          language: i18n.language,
-        },
-      });
-      setSynonyms(
-        response.data.synonyms.map((s: { synonym: string }) => s.synonym),
-      );
-      setCurrentStep(1); // Move to the synonyms step
-    } catch (err: any) {
-      handleError(err);
-    } finally {
-      setLoading(false);
-      setSynonymLoading(false);
-    }
-  };
-
-  const handleSynonymClick = async (synonym: string) => {
-    setConceptLoading(true);
-    setError(null);
-
-    try {
-      const response = await axios.get(`/api/concept_lookup`, {
-        params: { term: synonym, language: i18n.language },
-      });
-
-      if (response.data.concepts && response.data.concepts.length > 0) {
-        setConceptTable(response.data.concepts);
-        setCurrentStep(2); // Move to the results step
+  const handleError = useCallback(
+    (err: any) => {
+      console.error("API call error:", err);
+      if (err.response) {
+        setError(
+          `${t("serverError", { ns: "common" })}: ${
+            err.response.data.detail || t("unknownError", { ns: "common" })
+          }`,
+        );
+      } else if (err.request) {
+        setError(t("noResponseError", { ns: "common" }));
       } else {
-        setConceptTable([]);
+        setError(`${t("genericError", { ns: "common" })}: ${err.message}`);
       }
-    } catch (err: any) {
-      handleError(err);
-    } finally {
-      setConceptLoading(false);
-    }
-  };
+    },
+    [t],
+  );
 
-  const handleError = (err: any) => {
-    console.error("API call error:", err);
-    if (err.response) {
-      setError(
-        `${t("serverError", { ns: "common" })}: ${
-          err.response.data.detail || t("unknownError", { ns: "common" })
-        }`,
-      );
-    } else if (err.request) {
-      setError(t("noResponseError", { ns: "common" }));
-    } else {
-      setError(`${t("genericError", { ns: "common" })}: ${err.message}`);
-    }
-  };
+  const handleSearch = useCallback(
+    async (term: string) => {
+      setInitialLoading(true);
+      setLoading(true);
+      setError(null);
+      setLastSearchTerm(term);
+      setHasSearched(true);
+      setSelectedTerm(null);
+      setConceptTable([]);
+      setCurrentStep(0);
+
+      try {
+        const response = await axios.get(`/api/search`, {
+          params: { term, language: i18n.language },
+        });
+        setSearchResults(response.data.results);
+      } catch (err: any) {
+        handleError(err);
+      } finally {
+        setLoading(false);
+        setInitialLoading(false);
+      }
+    },
+    [i18n.language, handleError],
+  );
+
+  const handleDisambiguationSelect = useCallback(
+    async (term: DisambiguationResult) => {
+      setSynonymLoading(true);
+      setLoading(true);
+      setError(null);
+      setSelectedTerm(term);
+      setConceptTable([]);
+
+      try {
+        const response = await axios.get(`/api/synonyms`, {
+          params: {
+            term: term.term,
+            context: term.definition,
+            language: i18n.language,
+          },
+        });
+        setSynonyms(
+          response.data.synonyms.map((s: { synonym: string }) => s.synonym),
+        );
+        setCurrentStep(1); // Move to the synonyms step
+      } catch (err: any) {
+        handleError(err);
+      } finally {
+        setLoading(false);
+        setSynonymLoading(false);
+      }
+    },
+    [i18n.language, handleError],
+  );
+
+  const handleSynonymClick = useCallback(
+    async (synonym: string) => {
+      setConceptLoading(true);
+      setError(null);
+
+      try {
+        const response = await axios.get(`/api/concept_lookup`, {
+          params: { term: synonym, language: i18n.language },
+        });
+
+        if (response.data.concepts && response.data.concepts.length > 0) {
+          setConceptTable(response.data.concepts);
+          setCurrentStep(2); // Move to the results step
+        } else {
+          setConceptTable([]);
+        }
+      } catch (err: any) {
+        handleError(err);
+      } finally {
+        setConceptLoading(false);
+      }
+    },
+    [i18n.language, handleError],
+  );
+
+  const handleStepChange = useCallback((step: number) => {
+    setCurrentStep(step);
+  }, []);
+
+  const handleStepperFinish = useCallback(() => {
+    console.log("Stepper finished");
+    // Implement any final step logic here
+  }, []);
 
   const steps = [
     {
-      title: "Disambiguation",
+      title: t("disambiguationStep", { ns: "mainContainer" }),
       content: (
         <StepDisambiguation
           searchResults={searchResults}
@@ -168,7 +190,7 @@ const MainContainer: React.FC = () => {
       ),
     },
     {
-      title: "Synonyms",
+      title: t("synonymsStep", { ns: "mainContainer" }),
       content: (
         <StepSynonyms
           synonyms={synonyms}
@@ -178,18 +200,10 @@ const MainContainer: React.FC = () => {
       ),
     },
     {
-      title: "Results",
+      title: t("resultsStep", { ns: "mainContainer" }),
       content: <StepTableResults conceptTable={conceptTable} />,
     },
   ];
-
-  const handleStepChange = (step: number) => {
-    setCurrentStep(step);
-  };
-
-  const handleStepperFinish = () => {
-    console.log("Stepper finished");
-  };
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -239,28 +253,16 @@ const MainContainer: React.FC = () => {
                 <LoadingComponent
                   loadingText={
                     initialLoading
-                      ? t("loadingInitial", {
-                          ns: "mainContainer",
-                          defaultValue: "Searching...",
-                        })
+                      ? t("loadingInitial", { ns: "mainContainer" })
                       : synonymLoading
-                        ? t("loadingSynonyms", {
-                            ns: "mainContainer",
-                            defaultValue: "Fetching synonyms...",
-                          })
-                        : t("loadingConcepts", {
-                            ns: "mainContainer",
-                            defaultValue: "Retrieving concepts...",
-                          })
+                        ? t("loadingSynonyms", { ns: "mainContainer" })
+                        : t("loadingConcepts", { ns: "mainContainer" })
                   }
                   size={loadingSize}
                   showAdditionalInfo={conceptLoading}
                   additionalInfoText={
                     conceptLoading
-                      ? t("loadingAdditionalInfo", {
-                          ns: "mainContainer",
-                          defaultValue: "This might take a few seconds...",
-                        })
+                      ? t("loadingAdditionalInfo", { ns: "mainContainer" })
                       : undefined
                   }
                   primaryColor="primary"

@@ -1,5 +1,6 @@
-// LoadingComponent.tsx
 import React from "react";
+import { useTranslation } from "react-i18next";
+import { cn } from "@/lib/utils";
 
 interface LoadingComponentProps {
   size?: "sm" | "md" | "lg";
@@ -9,8 +10,8 @@ interface LoadingComponentProps {
   primaryColor?: string;
   accentColor?: string;
   secondaryColor?: string;
-  className?: string; // Allows custom styling from parent components
-  textAlignment?: "center" | "left" | "right"; // Controls text alignment
+  className?: string;
+  textAlignment?: "center" | "left" | "right";
 }
 
 type Size = "sm" | "md" | "lg";
@@ -29,65 +30,84 @@ const textSizeClasses: Record<Size, string> = {
 
 const LoadingComponent: React.FC<LoadingComponentProps> = ({
   size = "md",
-  loadingText = "Cargando...",
+  loadingText,
   showAdditionalInfo = true,
-  additionalInfoText = "Por favor, espere mientras preparamos su contenido",
+  additionalInfoText,
   primaryColor = "primary",
   accentColor = "accent",
   secondaryColor = "secondary",
   className = "",
   textAlignment = "center",
 }) => {
-  // Ensure the size is one of the defined sizes
+  const { t } = useTranslation("common");
+
   const validatedSize: Size = size in sizeClasses ? size : "md";
   const selectedSizeClass = sizeClasses[validatedSize];
   const selectedTextSizeClass = textSizeClasses[validatedSize];
 
-  // Construct color classes
   const primaryBorderColor = `border-${primaryColor}`;
   const accentBorderColor = `border-${accentColor}`;
   const secondaryBorderColor = `border-${secondaryColor}`;
   const textColorClass = `text-${primaryColor}`;
 
-  // Text alignment class
   const alignmentClass = `text-${textAlignment}`;
 
   return (
     <div
-      className={`w-full bg-background flex items-start justify-center pt-16 overflow-hidden ${className}`}
+      className={cn(
+        "w-full bg-background flex items-start justify-center pt-16 overflow-hidden",
+        className,
+      )}
       role="status"
       aria-live="polite"
     >
       <div className="flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 space-y-4 max-w-xl">
-        {/* Custom Loading Animation */}
-        <div className={`relative ${selectedSizeClass}`}>
+        <div className={cn("relative", selectedSizeClass)}>
           <div
-            className={`absolute inset-0 ${primaryBorderColor} border-4 rounded-full animate-ping-slow`}
+            className={cn(
+              "absolute inset-0",
+              primaryBorderColor,
+              "border-4 rounded-full animate-ping-slow",
+            )}
             aria-hidden="true"
           ></div>
           <div
-            className={`absolute inset-3 ${accentBorderColor} border-4 rounded-full animate-ping-slower`}
+            className={cn(
+              "absolute inset-3",
+              accentBorderColor,
+              "border-4 rounded-full animate-ping-slower",
+            )}
             style={{ animationDelay: "0.5s" }}
             aria-hidden="true"
           ></div>
           <div
-            className={`absolute inset-6 ${secondaryBorderColor} border-4 rounded-full animate-ping-slowest`}
+            className={cn(
+              "absolute inset-6",
+              secondaryBorderColor,
+              "border-4 rounded-full animate-ping-slowest",
+            )}
             style={{ animationDelay: "1s" }}
             aria-hidden="true"
           ></div>
         </div>
-        {/* Loading Text */}
         <h2
-          className={`font-serif font-bold ${textColorClass} drop-shadow-lg ${selectedTextSizeClass} animate-scale ${alignmentClass}`}
+          className={cn(
+            "font-serif font-bold drop-shadow-lg animate-scale",
+            textColorClass,
+            selectedTextSizeClass,
+            alignmentClass,
+          )}
         >
-          {loadingText}
+          {loadingText || t("loading")}
         </h2>
-        {/* Additional Info */}
         {showAdditionalInfo && (
           <p
-            className={`text-muted-foreground ${alignmentClass} text-sm lg:text-base max-w-md`}
+            className={cn(
+              "text-muted-foreground text-sm lg:text-base max-w-md",
+              alignmentClass,
+            )}
           >
-            {additionalInfoText}
+            {additionalInfoText || t("loadingAdditionalInfo")}
           </p>
         )}
       </div>

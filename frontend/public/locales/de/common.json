@@ -1,9 +1,16 @@
 {
-  "retry": "Erneut versuchen",
+  "retry": "Wiederholen",
   "serverError": "Serverfehler",
   "unknownError": "Unbekannter Fehler",
   "noResponseError": "Keine Antwort vom Server erhalten. Bitte versuchen Sie es erneut.",
   "genericError": "Ein Fehler ist aufgetreten",
   "backToResults": "Zurück zu den Ergebnissen",
-  "selectYourLanguage": "Wählen Sie Ihre Sprache"
+  "selectYourLanguage": "Wählen Sie Ihre Sprache",
+  "stepAria": "Schritt {{number}}: {{title}}",
+  "stepperNavigation": "Schritt Fortschritt",
+  "back": "Zurück",
+  "next": "Weiter",
+  "finish": "Fertig",
+  "loading": "Laden...",
+  "loadingAdditionalInfo": "Bitte warten Sie, während wir Ihre Inhalte vorbereiten"
 }

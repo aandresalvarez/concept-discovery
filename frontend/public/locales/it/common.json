@@ -2,8 +2,15 @@
   "retry": "Riprova",
   "serverError": "Errore del server",
   "unknownError": "Errore sconosciuto",
-  "noResponseError": "Nessuna risposta ricevuta dal server. Si prega di riprovare.",
+  "noResponseError": "Nessuna risposta ricevuta dal server. Riprova.",
   "genericError": "Si è verificato un errore",
-  "backToResults": "Torna ai Risultati",
-  "selectYourLanguage": "Seleziona la tua lingua"
+  "backToResults": "Torna ai risultati",
+  "selectYourLanguage": "Seleziona la tua lingua",
+  "stepAria": "Passo {{number}}: {{title}}",
+  "stepperNavigation": "Progresso dei passi",
+  "back": "Indietro",
+  "next": "Avanti",
+  "finish": "Fine",
+  "loading": "Caricamento...",
+  "loadingAdditionalInfo": "Attendere mentre prepariamo il contenuto"
 }
