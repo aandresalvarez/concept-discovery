@@ -97,7 +97,7 @@ async def search(term: str = Query(..., min_length=1),
     try:
         logger.debug("Calling disambiguate function")
         response = disambiguate(term, language)
-        print(f"\n\n\n\n\n EL responseAAAA: {response.text} \n\n\n\n\n\n")
+
         logger.debug(f"Disambiguate function returned: {response}")
 
         # Since disambiguate returns a list of Messages
@@ -139,16 +139,6 @@ async def search(term: str = Query(..., min_length=1),
 @app.get("/api")
 def read_root():
     return {"Hello": "World"}
-
-
-@app.get("/api/test")
-def test1(name: str):
-    return testurl(name)
-
-
-@app.get("/api/items/{item_id}")
-def read_item(item_id: int, q: Union[str, None] = None):
-    return {"item_id": item_id, "q": q}
 
 
 # Serve React frontend only if the dist directory exists
