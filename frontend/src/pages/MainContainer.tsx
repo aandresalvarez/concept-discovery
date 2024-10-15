@@ -39,9 +39,6 @@ const MainContainer: React.FC = () => {
   const [synonyms, setSynonyms] = useState<string[]>([]);
   const [conceptTable, setConceptTable] = useState<ConceptTableRow[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
-  const [conceptLoading, setConceptLoading] = useState<boolean>(false);
-  const [initialLoading, setInitialLoading] = useState<boolean>(false);
-  const [synonymLoading, setSynonymLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSearched, setHasSearched] = useState<boolean>(false);
   const [selectedTerm, setSelectedTerm] = useState<DisambiguationResult | null>(
@@ -50,6 +47,7 @@ const MainContainer: React.FC = () => {
   const [lastSearchTerm, setLastSearchTerm] = useState<string>("");
   const [languageSelected, setLanguageSelected] = useState<boolean>(false);
   const [currentStep, setCurrentStep] = useState<number>(0);
+  const [canProceed, setCanProceed] = useState<boolean>(false);
 
   const isSmallScreen = useMediaQuery("(max-width: 767px)");
   const loadingSize: "sm" | "md" = isSmallScreen ? "sm" : "md";
@@ -61,24 +59,12 @@ const MainContainer: React.FC = () => {
     [i18n],
   );
 
-  const handleRetry = useCallback(() => {
-    if (lastSearchTerm) {
-      handleSearch(lastSearchTerm);
-    }
-  }, [lastSearchTerm]);
-
-  const handleLanguageSelected = useCallback(() => {
-    setLanguageSelected(true);
-  }, []);
-
   const handleError = useCallback(
     (err: any) => {
       console.error("API call error:", err);
       if (err.response) {
         setError(
-          `${t("serverError", { ns: "common" })}: ${
-            err.response.data.detail || t("unknownError", { ns: "common" })
-          }`,
+          `${t("serverError", { ns: "common" })}: ${err.response.data.detail || t("unknownError", { ns: "common" })}`,
         );
       } else if (err.request) {
         setError(t("noResponseError", { ns: "common" }));
@@ -91,14 +77,15 @@ const MainContainer: React.FC = () => {
 
   const handleSearch = useCallback(
     async (term: string) => {
-      setInitialLoading(true);
       setLoading(true);
       setError(null);
       setLastSearchTerm(term);
       setHasSearched(true);
       setSelectedTerm(null);
+      setSynonyms([]);
       setConceptTable([]);
       setCurrentStep(0);
+      setCanProceed(false);
 
       try {
         const response = await axios.get(`/api/search`, {
@@ -109,7 +96,6 @@ const MainContainer: React.FC = () => {
         handleError(err);
       } finally {
         setLoading(false);
-        setInitialLoading(false);
       }
     },
     [i18n.language, handleError],
@@ -117,11 +103,12 @@ const MainContainer: React.FC = () => {
 
   const handleDisambiguationSelect = useCallback(
     async (term: DisambiguationResult) => {
-      setSynonymLoading(true);
       setLoading(true);
       setError(null);
       setSelectedTerm(term);
+      setSynonyms([]);
       setConceptTable([]);
+      setCanProceed(false);
 
       try {
         const response = await axios.get(`/api/synonyms`, {
@@ -134,12 +121,11 @@ const MainContainer: React.FC = () => {
         setSynonyms(
           response.data.synonyms.map((s: { synonym: string }) => s.synonym),
         );
-        setCurrentStep(1); // Move to the synonyms step
+        setCurrentStep(1);
       } catch (err: any) {
         handleError(err);
       } finally {
         setLoading(false);
-        setSynonymLoading(false);
       }
     },
     [i18n.language, handleError],
@@ -147,8 +133,9 @@ const MainContainer: React.FC = () => {
 
   const handleSynonymClick = useCallback(
     async (synonym: string) => {
-      setConceptLoading(true);
+      setLoading(true);
       setError(null);
+      setConceptTable([]);
 
       try {
         const response = await axios.get(`/api/concept_lookup`, {
@@ -157,26 +144,43 @@ const MainContainer: React.FC = () => {
 
         if (response.data.concepts && response.data.concepts.length > 0) {
           setConceptTable(response.data.concepts);
-          setCurrentStep(2); // Move to the results step
+          setCurrentStep(2);
+          setCanProceed(true);
         } else {
-          setConceptTable([]);
+          setError(t("noConceptsFound", { ns: "mainContainer" }));
         }
       } catch (err: any) {
         handleError(err);
       } finally {
-        setConceptLoading(false);
+        setLoading(false);
       }
     },
-    [i18n.language, handleError],
+    [i18n.language, handleError, t],
   );
 
-  const handleStepChange = useCallback((step: number) => {
-    setCurrentStep(step);
-  }, []);
+  const handleStepChange = useCallback(
+    (step: number) => {
+      if (step <= currentStep) {
+        setCurrentStep(step);
+        setCanProceed(step < currentStep);
+      }
+    },
+    [currentStep],
+  );
 
   const handleStepperFinish = useCallback(() => {
     console.log("Stepper finished");
     // Implement any final step logic here
+  }, []);
+
+  const handleRetry = useCallback(() => {
+    if (lastSearchTerm) {
+      handleSearch(lastSearchTerm);
+    }
+  }, [lastSearchTerm, handleSearch]);
+
+  const handleLanguageSelected = useCallback(() => {
+    setLanguageSelected(true);
   }, []);
 
   const steps = [
@@ -249,52 +253,42 @@ const MainContainer: React.FC = () => {
                 />
               </div>
 
-              {(initialLoading || synonymLoading || conceptLoading) && (
+              {loading ? (
                 <LoadingComponent
-                  loadingText={
-                    initialLoading
-                      ? t("loadingInitial", { ns: "mainContainer" })
-                      : synonymLoading
-                        ? t("loadingSynonyms", { ns: "mainContainer" })
-                        : t("loadingConcepts", { ns: "mainContainer" })
-                  }
+                  loadingText={t(
+                    `loading${currentStep === 0 ? "Initial" : currentStep === 1 ? "Synonyms" : "Concepts"}`,
+                    { ns: "mainContainer" },
+                  )}
                   size={loadingSize}
-                  showAdditionalInfo={conceptLoading}
-                  additionalInfoText={
-                    conceptLoading
-                      ? t("loadingAdditionalInfo", { ns: "mainContainer" })
-                      : undefined
-                  }
+                  showAdditionalInfo={currentStep === 2}
+                  additionalInfoText={t("loadingAdditionalInfo", {
+                    ns: "mainContainer",
+                  })}
                   primaryColor="primary"
                   accentColor="accent"
                   secondaryColor="secondary"
                 />
-              )}
-
-              {!initialLoading && !synonymLoading && !conceptLoading && (
-                <>
-                  {loading ? null : error ? (
-                    <div className="text-center text-destructive">
-                      <p>{error}</p>
-                      <Button onClick={handleRetry} className="mt-4">
-                        {t("retry", { ns: "common" })}
-                      </Button>
-                    </div>
-                  ) : searchResults.length > 0 ? (
-                    <Stepper
-                      steps={steps}
-                      initialStep={currentStep}
-                      onStepChange={handleStepChange}
-                      onFinish={handleStepperFinish}
-                      activeColor="bg-primary"
-                      inactiveColor="bg-secondary"
-                    />
-                  ) : (
-                    <div className="text-center text-muted-foreground">
-                      {t("noResults", { ns: "mainContainer" })}
-                    </div>
-                  )}
-                </>
+              ) : error ? (
+                <div className="text-center text-destructive">
+                  <p>{error}</p>
+                  <Button onClick={handleRetry} className="mt-4">
+                    {t("retry", { ns: "common" })}
+                  </Button>
+                </div>
+              ) : searchResults.length > 0 ? (
+                <Stepper
+                  steps={steps}
+                  initialStep={currentStep}
+                  onStepChange={handleStepChange}
+                  onFinish={handleStepperFinish}
+                  activeColor="bg-primary"
+                  inactiveColor="bg-secondary"
+                  canProceed={canProceed}
+                />
+              ) : (
+                <div className="text-center text-muted-foreground">
+                  {t("noResults", { ns: "mainContainer" })}
+                </div>
               )}
             </motion.div>
           )}

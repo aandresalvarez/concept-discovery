@@ -19,6 +19,7 @@ interface StepperProps {
   activeColor?: string;
   inactiveColor?: string;
   className?: string;
+  canProceed: boolean;
 }
 
 const Stepper: React.FC<StepperProps> = ({
@@ -29,6 +30,7 @@ const Stepper: React.FC<StepperProps> = ({
   activeColor = "bg-primary",
   inactiveColor = "bg-secondary",
   className = "",
+  canProceed,
 }) => {
   const { t } = useTranslation("common");
   const [currentStep, setCurrentStep] = useState<number>(initialStep);
@@ -55,7 +57,7 @@ const Stepper: React.FC<StepperProps> = ({
   };
 
   const handleStepClick = (index: number) => {
-    if (index <= currentStep + 1) {
+    if (index <= currentStep) {
       setCurrentStep(index);
       onStepChange(index);
     }
@@ -68,7 +70,6 @@ const Stepper: React.FC<StepperProps> = ({
 
       return (
         <React.Fragment key={`step-${index}`}>
-          {/* Step Indicator */}
           <button
             type="button"
             onClick={() => handleStepClick(index)}
@@ -77,6 +78,7 @@ const Stepper: React.FC<StepperProps> = ({
               isCompleted || isActive ? activeColor : inactiveColor,
               "hover:ring-2 hover:ring-offset-2 hover:ring-primary",
               "z-10",
+              { "cursor-not-allowed opacity-50": index > currentStep },
             )}
             aria-current={isActive ? "step" : undefined}
             aria-label={t("stepAria", { number: index + 1, title: step.title })}
@@ -86,11 +88,11 @@ const Stepper: React.FC<StepperProps> = ({
                 handleStepClick(index);
               }
             }}
+            disabled={index > currentStep}
           >
             {isCompleted ? <Check size={16} /> : index + 1}
           </button>
 
-          {/* Connector Line (except after the last step) */}
           {index < steps.length - 1 && (
             <div
               key={`connector-${index}`}
@@ -122,18 +124,15 @@ const Stepper: React.FC<StepperProps> = ({
       role="navigation"
       aria-label={t("stepperNavigation")}
     >
-      {/* Step Indicators and Connectors */}
       <div className="flex flex-col items-center">
         <div className="flex items-center justify-between w-full">
           {renderStepIndicators}
         </div>
-        {/* Step Titles */}
         <div className="flex items-center justify-between w-full mt-2">
           {renderStepTitles}
         </div>
       </div>
 
-      {/* Step Content */}
       <div className="mb-6 sm:mb-8 px-4">
         <h2
           className={cn(
@@ -147,7 +146,6 @@ const Stepper: React.FC<StepperProps> = ({
         </div>
       </div>
 
-      {/* Navigation Buttons */}
       <div className="flex justify-between px-4">
         <Button
           onClick={handleBack}
@@ -163,10 +161,12 @@ const Stepper: React.FC<StepperProps> = ({
         </Button>
         <Button
           onClick={handleNext}
-          disabled={isLastStep && currentStep === steps.length - 1}
+          disabled={
+            !canProceed || (isLastStep && currentStep === steps.length - 1)
+          }
           className={cn(
             "flex items-center text-xs sm:text-sm",
-            isLastStep && currentStep === steps.length - 1
+            !canProceed || (isLastStep && currentStep === steps.length - 1)
               ? "opacity-50 cursor-not-allowed"
               : "",
           )}
