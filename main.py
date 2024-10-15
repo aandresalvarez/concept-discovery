@@ -52,10 +52,14 @@ class SynonymResponse(BaseModel):
 
 class ConceptTableRow(BaseModel):
     concept_id: int
+    code: str
     name: str
+    class_name: str
+    standard_concept: str
+    invalid_reason: Union[str, None]
     domain: str
     vocabulary: str
-    standard_concept: str
+    score: Union[float, None]
 
 
 class ConceptTableResponse(BaseModel):
@@ -66,10 +70,8 @@ class ConceptTableResponse(BaseModel):
 async def get_concept_table(term: str, language: str):
     try:
         response = concept_lookup(term, language)
-        concepts = response.parsed.concepts  # Access the parsed concepts
-        return {
-            "concepts": [concept.model_dump() for concept in concepts]
-        }  # Use model_dump for dictionaries
+        concepts = response.parsed.concepts
+        return {"concepts": [concept.model_dump() for concept in concepts]}
     except Exception as e:
         logger.error(f"An error occurred during concept lookup: {str(e)}")
         logger.error(traceback.format_exc())

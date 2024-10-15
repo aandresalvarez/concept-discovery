@@ -23,10 +23,14 @@ interface DisambiguationResult {
 
 interface ConceptTableRow {
   concept_id: number;
+  code: string;
   name: string;
+  class_name: string;
+  standard_concept: string;
+  invalid_reason: string | null;
   domain: string;
   vocabulary: string;
-  standard_concept: string;
+  score: number | null;
 }
 
 const MainContainer: React.FC = () => {
