@@ -254,20 +254,24 @@ const MainContainer: React.FC = () => {
               </div>
 
               {loading ? (
-                <LoadingComponent
-                  loadingText={t(
-                    `loading${currentStep === 0 ? "Initial" : currentStep === 1 ? "Synonyms" : "Concepts"}`,
-                    { ns: "mainContainer" },
-                  )}
-                  size={loadingSize}
-                  showAdditionalInfo={currentStep === 2}
-                  additionalInfoText={t("loadingAdditionalInfo", {
-                    ns: "mainContainer",
-                  })}
-                  primaryColor="primary"
-                  accentColor="accent"
-                  secondaryColor="secondary"
-                />
+                <div className="pt-16">
+                  {" "}
+                  {/* Added padding-top */}
+                  <LoadingComponent
+                    loadingText={t(
+                      `loading${currentStep === 0 ? "Initial" : currentStep === 1 ? "Synonyms" : "Concepts"}`,
+                      { ns: "mainContainer" },
+                    )}
+                    size={loadingSize}
+                    showAdditionalInfo={currentStep === 2}
+                    additionalInfoText={t("loadingAdditionalInfo", {
+                      ns: "mainContainer",
+                    })}
+                    primaryColor="primary"
+                    accentColor="accent"
+                    secondaryColor="secondary"
+                  />
+                </div>
               ) : error ? (
                 <div className="text-center text-destructive">
                   <p>{error}</p>
