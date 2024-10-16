@@ -3,28 +3,19 @@ import os
 import shutil
 from pathlib import Path
 import logging
-import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import ell
 
 # --------------------------------------------------------------------------------
 # INSTRUCTIONS:
-# 1. BACKUP all translation files:
-#    Run: python manage_translations.py backup
+# 1. Backup translation files: Choose option 1 from the menu.
+# 2. Restore translation files: Choose option 2 from the menu.
+# 3. Update all keys: Choose option 3, optimize translation using concurrency.
+# 4. Update specific keys: Choose option 4, specify keys.
+# 5. Create new language: Choose option 5, auto-translate new language.
+# 6. Exit: Choose option 6 to exit.
 #
-# 2. RESTORE translation files from backup:
-#    Run: python manage_translations.py restore
-#
-# 3. UPDATE ALL KEYS in the translation files:
-#    Run: python manage_translations.py update_all --concurrency 5
-#
-# 4. UPDATE SPECIFIC KEYS in the translation files:
-#    Run: python manage_translations.py update_specific --keys key1 key2 --concurrency 5
-#    Example: python manage_translations.py update_specific --keys mainTitle description
-#    (You can update multiple keys by passing them as arguments)
-#
-# OPTIONS:
-# --concurrency: Number of concurrent threads (default is 5). This optimizes translation tasks.
+# Translation Optimization: Only un-translated or changed content will be updated.
 # --------------------------------------------------------------------------------
 
 # Configure logging
@@ -35,15 +26,16 @@ LOCALES_DIR = Path('/home/runner/workspace/frontend/public/locales')
 BACKUP_DIR = Path('/home/runner/workspace/frontend/public/locales_backup')
 
 
-# ELL translation function with error handling
+# ELL translation function with an improved prompt
 @ell.simple(model="gpt-4o-mini")
 def translate(text, target_language):
-    """You are a helpful assistant"""  # System prompt
-    return f"Translate {text} into {target_language}!"  # User prompt
+    """You are a highly accurate translation assistant. Your task is to translate the provided text clearly and concisely into the specified target language. Provide only the translated text with no additional comments or formatting."""
+
+    return f"Translate the following text into {target_language}:\n\n{text}\n\nProvide only the translated text with no additional comments."
 
 
 # --------------------------------------------------------------------------------
-# BACKUP FUNCTION: Creates a backup of all JSON translation files in a separate folder.
+# BACKUP FUNCTION: Create a backup of all JSON translation files in a separate folder.
 # --------------------------------------------------------------------------------
 def backup_files():
     """Create a backup of all JSON files in a separate folder."""
@@ -62,7 +54,7 @@ def backup_files():
 
 
 # --------------------------------------------------------------------------------
-# RESTORE FUNCTION: Restores all translation files from the backup folder.
+# RESTORE FUNCTION: Restore all translation files from the backup folder.
 # --------------------------------------------------------------------------------
 def restore_backup():
     """Restore all JSON files from the backup folder to the original location."""
@@ -108,7 +100,7 @@ def save_json(filepath, content):
 
 
 # --------------------------------------------------------------------------------
-# FUNCTION: Ensures that new JSON files in the English folder are added to all other languages.
+# FUNCTION: Ensure that new JSON files in the English folder are added to all other languages.
 # --------------------------------------------------------------------------------
 def ensure_file_exists_for_all_languages(en_file):
     """Ensure that if a new JSON file exists in the English folder,
@@ -125,7 +117,7 @@ def ensure_file_exists_for_all_languages(en_file):
 
 # --------------------------------------------------------------------------------
 # FUNCTION: Update all keys in the English files and propagate changes to all languages.
-# USAGE: Run python manage_translations.py update_all --concurrency 5
+# Optimization: Only update keys if the content has changed or is missing.
 # --------------------------------------------------------------------------------
 def update_all_keys(concurrency=5):
     """Update all keys in the English files and propagate the changes to all languages."""
@@ -144,17 +136,15 @@ def update_all_keys(concurrency=5):
                 lang_file = LOCALES_DIR / lang / en_file.relative_to(en_dir)
                 lang_content = load_json(lang_file)
 
-                def update_language():
+                # Only translate missing or changed content
+                def update_language(lang_file=lang_file,
+                                    lang_content=lang_content,
+                                    en_content=en_content,
+                                    lang=lang):
                     updated = False
                     for key, value in en_content.items():
-                        # Check if the English text has changed
-                        existing_translation = lang_content.get(key, "")
-                        if existing_translation:
-                            new_translation = translate(value, lang)
-                            if existing_translation != new_translation:
-                                lang_content[key] = new_translation
-                                updated = True
-                        else:
+                        if key not in lang_content or lang_content[
+                                key] != value:
                             lang_content[key] = translate(value, lang)
                             updated = True
                     if updated:
@@ -172,7 +162,6 @@ def update_all_keys(concurrency=5):
 
 # --------------------------------------------------------------------------------
 # FUNCTION: Update specific keys in the English files and propagate changes to all languages.
-# USAGE: Run python manage_translations.py update_specific --keys key1 key2 --concurrency 5
 # --------------------------------------------------------------------------------
 def update_specific_keys(keys_to_update, concurrency=5):
     """Update specific keys in the English files and propagate changes to all languages."""
@@ -191,16 +180,20 @@ def update_specific_keys(keys_to_update, concurrency=5):
                 lang_file = LOCALES_DIR / lang / en_file.relative_to(en_dir)
                 lang_content = load_json(lang_file)
 
-                def update_language():
+                # Only translate missing or changed content for specific keys
+                def update_language(lang_file=lang_file,
+                                    lang_content=lang_content,
+                                    en_content=en_content,
+                                    lang=lang,
+                                    keys_to_update=keys_to_update):
                     updated = False
                     for key in keys_to_update:
-                        if key in en_content:
-                            value = en_content[key]
-                            existing_translation = lang_content.get(key, "")
-                            new_translation = translate(value, lang)
-                            if existing_translation != new_translation:
-                                lang_content[key] = new_translation
-                                updated = True
+                        if key in en_content and (key not in lang_content
+                                                  or lang_content[key]
+                                                  != en_content[key]):
+                            lang_content[key] = translate(
+                                en_content[key], lang)
+                            updated = True
                     if updated:
                         save_json(lang_file, lang_content)
                         logging.info(
@@ -216,64 +209,76 @@ def update_specific_keys(keys_to_update, concurrency=5):
 
 
 # --------------------------------------------------------------------------------
-# MAIN FUNCTION: Parses command-line arguments and executes the corresponding action.
+# FUNCTION: Create a new language folder and populate it with translated content.
 # --------------------------------------------------------------------------------
-def main():
-    parser = argparse.ArgumentParser(description='Manage translation files.')
-    parser.add_argument(
-        'action',
-        choices=['backup', 'restore', 'update_all', 'update_specific'],
-        help='Action to perform')
-    parser.add_argument('--keys', nargs='*', help='Specific keys to update')
-    parser.add_argument('--concurrency',
-                        type=int,
-                        default=5,
-                        help='Number of concurrent threads')
-    args = parser.parse_args()
+def create_new_language(new_language):
+    """Create a new language folder and copy all JSON files from English with translated content."""
+    new_language_dir = LOCALES_DIR / new_language
+    if new_language_dir.exists():
+        logging.error(f"Language folder for '{new_language}' already exists.")
+        return
 
-    if args.action == 'backup':
+    try:
+        new_language_dir.mkdir(parents=True)
+        en_dir = LOCALES_DIR / 'en'
+        for en_file in en_dir.rglob('*.json'):
+            new_lang_file = new_language_dir / en_file.relative_to(en_dir)
+            en_content = load_json(en_file)
+            new_lang_content = {
+                key: translate(value, new_language)
+                for key, value in en_content.items()
+            }
+            new_lang_file.parent.mkdir(parents=True, exist_ok=True)
+            save_json(new_lang_file, new_lang_content)
+            logging.info(
+                f"Created and translated {new_lang_file} for new language '{new_language}'"
+            )
+    except Exception as e:
+        logging.error(f"Error creating new language '{new_language}': {e}")
+
+
+# --------------------------------------------------------------------------------
+# MAIN MENU: Displays the menu options and handles user input.
+# --------------------------------------------------------------------------------
+def main_menu():
+    print("\nTranslation Management Tool")
+    print("----------------------------")
+    print("1. Backup translation files")
+    print("2. Restore translation files from backup")
+    print("3. Update all keys in all languages")
+    print("4. Update specific keys in all languages")
+    print("5. Create a new language (with auto-translation)")
+    print("6. Exit")
+
+    choice = input("Select an option (1-6): ")
+
+    if choice == '1':
         backup_files()
-    elif args.action == 'restore':
+    elif choice == '2':
         restore_backup()
-    elif args.action == 'update_all':
-        backup_files()  # Backup before update
-        update_all_keys(concurrency=args.concurrency)
-    elif args.action == 'update_specific':
-        if not args.keys:
-            logging.error('Please provide keys to update with --keys')
-            return
-        backup_files()  # Backup before update
-        update_specific_keys(args.keys, concurrency=args.concurrency)
+    elif choice == '3':
+        concurrency = input(
+            "Enter number of concurrent threads (default 5): ") or 5
+        update_all_keys(concurrency=int(concurrency))
+    elif choice == '4':
+        keys = input("Enter keys to update (separate by spaces): ").split()
+        concurrency = input(
+            "Enter number of concurrent threads (default 5): ") or 5
+        update_specific_keys(keys_to_update=keys, concurrency=int(concurrency))
+    elif choice == '5':
+        new_language = input(
+            "Enter the new language code (e.g., 'es' for Spanish): ").strip()
+        create_new_language(new_language)
+    elif choice == '6':
+        print("Exiting the program.")
+        exit()
     else:
-        logging.error(
-            "Invalid action. Please choose from 'backup', 'restore', 'update_all', 'update_specific'."
-        )
+        print("Invalid choice. Please select a valid option.")
 
 
-# Entry point of the script
+# --------------------------------------------------------------------------------
+# MAIN FUNCTION: Runs the main menu and handles user interactions.
+# --------------------------------------------------------------------------------
 if __name__ == '__main__':
-    main()
-
-# Explanation of the Script
-# How to run the script:
-
-# Backup all translation files:
-# bash
-# Copy code
-# python manage_translations.py backup
-# Restore files from the backup:
-# bash
-# Copy code
-# python manage_translations.py restore
-# Update All Keys: Updates all keys in the translation files:
-# bash
-# Copy code
-# python manage_translations.py update_all --concurrency 5
-# Update Specific Keys: Updates only specified keys:
-# bash
-# Copy code
-# python manage_translations.py update_specific --keys mainTitle description
-# You can specify multiple keys by passing them after --keys.
-# Concurrency: The --concurrency flag controls how many concurrent threads will be used for processing translations. This improves performance for large datasets.
-
-# Logging: The script logs important actions and errors using Python's logging module, which allows for better tracking and debugging.
+    while True:
+        main_menu()
