@@ -1,0 +1,16 @@
+{
+    "retry": "إعادة المحاولة",
+    "serverError": "خطأ في الخادم",
+    "unknownError": "خطأ غير معروف",
+    "noResponseError": "لم يتم استلام رد من الخادم. يرجى المحاولة مرة أخرى.",
+    "genericError": "حدث خطأ",
+    "backToResults": "العودة إلى النتائج",
+    "selectYourLanguage": "اختر لغتك",
+    "stepAria": "الخطوة {{number}}: {{title}}",
+    "stepperNavigation": "خطوات التقدم",
+    "back": "عودة",
+    "next": "التالي",
+    "finish": "أنهى",
+    "loading": "جارٍ التحميل...",
+    "loadingAdditionalInfo": "يرجى الانتظار بينما نجهز محتواك"
+}

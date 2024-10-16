@@ -1,0 +1,16 @@
+{
+    "retry": "Yeniden dene",
+    "serverError": "Sunucu hatası",
+    "unknownError": "Bilinmeyen hata",
+    "noResponseError": "Sunucudan yanıt alınamadı. Lütfen tekrar deneyin.",
+    "genericError": "Bir hata oluştu",
+    "backToResults": "Sonuçlara Dön",
+    "selectYourLanguage": "Dilini seçin",
+    "stepAria": "Adım {{number}}: {{title}}",
+    "stepperNavigation": "Adım İlerlemesi",
+    "back": "Geri",
+    "next": "Sonra",
+    "finish": "Bitir",
+    "loading": "Yükleniyor...",
+    "loadingAdditionalInfo": "Lütfen içeriğinizi hazırlarken bekleyin."
+}

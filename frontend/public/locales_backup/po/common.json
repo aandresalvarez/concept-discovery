@@ -1,0 +1,16 @@
+{
+    "retry": "Spróbuj ponownie",
+    "serverError": "Błąd serwera",
+    "unknownError": "Nieznany błąd",
+    "noResponseError": "Nie otrzymano odpowiedzi z serwera. Proszę spróbować ponownie.",
+    "genericError": "Wystąpił błąd",
+    "backToResults": "Wraca do wyników",
+    "selectYourLanguage": "Wybierz swój język",
+    "stepAria": "Krok {{number}}: {{title}}",
+    "stepperNavigation": "Postęp kroku",
+    "back": "Wstecz",
+    "next": "Następny",
+    "finish": "Zakończ",
+    "loading": "Ładowanie...",
+    "loadingAdditionalInfo": "Proszę czekać, przygotowujemy Twoje treści."
+}

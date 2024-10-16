@@ -12,5 +12,22 @@
   "next": "Next",
   "finish": "Finish",
   "loading": "Loading...",
-  "loadingAdditionalInfo": "Please wait while we prepare your content"
+  "loadingAdditionalInfo": "Please wait while we prepare your content",
+  "searchLanguage": "Search for a language",
+  "noLanguageFound": "No language found. Would you like to add a new one?",
+  "createLanguage": "Create New Language",
+  "languageName": "Language Name",
+  "languageCode": "Language Code",
+  "nativeName": "Native Name",
+  "cancel": "Cancel",
+  "save": "Save",
+  "allFieldsRequired": "All fields are required",
+  "failedToCreateLanguage": "Failed to create language. Please try again.",
+  "errorCreatingLanguage": "An error occurred while creating the language. Please try again.",
+  "languageCreatedSuccess": "Language created successfully!",
+  "invalidLanguageCode": "Invalid language code. Please use a 2-letter ISO code.",
+  "languageAlreadyExists": "A language with this code already exists.",
+  "confirmLanguageCreation": "Are you sure you want to create this language?",
+  "yes": "Yes",
+  "no": "No"
 }

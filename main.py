@@ -66,6 +66,41 @@ class ConceptTableResponse(BaseModel):
     concepts: List[ConceptTableRow]
 
 
+class CreateLanguageRequest(BaseModel):
+    name: str
+    code: str
+    native_name: str
+
+
+class CreateLanguageResponse(BaseModel):
+    success: bool
+    message: str
+
+
+@app.post("/api/create_language", response_model=CreateLanguageResponse)
+async def create_language(request: CreateLanguageRequest):
+    try:
+        # Here you would typically interact with your database or language service
+        # to create the new language. For this example, we'll just log the attempt.
+        logger.info(
+            f"Attempting to create new language: {request.name} ({request.code})"
+        )
+
+        # Simulate language creation
+        # In a real application, you'd add the language to your database or language service
+        success = True
+        message = f"Successfully created language: {request.name} ({request.code})"
+
+        # Log the successful creation
+        logger.info(message)
+
+        return CreateLanguageResponse(success=success, message=message)
+    except Exception as e:
+        logger.error(f"Failed to create language: {str(e)}")
+        raise HTTPException(status_code=500,
+                            detail=f"Failed to create language: {str(e)}")
+
+
 @app.get("/api/concept_lookup")
 async def get_concept_table(term: str, language: str):
     try:

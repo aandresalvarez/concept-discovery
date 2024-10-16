@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import axios from "axios";
 import {
   Dialog,
   DialogContent,
@@ -22,7 +23,7 @@ interface ForcedLanguageSelectorProps {
   onLanguageSelected: (language: string) => void;
 }
 
-const languageOptions: Language[] = [
+const initialLanguageOptions: Language[] = [
   { value: "en", label: "English", nativeName: "English" },
   { value: "es", label: "Spanish", nativeName: "Español" },
   { value: "fr", label: "French", nativeName: "Français" },
@@ -43,23 +44,35 @@ const ForcedLanguageSelector: React.FC<ForcedLanguageSelectorProps> = ({
   onLanguageSelected,
 }) => {
   const { t, i18n } = useTranslation("common");
+  const isDesktop = useMediaQuery("(min-width: 768px)");
+
   const [searchQuery, setSearchQuery] = useState("");
+  const [languageOptions, setLanguageOptions] = useState(
+    initialLanguageOptions,
+  );
   const [filteredLanguages, setFilteredLanguages] = useState(languageOptions);
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
-  const isDesktop = useMediaQuery("(min-width: 768px)");
+  const [isCreatingLanguage, setIsCreatingLanguage] = useState(false);
+  const [newLanguage, setNewLanguage] = useState({
+    name: "",
+    code: "",
+    nativeName: "",
+  });
+  const [error, setError] = useState<string | null>(null);
 
   const filterLanguages = useCallback(() => {
     const filtered = languageOptions.filter(
       (lang) =>
         lang.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        lang.nativeName.toLowerCase().includes(searchQuery.toLowerCase()),
+        lang.nativeName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        lang.value.toLowerCase().includes(searchQuery.toLowerCase()),
     );
     setFilteredLanguages(filtered);
-  }, [searchQuery]);
+  }, [searchQuery, languageOptions]);
 
   useEffect(() => {
     filterLanguages();
-  }, [filterLanguages, searchQuery]);
+  }, [filterLanguages]);
 
   const handleLanguageSelect = (language: string) => {
     setSelectedLanguage(language);
@@ -68,8 +81,40 @@ const ForcedLanguageSelector: React.FC<ForcedLanguageSelectorProps> = ({
   };
 
   const handleCreateLanguage = () => {
-    console.log("Creating new language:", searchQuery);
-    // Implement logic to create a new language
+    setIsCreatingLanguage(true);
+    setError(null);
+  };
+
+  const handleSaveNewLanguage = async () => {
+    try {
+      if (!newLanguage.name || !newLanguage.code || !newLanguage.nativeName) {
+        setError(t("allFieldsRequired"));
+        return;
+      }
+
+      const response = await axios.post("/api/create_language", {
+        name: newLanguage.name,
+        code: newLanguage.code,
+        native_name: newLanguage.nativeName,
+      });
+
+      if (response.data.success) {
+        const newLangOption = {
+          value: newLanguage.code,
+          label: newLanguage.name,
+          nativeName: newLanguage.nativeName,
+        };
+        setLanguageOptions([...languageOptions, newLangOption]);
+        setIsCreatingLanguage(false);
+        setNewLanguage({ name: "", code: "", nativeName: "" });
+        setError(null);
+      } else {
+        setError(response.data.message || t("failedToCreateLanguage"));
+      }
+    } catch (error) {
+      console.error("Error creating language:", error);
+      setError(t("errorCreatingLanguage"));
+    }
   };
 
   const renderLanguageButton = (lang: Language) => (
@@ -87,18 +132,51 @@ const ForcedLanguageSelector: React.FC<ForcedLanguageSelectorProps> = ({
     </Button>
   );
 
-  const renderLanguageGrid = () => (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-      {filteredLanguages.map(renderLanguageButton)}
-    </div>
-  );
-
   const renderLanguageList = () => (
     <ScrollArea className="h-[calc(100vh-200px)] mt-4">
       <div className="pr-4 space-y-2">
         {filteredLanguages.map(renderLanguageButton)}
       </div>
     </ScrollArea>
+  );
+
+  const renderLanguageGrid = () => (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+      {filteredLanguages.map(renderLanguageButton)}
+    </div>
+  );
+
+  const renderCreateLanguageForm = () => (
+    <div className="space-y-4 mt-4">
+      <Input
+        placeholder={t("languageName")}
+        value={newLanguage.name}
+        onChange={(e) =>
+          setNewLanguage({ ...newLanguage, name: e.target.value })
+        }
+      />
+      <Input
+        placeholder={t("languageCode")}
+        value={newLanguage.code}
+        onChange={(e) =>
+          setNewLanguage({ ...newLanguage, code: e.target.value })
+        }
+      />
+      <Input
+        placeholder={t("nativeName")}
+        value={newLanguage.nativeName}
+        onChange={(e) =>
+          setNewLanguage({ ...newLanguage, nativeName: e.target.value })
+        }
+      />
+      {error && <p className="text-destructive">{error}</p>}
+      <div className="flex justify-end space-x-2">
+        <Button variant="outline" onClick={() => setIsCreatingLanguage(false)}>
+          {t("cancel")}
+        </Button>
+        <Button onClick={handleSaveNewLanguage}>{t("save")}</Button>
+      </div>
+    </div>
   );
 
   return (
@@ -135,7 +213,9 @@ const ForcedLanguageSelector: React.FC<ForcedLanguageSelectorProps> = ({
             )}
           </div>
         </div>
-        {filteredLanguages.length > 0 ? (
+        {isCreatingLanguage ? (
+          renderCreateLanguageForm()
+        ) : filteredLanguages.length > 0 ? (
           isDesktop ? (
             renderLanguageGrid()
           ) : (
