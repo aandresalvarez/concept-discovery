@@ -1,0 +1,16 @@
+{
+    "retry": "再試行",
+    "serverError": "サーバーエラー",
+    "unknownError": "不明なエラー",
+    "noResponseError": "サーバーからの応答がありません。もう一度試してください。",
+    "genericError": "エラーが発生しました",
+    "backToResults": "結果に戻る",
+    "selectYourLanguage": "言語を選択してください",
+    "stepAria": "ステップ{{number}}：{{title}}",
+    "stepperNavigation": "ステップの進行状況",
+    "back": "戻る",
+    "next": "次",
+    "finish": "終了",
+    "loading": "読み込み中...",
+    "loadingAdditionalInfo": "コンテンツを準備していますので、しばらくお待ちください。"
+}
