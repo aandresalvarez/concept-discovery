@@ -40,56 +40,53 @@ const LoadingComponent: React.FC<LoadingComponentProps> = ({
   textAlignment = "center",
 }) => {
   const { t } = useTranslation("common");
-
   const validatedSize: Size = size in sizeClasses ? size : "md";
   const selectedSizeClass = sizeClasses[validatedSize];
   const selectedTextSizeClass = textSizeClasses[validatedSize];
-
   const primaryBorderColor = `border-${primaryColor}`;
   const accentBorderColor = `border-${accentColor}`;
   const secondaryBorderColor = `border-${secondaryColor}`;
   const textColorClass = `text-${primaryColor}`;
-
   const alignmentClass = `text-${textAlignment}`;
 
   return (
     <div
       className={cn(
-        "w-full bg-background flex items-start justify-center pt-16 overflow-hidden",
+        "w-full bg-background flex flex-col items-center justify-center pt-16 overflow-hidden",
         className,
       )}
       role="status"
       aria-live="polite"
     >
+      <div className={cn("relative", selectedSizeClass, "mb-8")}>
+        <div
+          className={cn(
+            "absolute inset-0",
+            primaryBorderColor,
+            "border-4 rounded-full animate-ping-slow",
+          )}
+          aria-hidden="true"
+        ></div>
+        <div
+          className={cn(
+            "absolute inset-3",
+            accentBorderColor,
+            "border-4 rounded-full animate-ping-slower",
+          )}
+          style={{ animationDelay: "0.5s" }}
+          aria-hidden="true"
+        ></div>
+        <div
+          className={cn(
+            "absolute inset-6",
+            secondaryBorderColor,
+            "border-4 rounded-full animate-ping-slowest",
+          )}
+          style={{ animationDelay: "1s" }}
+          aria-hidden="true"
+        ></div>
+      </div>
       <div className="flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 space-y-4 max-w-xl">
-        <div className={cn("relative", selectedSizeClass)}>
-          <div
-            className={cn(
-              "absolute inset-0",
-              primaryBorderColor,
-              "border-4 rounded-full animate-ping-slow",
-            )}
-            aria-hidden="true"
-          ></div>
-          <div
-            className={cn(
-              "absolute inset-3",
-              accentBorderColor,
-              "border-4 rounded-full animate-ping-slower",
-            )}
-            style={{ animationDelay: "0.5s" }}
-            aria-hidden="true"
-          ></div>
-          <div
-            className={cn(
-              "absolute inset-6",
-              secondaryBorderColor,
-              "border-4 rounded-full animate-ping-slowest",
-            )}
-            style={{ animationDelay: "1s" }}
-            aria-hidden="true"
-          ></div>
-        </div>
         <h2
           className={cn(
             "font-serif font-bold drop-shadow-lg animate-scale",
