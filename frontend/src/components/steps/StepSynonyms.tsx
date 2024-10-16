@@ -26,24 +26,34 @@ const StepSynonyms: React.FC<StepSynonymsProps> = ({
 
   return (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">
+      <h2 className="text-xl">
         {t("synonymsFor", { term: selectedTerm?.term || t("selectedTerm") })}
       </h2>
       {selectedTerm && (
         <Card className="p-4 bg-secondary/50">
-          <h3 className="font-semibold">{selectedTerm.term}</h3>
-          <p className="text-sm mt-2">{selectedTerm.definition}</p>
-          <p className="text-sm mt-2">
-            <strong>{t("category")}:</strong> {selectedTerm.category}
-          </p>
-          <p className="text-sm mt-2">
-            <strong>{t("usage")}:</strong> {selectedTerm.usage}
-          </p>
-          <p className="text-sm mt-2">
-            <strong>{t("context")}:</strong> {selectedTerm.context}
-          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+            {/* First Column: Term and Category */}
+            <div>
+              <p className="font-semibold text-md">{selectedTerm.term}</p>
+              <small className="text-sm text-gray-500">
+                - {selectedTerm.category}
+              </small>
+              <p className="mt-2">{selectedTerm.definition}</p>
+            </div>
+            {/* Second Column: Usage */}
+            <div>
+              <p className="font-semibold">{t("usage")}:</p>
+              <p>{selectedTerm.usage}</p>
+            </div>
+            {/* Third Column: Context */}
+            <div>
+              <p className="font-semibold">{t("context")}:</p>
+              <p>{selectedTerm.context}</p>
+            </div>
+          </div>
         </Card>
       )}
+
       {synonyms.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {synonyms.map((synonym, index) => (

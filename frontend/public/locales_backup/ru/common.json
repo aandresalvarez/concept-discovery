@@ -1,0 +1,16 @@
+{
+  "retry": "Повторить",
+  "serverError": "Ошибка сервера",
+  "unknownError": "Неизвестная ошибка",
+  "noResponseError": "Ответ от сервера не получен. Пожалуйста, повторите попытку.",
+  "genericError": "Произошла ошибка",
+  "backToResults": "Назад к результатам",
+  "selectYourLanguage": "Выберите ваш язык",
+  "stepAria": "Шаг {{number}}: {{title}}",
+  "stepperNavigation": "Прогресс шагов",
+  "back": "Назад",
+  "next": "Далее",
+  "finish": "Завершить",
+  "loading": "Загрузка...",
+  "loadingAdditionalInfo": "Пожалуйста, подождите, пока мы подготавливаем ваш контент"
+}

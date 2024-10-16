@@ -87,7 +87,10 @@ def disambiguate(term: str, language: str = "en") -> str:
     """
     return [
         ell.system(
-            f"""Explain a potentially ambiguous medical term to a user in the specified language '{language}'. Your output should be formatted as a JSON array of objects, where each object represents a possible meaning of the term.
+            f"""Explain a potentially ambiguous medical term to a user in the specified language '{language}'. 
+            For example, the Polish word "zawał" can mean either myocardial infarction or cerebral infarction,
+            while the Spanish word "constipado" can refer to either a cold or constipation.
+            Your output should be formatted as a JSON array of objects, where each object represents a possible meaning of the term.
 
 - Do not include specific opinions.
 - Limit explanations to possible definitions that can be understood in the language and cultural context.

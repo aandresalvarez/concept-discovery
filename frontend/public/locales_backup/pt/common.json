@@ -1,0 +1,16 @@
+{
+  "retry": "Repetir",
+  "serverError": "Erro no servidor",
+  "unknownError": "Erro desconhecido",
+  "noResponseError": "Nenhuma resposta recebida do servidor. Tente novamente.",
+  "genericError": "Ocorreu um erro",
+  "backToResults": "Voltar aos resultados",
+  "selectYourLanguage": "Selecione o seu idioma",
+  "stepAria": "Passo {{number}}: {{title}}",
+  "stepperNavigation": "Progresso dos passos",
+  "back": "Voltar",
+  "next": "Próximo",
+  "finish": "Concluir",
+  "loading": "Carregando...",
+  "loadingAdditionalInfo": "Aguarde enquanto preparamos seu conteúdo"
+}
