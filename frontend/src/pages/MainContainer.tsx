@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
@@ -53,7 +53,7 @@ const MainContainer: React.FC = () => {
     useState<boolean>(false);
 
   const isSmallScreen = useMediaQuery("(max-width: 767px)");
-  const loadingSize: "sm" | "md" = isSmallScreen ? "sm" : "md";
+  const loadingSize = isSmallScreen ? "sm" : "md";
 
   const handleLanguageChange = useCallback(
     (lang: string) => {
@@ -71,7 +71,9 @@ const MainContainer: React.FC = () => {
       console.error("API call error:", err);
       if (err.response) {
         setError(
-          `${t("serverError", { ns: "common" })}: ${err.response.data.detail || t("unknownError", { ns: "common" })}`,
+          `${t("serverError", { ns: "common" })}: ${
+            err.response.data.detail || t("unknownError", { ns: "common" })
+          }`,
         );
       } else if (err.request) {
         setError(t("noResponseError", { ns: "common" }));
@@ -195,6 +197,21 @@ const MainContainer: React.FC = () => {
     setShowLanguageSelector(false);
   }, []);
 
+  const loadingText = useMemo(() => {
+    if (!loading) return "";
+
+    switch (currentStep) {
+      case 0:
+        return t("loadingInitial");
+      case 1:
+        return t("loadingConcepts");
+      case 2:
+        return t("loadingAdditionalInfo");
+      default:
+        return t("loading");
+    }
+  }, [loading, currentStep, t]);
+
   const steps = [
     {
       title: t("disambiguationStep", { ns: "mainContainer" }),
@@ -255,7 +272,9 @@ const MainContainer: React.FC = () => {
               <div className="w-full">
                 <SearchBox
                   onSearch={handleSearch}
-                  placeholder={t("searchPlaceholder", { ns: "mainContainer" })}
+                  placeholder={t("searchPlaceholder", {
+                    ns: "mainContainer",
+                  })}
                   onLanguageChange={handleLanguageChange}
                   selectedLanguage={i18n.language}
                   showLangSelection={false}
@@ -273,7 +292,9 @@ const MainContainer: React.FC = () => {
               <div className="mb-6">
                 <SearchBox
                   onSearch={handleSearch}
-                  placeholder={t("searchPlaceholder", { ns: "mainContainer" })}
+                  placeholder={t("searchPlaceholder", {
+                    ns: "mainContainer",
+                  })}
                   onLanguageChange={handleLanguageChange}
                   selectedLanguage={i18n.language}
                   showLangSelection={false}
@@ -283,10 +304,7 @@ const MainContainer: React.FC = () => {
               {loading ? (
                 <div className="pt-16">
                   <LoadingComponent
-                    loadingText={t(
-                      `loading${currentStep === 0 ? "Initial" : currentStep === 1 ? "Synonyms" : "Concepts"}`,
-                      { ns: "mainContainer" },
-                    )}
+                    loadingText={loadingText}
                     size={loadingSize}
                     showAdditionalInfo={currentStep === 2}
                     additionalInfoText={t("loadingAdditionalInfo", {
