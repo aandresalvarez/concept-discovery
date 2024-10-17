@@ -98,10 +98,10 @@ def disambiguate(term: str, language: str = "en") -> str:
             f"""You will be asked to explain a potentially ambiguous medical term in a specified language, either provided by the user or chosen by the assistant.
 
             Follow these steps:
-            1. Identify the medical term either from user input or by choosing a commonly ambiguous medical term within the specified language.
+            1. Identify the medical term from the user input.
             2. Provide only medical-related meanings or interpretations of the term in that language.
             3. If the term has multiple distinct medical meanings, provide each one clearly, ensuring that the definitions are not redundant.
-            4. If the term has only one possible medical meaning, or if the possible meanings are extremely similar, return just one result.
+            4. If the term has only one possible medical meaning, still return it within a JSON array.
             5. Do not include disambiguation options for non-medical uses of the term.
 
             Examples:
@@ -112,15 +112,18 @@ def disambiguate(term: str, language: str = "en") -> str:
             Italian: "Colpo" in medical terms can mean colpo di calore (heatstroke) or colpo di frusta (whiplash). The word "colpo" generally means a blow or strike, which can be used in different contexts within medicine.
             French: "Crise" can refer to a seizure (crise d'épilepsie), an attack (crise cardiaque for a heart attack), or a crisis (such as a psychological crisis or anxiety attack).
             Portuguese: "Infarto" can mean both myocardial infarction (heart attack) or infarction in other organs (such as a pulmonary or cerebral infarction), depending on the context.
-            Spanish: "Derrame" can mean a cerebral hemorrhage (brain bleed or stroke) or pleural effusion (fluid around the lungs), which affects entirely different organs but shares the general concept of a fluid spill.
+            Spanish: "Derrame" can mean a cerebral hemorrhage (brain bleed or stroke) or pleural effusion (fluid around the lungs), affecting different organs but sharing the concept of fluid leakage.
             German: "Schock" can refer to both cardiogenic shock (a severe condition due to heart failure) and psychological shock (an acute stress response).
-            English/Spanish: The word "stroke" in English primarily refers to a cerebrovascular accident (CVA), while the Spanish word "golpe" (literal translation for stroke) can mean a blow or trauma, which could imply injury in various parts of the body depending on context.
-            French: "Infarctus" can refer to a heart attack (myocardial infarction) or a broader infarction (tissue death due to lack of blood flow), which could apply to different organs (such as the brain or lungs).
-            Italian: "Crisi" can mean an epileptic seizure (crisi epilettica), a cardiac crisis (crisi cardiaca), or even a psychological crisis, making it a multi-context medical term.
-            Dutch: "Infarct" is a general term for tissue death due to lack of blood supply, and it can refer to heart, brain, or other organ infarctions, depending on the location.
-            Russian: "Остановка" (ostanovka) can refer to the stopping of any organ’s function, like cardiac arrest or respiratory arrest, but it can also be used for more general cessation, such as halting a process.
-            Spanish: "Paro" can mean cardiac arrest (paro cardíaco) or respiratory arrest (paro respiratorio), where "paro" simply means stopping.
-            Portuguese: "Crise" can refer to a crisis like a seizure, an asthma attack (crise asmática), or even a cardiac crisis, making it applicable in various contexts.
+            English/Spanish: The word "stroke" in English primarily refers to a cerebrovascular accident (CVA), while the Spanish word "golpe" (literal translation for stroke) can mean a blow or trauma, implying injury in various body parts depending on context.
+            French: "Infarctus" can refer to a heart attack (myocardial infarction) or a broader infarction (tissue death due to lack of blood flow), applicable to different organs like the brain or lungs.
+            Italian: "Crisi" can mean an epileptic seizure (crisi epilettica), a cardiac crisis (crisi cardiaca), or a psychological crisis, making it a multi-context medical term.
+            Dutch: "Infarct" is a general term for tissue death due to lack of blood supply and can refer to heart, brain, or other organ infarctions.
+            Russian: "Остановка" (ostanovka) can refer to the stopping of any organ’s function, like cardiac arrest or respiratory arrest, but also general cessation, such as halting a process.
+            Spanish: "Paro" can mean cardiac arrest (paro cardíaco) or respiratory arrest (paro respiratorio); "paro" simply means stopping.
+            Portuguese: "Crise" can refer to a seizure, an asthma attack (crise asmática), or a cardiac crisis, making it applicable in various contexts.
+            Japanese: "ショック" (Shokku) can mean either cardiogenic shock or psychological shock, depending on the medical context.
+            Chinese (Simplified): "中风" (Zhōngfēng) can refer to a cerebrovascular accident (stroke) or apoplexy, based on historical and contextual usage.
+            Arabic: "أزمة" (Azmah) can denote either an asthma attack or a psychological crisis within medical discussions.
 
             Your output should be formatted as a JSON array of objects, with each object representing a unique medical meaning of the term.
 
@@ -131,25 +134,16 @@ def disambiguate(term: str, language: str = "en") -> str:
                 "definition": "<Definition of the medical term in {language}>",
                 "usage": "<How the medical term is used in {language}>",
                 "context": "<Medical context or specialty where the term is commonly used in {language}>",
-                "category": "<Category of the medical term. e.g. disease, condition, etc. in {language}>"
+                "category": "<Category of the medical term, e.g., disease, condition, etc., in {language}>"
               }}
             ]
             ```
 
-            If there is only one distinct medical meaning for the term, return:
-
-            ```json
-            {{
-              "term": "<The medical term>",
-              "definition": "<Definition of the medical term in {language}>",
-              "usage": "<How the medical term is used in {language}>",
-              "context": "<Medical context or specialty where the term is commonly used in {language}>",
-              "category": "<Category of the medical term. e.g. disease, condition, etc. in {language}>"
-            }}
-            ```
-            """),
+            """
+        ),
         ell.user(
-            f"Disambiguate the following medical term in {language}: {term}")
+            f"Disambiguate the following medical term in {language}: {term}"
+        )
     ]
 
 
