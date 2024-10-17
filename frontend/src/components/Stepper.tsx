@@ -166,21 +166,19 @@ const Stepper: React.FC<StepperProps> = ({
           <ChevronLeft className="mr-1 sm:mr-2" size={16} />
           {t("back")}
         </Button>
-        <Button
-          onClick={handleNext}
-          disabled={
-            !canProceed || (isLastStep && currentStep === steps.length - 1)
-          }
-          className={cn(
-            "flex items-center text-sm sm:text-base",
-            !canProceed || (isLastStep && currentStep === steps.length - 1)
-              ? "opacity-50 cursor-not-allowed"
-              : "",
-          )}
-        >
-          {isLastStep ? t("finish") : t("next")}
-          <ChevronRight className="ml-1 sm:ml-2" size={16} />
-        </Button>
+        {!isLastStep && (
+          <Button
+            onClick={handleNext}
+            disabled={!canProceed}
+            className={cn(
+              "flex items-center text-sm sm:text-base",
+              !canProceed ? "opacity-50 cursor-not-allowed" : "",
+            )}
+          >
+            {t("next")}
+            <ChevronRight className="ml-1 sm:ml-2" size={16} />
+          </Button>
+        )}
       </div>
     </div>
   );
