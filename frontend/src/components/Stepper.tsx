@@ -3,6 +3,7 @@ import { useTranslation } from "react-i18next";
 import { ChevronRight, ChevronLeft, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 interface Step {
   id?: string | number;
@@ -34,6 +35,7 @@ const Stepper: React.FC<StepperProps> = ({
 }) => {
   const { t } = useTranslation("common");
   const [currentStep, setCurrentStep] = useState<number>(initialStep);
+  const isMobile = useMediaQuery("(max-width: 640px)");
 
   const isLastStep = currentStep === steps.length - 1;
   const isFirstStep = currentStep === 0;
@@ -111,7 +113,7 @@ const Stepper: React.FC<StepperProps> = ({
     return steps.map((step, index) => (
       <div
         key={`title-${index}`}
-        className="text-xs sm:text-sm text-center w-8 sm:w-10 mt-2"
+        className="hidden sm:block text-xs sm:text-sm text-center w-8 sm:w-10 mt-2"
       >
         {step.title}
       </div>
@@ -133,15 +135,20 @@ const Stepper: React.FC<StepperProps> = ({
         </div>
       </div>
 
-      <div className="mb-6 sm:mb-8 px-4">
+      <div className={cn("mb-6 sm:mb-8", isMobile ? "px-0" : "px-4")}>
         <h2
           className={cn(
-            "text-lg sm:text-2xl font-bold mb-2 sm:mb-4 text-center",
+            "text-xl sm:text-2xl font-bold mb-2 sm:mb-4 text-center",
           )}
         >
           {steps[currentStep].title}
         </h2>
-        <div className={cn("border p-4 sm:p-6 rounded-lg")}>
+        <div
+          className={cn(
+            isMobile ? "w-full" : "border p-4 sm:p-6 rounded-lg",
+            isMobile ? "text-lg" : "text-base",
+          )}
+        >
           {steps[currentStep].content}
         </div>
       </div>
@@ -152,7 +159,7 @@ const Stepper: React.FC<StepperProps> = ({
           disabled={isFirstStep}
           variant="outline"
           className={cn(
-            "flex items-center text-xs sm:text-sm",
+            "flex items-center text-sm sm:text-base",
             isFirstStep ? "opacity-50 cursor-not-allowed" : "",
           )}
         >
@@ -165,7 +172,7 @@ const Stepper: React.FC<StepperProps> = ({
             !canProceed || (isLastStep && currentStep === steps.length - 1)
           }
           className={cn(
-            "flex items-center text-xs sm:text-sm",
+            "flex items-center text-sm sm:text-base",
             !canProceed || (isLastStep && currentStep === steps.length - 1)
               ? "opacity-50 cursor-not-allowed"
               : "",
