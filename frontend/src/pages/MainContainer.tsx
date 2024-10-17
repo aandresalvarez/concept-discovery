@@ -10,6 +10,7 @@ import StepSynonyms from "@/components/steps/StepSynonyms";
 import StepTableResults from "@/components/steps/StepTableResults";
 import ForcedLanguageSelector from "@/components/ForcedLanguageSelector";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
+import { Languages } from "lucide-react";
 
 interface DisambiguationResult {
   term: string;
@@ -59,14 +60,16 @@ const MainContainer: React.FC = () => {
     [i18n],
   );
 
+  const handleLanguageRefresh = useCallback(() => {
+    window.location.reload();
+  }, []);
+
   const handleError = useCallback(
     (err: any) => {
       console.error("API call error:", err);
       if (err.response) {
         setError(
-          `${t("serverError", { ns: "common" })}: ${
-            err.response.data.detail || t("unknownError", { ns: "common" })
-          }`,
+          `${t("serverError", { ns: "common" })}: ${err.response.data.detail || t("unknownError", { ns: "common" })}`,
         );
       } else if (err.request) {
         setError(t("noResponseError", { ns: "common" }));
@@ -215,6 +218,18 @@ const MainContainer: React.FC = () => {
     },
   ];
 
+  const renderLanguageButton = () => (
+    <Button
+      variant="link"
+      size="sm"
+      className="p-1"
+      onClick={handleLanguageRefresh}
+      title={t("changeLanguage", { ns: "common" })}
+    >
+      <Languages className="h-4 w-4" />
+    </Button>
+  );
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header />
@@ -228,9 +243,12 @@ const MainContainer: React.FC = () => {
               exit={{ opacity: 0 }}
               className="flex flex-col items-center justify-center flex-grow"
             >
-              <h1 className="text-4xl font-bold mb-8 text-foreground text-center">
-                {t("title", { ns: "mainContainer" })}
-              </h1>
+              <div className="flex items-center justify-center mb-8">
+                <h1 className="text-4xl font-bold text-foreground text-center mr-2">
+                  {t("title", { ns: "mainContainer" })}
+                </h1>
+                {renderLanguageButton()}
+              </div>
               <div className="w-full">
                 <SearchBox
                   onSearch={handleSearch}
@@ -257,12 +275,13 @@ const MainContainer: React.FC = () => {
                   selectedLanguage={i18n.language}
                   showLangSelection={false}
                 />
+                <div className="mt-2 flex justify-center">
+                  {renderLanguageButton()}
+                </div>
               </div>
 
               {loading ? (
                 <div className="pt-16">
-                  {" "}
-                  {/* Added padding-top */}
                   <LoadingComponent
                     loadingText={t(
                       `loading${currentStep === 0 ? "Initial" : currentStep === 1 ? "Synonyms" : "Concepts"}`,
