@@ -58,63 +58,98 @@ class SynonymResponse(BaseModel):
 
 
 # LMP for generating synonyms
-@ell.complex(model="gpt-4o-mini", response_format=SynonymResponse)
+@ell.complex(model="gpt-4o-mini",
+             temperature=0.7,
+             response_format=SynonymResponse)
 def generate_synonyms(term: str, language: str, context: str) -> List[Message]:
     """
-    Generate synonyms for a given term in the specified language.
+    Generate contextually relevant and medically accurate synonyms for a given medical term in the specified language.
+    Each synonym will include a relevance score from 0 to 1, where 1 represents the highest relevance.
     """
     return [
         ell.system(
-            f"""You are a medical language expert. Generate up to 5 synonyms for the given medical term given the provided context.
-        Provide each synonym with a relevance score between 0 and 1, where 1 is highly relevant and 0 is less relevant. asuming the provided context"""
+            f"""You are a medical language expert tasked with generating synonyms for a medical term. 
+            The synonyms should be specific to the medical context and language provided. Follow these instructions:
+
+            1. Generate up to 5 synonyms for the term '{term}' based on the provided medical context '{context}' in the language '{language}'.
+            2. Ensure all synonyms are appropriate for the specified medical field or condition, avoiding non-medical or overly general terms.
+            3. If the term '{term}' itself is commonly used and relevant in this context, include it as one of the synonyms.
+            4. Each synonym should include a relevance score between 0 and 1. A score of 1 means the synonym is highly relevant to the medical context, and 0 indicates low relevance.
+            5. If there are limited appropriate synonyms due to the specificity of the term, provide fewer than 5 and ensure they are medically precise.
+            6. Avoid overly broad or non-specialized terms that could create confusion in the context of '{context}'."""
         ),
         ell.user(
-            f"Generate synonyms for the medical term '{term}' in the context of '{context}' in {language}. "
-        ),
-        ell.user(
-            f"if the term '{term}' with the context '{context}' is could valid in the provided language {language}, then add the term to the synonyms list."
+            f"Generate up to 5 medical synonyms for the term '{term}' in the context of '{context}' and the language '{language}', with relevance scores for each."
         )
     ]
 
 
 # LMP for concept disambiguation
-@ell.complex(model="gpt-4o-mini")
+@ell.complex(model="gpt-4o-mini", temperature=0.7)
 def disambiguate(term: str, language: str = "en") -> str:
     """
     Return a list of possible meanings of a medical term, formatted as a JSON structure.
     Each meaning includes definition, usage, and medical context.
     The results will be in the specified language, defaulting to English if not specified.
+    Only medical meanings are considered. If there is only one meaning or very similar meanings, return a single result.
     """
     return [
         ell.system(
-            f"""Explain a potentially ambiguous medical term to a user in the specified language '{language}'. 
-            For example, the Polish word "zawał" can mean either myocardial infarction or cerebral infarction,
-            while the Spanish word "constipado" can refer to either a cold or constipation.
-            Your output should be formatted as a JSON array of objects, where each object represents a possible meaning of the term.
+            f"""You will be asked to explain a potentially ambiguous medical term in a specified language, either provided by the user or chosen by the assistant.
 
-- Do not include specific opinions.
-- Limit explanations to possible definitions that can be understood in the language and cultural context.
+            Follow these steps:
+            1. Identify the medical term either from user input or by choosing a commonly ambiguous medical term within the specified language.
+            2. Provide only medical-related meanings or interpretations of the term in that language.
+            3. If the term has multiple distinct medical meanings, provide each one clearly, ensuring that the definitions are not redundant.
+            4. If the term has only one possible medical meaning, or if the possible meanings are extremely similar, return just one result.
+            5. Do not include disambiguation options for non-medical uses of the term.
 
-# Steps
+            Examples:
+            Polish: "Zawał" can mean either myocardial infarction (heart attack) or cerebral infarction (stroke), depending on the affected organ.
+            Spanish: "Constipado" can refer to both a cold (nasal congestion) or constipation, leading to confusion between respiratory and digestive symptoms.
+            German: "Schlaganfall" is generally used for a stroke, but in older or colloquial usage, it can also imply a sudden fainting or seizure-like episode.
+            Russian: "Инфаркт" (infarkt) is commonly used for a heart attack (myocardial infarction) but can also refer to any type of infarction (e.g., pulmonary infarction, brain infarction).
+            Italian: "Colpo" in medical terms can mean colpo di calore (heatstroke) or colpo di frusta (whiplash). The word "colpo" generally means a blow or strike, which can be used in different contexts within medicine.
+            French: "Crise" can refer to a seizure (crise d'épilepsie), an attack (crise cardiaque for a heart attack), or a crisis (such as a psychological crisis or anxiety attack).
+            Portuguese: "Infarto" can mean both myocardial infarction (heart attack) or infarction in other organs (such as a pulmonary or cerebral infarction), depending on the context.
+            Spanish: "Derrame" can mean a cerebral hemorrhage (brain bleed or stroke) or pleural effusion (fluid around the lungs), which affects entirely different organs but shares the general concept of a fluid spill.
+            German: "Schock" can refer to both cardiogenic shock (a severe condition due to heart failure) and psychological shock (an acute stress response).
+            English/Spanish: The word "stroke" in English primarily refers to a cerebrovascular accident (CVA), while the Spanish word "golpe" (literal translation for stroke) can mean a blow or trauma, which could imply injury in various parts of the body depending on context.
+            French: "Infarctus" can refer to a heart attack (myocardial infarction) or a broader infarction (tissue death due to lack of blood flow), which could apply to different organs (such as the brain or lungs).
+            Italian: "Crisi" can mean an epileptic seizure (crisi epilettica), a cardiac crisis (crisi cardiaca), or even a psychological crisis, making it a multi-context medical term.
+            Dutch: "Infarct" is a general term for tissue death due to lack of blood supply, and it can refer to heart, brain, or other organ infarctions, depending on the location.
+            Russian: "Остановка" (ostanovka) can refer to the stopping of any organ’s function, like cardiac arrest or respiratory arrest, but it can also be used for more general cessation, such as halting a process.
+            Spanish: "Paro" can mean cardiac arrest (paro cardíaco) or respiratory arrest (paro respiratorio), where "paro" simply means stopping.
+            Portuguese: "Crise" can refer to a crisis like a seizure, an asthma attack (crise asmática), or even a cardiac crisis, making it applicable in various contexts.
 
-1. Identify the medical term to be explained.
-2. Provide multiple possible meanings or interpretations of the term.
-3. Ensure definitions are culturally and linguistically appropriate for the user's context.
-4. Limit the explanations to factual, non-opinionated content.
+            Your output should be formatted as a JSON array of objects, with each object representing a unique medical meaning of the term.
 
+            ```json
+            [
+              {{
+                "term": "<The medical term>",
+                "definition": "<Definition of the medical term in {language}>",
+                "usage": "<How the medical term is used in {language}>",
+                "context": "<Medical context or specialty where the term is commonly used in {language}>",
+                "category": "<Category of the medical term. e.g. disease, condition, etc. in {language}>"
+              }}
+            ]
+            ```
+
+            If there is only one distinct medical meaning for the term, return:
 
             ```json
             {{
               "term": "<The medical term>",
               "definition": "<Definition of the medical term in {language}>",
-              "usage": "<How the medical term is used. in {language}>",
+              "usage": "<How the medical term is used in {language}>",
               "context": "<Medical context or specialty where the term is commonly used in {language}>",
               "category": "<Category of the medical term. e.g. disease, condition, etc. in {language}>"
             }}
             ```
             """),
         ell.user(
-            f"Disambiguate the following medical term in {language}: {term}"),
+            f"Disambiguate the following medical term in {language}: {term}")
     ]
 
 
@@ -193,20 +228,40 @@ vocabulary"""),
 
 
 @ell.simple(model="gpt-4o-mini", temperature=0.0)
-def translate(termed: str, language: str = "en"):
+def translate(term: str, context: str, language: str = "en") -> str:
     """
-    Translates a given term to the specified language. Only anser with the translated term and nothing else."""
-    return f"{termed} trasnlated to {language} is : !"
+    Translates the given medical term or synonym into the specified language, taking the provided medical context into account.
+    The translation will ensure that the term is contextually accurate based on the medical meaning from the disambiguation step.
+    Only respond with the translated term and nothing else.
+    """
+    return [
+        ell.system(
+            f"""You are a medical language expert. Your task is to translate medical terms while considering the specific medical context provided.
+
+            1. Translate the term '{term}' into the language '{language}'.
+            2. The translation must be contextually accurate according to the medical context: '{context}'.
+            3. Only provide the translated term, ensuring that it aligns with the medical usage in the specified context.
+            4. Do not provide any additional explanations or responses beyond the translated term.
+
+            Example format:
+            "<translated term>"
+            """),
+        ell.user(
+            f"Translate the term '{term}' considering the medical context '{context}' into the language '{language}'."
+        )
+    ]
 
 
 @ell.complex(
     model="gpt-4o-mini",
     response_format=ConceptResponse)  # Use complex for structured output
-def concept_lookup(term: str, language: str = "en") -> List[Message]:
+def concept_lookup(term: str,
+                   context: str,
+                   language: str = "en") -> List[Message]:
     """
     Looks up a medical term in the OMOP database and returns structured concept information.
     """
-    string_to_search = translate(term, "english")
+    string_to_search = translate(term, context, "english")
     logger.debug(f"Received term: {term}, language: {language}")
     print(f"EL string tosearthc:::: {string_to_search}")
     concepts_json = find_omop_concept(string_to_search, language)

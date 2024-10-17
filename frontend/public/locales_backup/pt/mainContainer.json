@@ -1,7 +1,7 @@
 {
     "title": "Descoberta de Conceitos Médicos",
     "searchPlaceholder": "Digite um termo médico, por exemplo, 'aspirina'",
-    "loadingInitial": "Procurando...",
+    "loadingInitial": "Buscando...",
     "loadingSynonyms": "Buscando sinônimos...",
     "loadingConcepts": "Recuperando conceitos...",
     "loadingAdditionalInfo": "Isso pode levar alguns segundos...",
@@ -22,15 +22,15 @@
     "noConceptsFound": "Nenhum conceito encontrado para o sinônimo selecionado.",
     "conceptTable": "Tabela de Conceitos",
     "backToResults": "Voltar aos Resultados",
-    "conceptId": "ID do conceito",
+    "conceptId": "ID do Conceito",
     "code": "Código",
     "name": "Nome",
     "class": "Classe",
     "domain": "Domínio",
     "vocabulary": "Vocabulário",
     "standardConcept": "Conceito Padrão",
-    "invalidReason": "Razão inválida",
+    "invalidReason": "Razão Inválida",
     "notApplicable": "N/A",
-    "seeMoreDetails": "Veja Mais Detalhes",
+    "seeMoreDetails": "Ver Mais Detalhes",
     "seeInAthena": "Veja em Atena"
 }

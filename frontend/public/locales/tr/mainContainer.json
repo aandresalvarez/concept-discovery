@@ -15,7 +15,7 @@
     "usage": "Kullanım",
     "context": "Bağlam",
     "close": "Kapat",
-    "synonymsFor": "'{{term}}' için başka söyleniş şekilleri. Tıbbi anlamını daha fazla keşfetmek için herhangi bir kelimenin üzerine dokunun.",
+    "synonymsFor": "'{{term}}' kelimesinin alternatifi. Medikal anlamını keşfetmek ve Athena, OHDSI Vokabüler Deposunda olası kodlarını aramak için herhangi bir terime dokunun.",
     "selectedTerm": "seçilen terim",
     "noSynonymsFound": "Seçilen terim için eşanlamlı kelime bulunamadı.",
     "category": "Kategori",

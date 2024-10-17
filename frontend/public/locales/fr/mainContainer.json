@@ -15,7 +15,7 @@
     "usage": "Utilisation",
     "context": "Contexte",
     "close": "Fermer",
-    "synonymsFor": "D'autres moyens de dire '{{term}}'. Appuyez sur n'importe quel mot pour en savoir plus sur sa signification médicale.",
+    "synonymsFor": "Alternatives au mot '{{term}}'. Appuyez sur un terme pour explorer sa signification médicale et rechercher ses codes possibles dans Athena, le dépôt de vocabulaire OHDSI.",
     "selectedTerm": "terme sélectionné",
     "noSynonymsFound": "Aucun synonyme trouvé pour le terme sélectionné.",
     "category": "Catégorie",

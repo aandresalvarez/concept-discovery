@@ -15,7 +15,7 @@
     "usage": "사용법",
     "context": "맥락",
     "close": "닫기",
-    "synonymsFor": "'{{term}}'의 다른 표현. 의료 의미에 대해 더 알아보려면 단어를 누르세요.",
+    "synonymsFor": "'{{term}}' 단어의 대안. 의학적 의미를 탐색하고 OHDSI 어휘 저장소 Athena에서 가능한 코드를 검색하려면 어떤 용어든 클릭하세요.",
     "selectedTerm": "선택된 용어",
     "noSynonymsFound": "선택한 용어에 대한 동의어가 없습니다.",
     "category": "카테고리",

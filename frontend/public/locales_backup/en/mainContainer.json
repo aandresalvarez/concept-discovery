@@ -15,7 +15,7 @@
   "usage": "Usage",
   "context": "Context",
   "close": "Close",
-  "synonymsFor": "Other ways to say '{{term}}'. Tap on any word to discover more about its medical meaning.",
+  "synonymsFor": "Alternatives to the word '{{term}}'. Tap on any term to explore its medical meaning and search for its possible codes in Athena, the OHDSI Vocabularies Repository.",
   "selectedTerm": "selected term",
   "noSynonymsFound": "No synonyms found for the selected term.",
   "category": "Category",

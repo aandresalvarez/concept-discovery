@@ -102,9 +102,9 @@ async def create_language(request: CreateLanguageRequest):
 
 
 @app.get("/api/concept_lookup")
-async def get_concept_table(term: str, language: str):
+async def get_concept_table(term: str, context: str, language: str):
     try:
-        response = concept_lookup(term, language)
+        response = concept_lookup(term, context, language)
         concepts = response.parsed.concepts
         return {"concepts": [concept.model_dump() for concept in concepts]}
     except Exception as e:

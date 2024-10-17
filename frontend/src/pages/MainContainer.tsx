@@ -64,7 +64,9 @@ const MainContainer: React.FC = () => {
       console.error("API call error:", err);
       if (err.response) {
         setError(
-          `${t("serverError", { ns: "common" })}: ${err.response.data.detail || t("unknownError", { ns: "common" })}`,
+          `${t("serverError", { ns: "common" })}: ${
+            err.response.data.detail || t("unknownError", { ns: "common" })
+          }`,
         );
       } else if (err.request) {
         setError(t("noResponseError", { ns: "common" }));
@@ -139,7 +141,11 @@ const MainContainer: React.FC = () => {
 
       try {
         const response = await axios.get(`/api/concept_lookup`, {
-          params: { term: synonym, language: i18n.language },
+          params: {
+            term: synonym,
+            context: selectedTerm?.definition,
+            language: i18n.language,
+          },
         });
 
         if (response.data.concepts && response.data.concepts.length > 0) {
@@ -155,7 +161,7 @@ const MainContainer: React.FC = () => {
         setLoading(false);
       }
     },
-    [i18n.language, handleError, t],
+    [i18n.language, handleError, t, selectedTerm],
   );
 
   const handleStepChange = useCallback(

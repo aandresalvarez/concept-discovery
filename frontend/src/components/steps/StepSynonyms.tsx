@@ -30,28 +30,30 @@ const StepSynonyms: React.FC<StepSynonymsProps> = ({
         {t("synonymsFor", { term: selectedTerm?.term || t("selectedTerm") })}
       </h2>
       {selectedTerm && (
-        <Card className="p-4 bg-secondary/50">
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
-            {/* First Column: Term and Category */}
-            <div>
-              <p className="font-semibold text-md">{selectedTerm.term}</p>
-              <small className="text-sm text-gray-500">
-                - {selectedTerm.category}
-              </small>
-              <p className="mt-2">{selectedTerm.definition}</p>
+        <div className="hidden md:block">
+          <Card className="p-4 bg-secondary/50">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm">
+              {/* First Column: Term and Category */}
+              <div>
+                <p className="font-semibold text-md">{selectedTerm.term}</p>
+                <small className="text-sm text-gray-500">
+                  - {selectedTerm.category}
+                </small>
+                <p className="mt-2">{selectedTerm.definition}</p>
+              </div>
+              {/* Second Column: Usage */}
+              <div>
+                <p className="font-semibold">{t("usage")}:</p>
+                <p>{selectedTerm.usage}</p>
+              </div>
+              {/* Third Column: Context */}
+              <div>
+                <p className="font-semibold">{t("context")}:</p>
+                <p>{selectedTerm.context}</p>
+              </div>
             </div>
-            {/* Second Column: Usage */}
-            <div>
-              <p className="font-semibold">{t("usage")}:</p>
-              <p>{selectedTerm.usage}</p>
-            </div>
-            {/* Third Column: Context */}
-            <div>
-              <p className="font-semibold">{t("context")}:</p>
-              <p>{selectedTerm.context}</p>
-            </div>
-          </div>
-        </Card>
+          </Card>
+        </div>
       )}
 
       {synonyms.length > 0 ? (

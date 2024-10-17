@@ -15,7 +15,7 @@
     "usage": "使用方法",
     "context": "上下文",
     "close": "关闭",
-    "synonymsFor": "其他表达“{{term}}”的方法。点击任何单词以了解其医学含义。",
+    "synonymsFor": "'{{term}}'一词的替代词。点击任何术语以探索其医学含义，并在OHDSI词汇库Athena中搜索其可能的编码。",
     "selectedTerm": "选择的术语",
     "noSynonymsFound": "未找到选定术语的同义词。",
     "category": "类别",
