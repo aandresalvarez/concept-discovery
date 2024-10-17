@@ -49,6 +49,8 @@ const MainContainer: React.FC = () => {
   const [languageSelected, setLanguageSelected] = useState<boolean>(false);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [canProceed, setCanProceed] = useState<boolean>(false);
+  const [showLanguageSelector, setShowLanguageSelector] =
+    useState<boolean>(false);
 
   const isSmallScreen = useMediaQuery("(max-width: 767px)");
   const loadingSize: "sm" | "md" = isSmallScreen ? "sm" : "md";
@@ -61,7 +63,7 @@ const MainContainer: React.FC = () => {
   );
 
   const handleLanguageRefresh = useCallback(() => {
-    window.location.reload();
+    setShowLanguageSelector(true);
   }, []);
 
   const handleError = useCallback(
@@ -190,6 +192,7 @@ const MainContainer: React.FC = () => {
 
   const handleLanguageSelected = useCallback(() => {
     setLanguageSelected(true);
+    setShowLanguageSelector(false);
   }, []);
 
   const steps = [
@@ -275,9 +278,6 @@ const MainContainer: React.FC = () => {
                   selectedLanguage={i18n.language}
                   showLangSelection={false}
                 />
-                <div className="mt-2 flex justify-center">
-                  {renderLanguageButton()}
-                </div>
               </div>
 
               {loading ? (
@@ -324,7 +324,7 @@ const MainContainer: React.FC = () => {
         </AnimatePresence>
       </main>
 
-      {!languageSelected && (
+      {(showLanguageSelector || !languageSelected) && (
         <ForcedLanguageSelector onLanguageSelected={handleLanguageSelected} />
       )}
     </div>
