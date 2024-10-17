@@ -21,11 +21,8 @@ import { ExternalLink } from "lucide-react";
 
 interface ConceptTableRow {
   concept_id: number;
-  code: string;
   name: string;
-  class_name: string;
   standard_concept: string;
-  invalid_reason: string | null;
   domain: string;
   vocabulary: string;
 }
@@ -59,12 +56,6 @@ const StepTableResults: React.FC<StepTableResultsProps> = ({
             <strong>{t("conceptId")}:</strong> {concept.concept_id}
           </p>
           <p className="text-sm">
-            <strong>{t("code")}:</strong> {concept.code}
-          </p>
-          <p className="text-sm">
-            <strong>{t("class")}:</strong> {concept.class_name}
-          </p>
-          <p className="text-sm">
             <strong>{t("standardConcept")}:</strong> {concept.standard_concept}
           </p>
           <div className="mt-1 flex justify-between items-center">
@@ -83,18 +74,11 @@ const StepTableResults: React.FC<StepTableResultsProps> = ({
                     <strong>{t("conceptId")}:</strong> {concept.concept_id}
                   </p>
                   <p>
-                    <strong>{t("code")}:</strong> {concept.code}
-                  </p>
-                  <p>
-                    <strong>{t("class")}:</strong> {concept.class_name}
+                    <strong>{t("name")}:</strong> {concept.name}
                   </p>
                   <p>
                     <strong>{t("standardConcept")}:</strong>{" "}
                     {concept.standard_concept}
-                  </p>
-                  <p>
-                    <strong>{t("invalidReason")}:</strong>{" "}
-                    {concept.invalid_reason || t("notApplicable")}
                   </p>
                   <p>
                     <strong>{t("domain")}:</strong> {concept.domain}
@@ -105,19 +89,17 @@ const StepTableResults: React.FC<StepTableResultsProps> = ({
                 </div>
               </DialogContent>
             </Dialog>
-            {isSmallScreen && (
-              <a
-                href={`https://athena.ohdsi.org/search-terms/terms/${concept.concept_id}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-primary hover:underline inline-flex items-center"
-              >
-                <Button variant="ghost" size="sm">
-                  {t("seeInAthena")}
-                  <ExternalLink className="ml-1 h-4 w-4" />
-                </Button>
-              </a>
-            )}
+            <a
+              href={`https://athena.ohdsi.org/search-terms/terms/${concept.concept_id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary hover:underline inline-flex items-center"
+            >
+              <Button variant="ghost" size="sm">
+                {t("seeInAthena")}
+                <ExternalLink className="ml-1 h-4 w-4" />
+              </Button>
+            </a>
           </div>
         </div>
       ))}
@@ -129,11 +111,8 @@ const StepTableResults: React.FC<StepTableResultsProps> = ({
       <TableHeader>
         <TableRow>
           <TableHead>{t("conceptId")}</TableHead>
-          <TableHead>{t("code")}</TableHead>
           <TableHead>{t("name")}</TableHead>
-          <TableHead>{t("class")}</TableHead>
           <TableHead>{t("standardConcept")}</TableHead>
-          <TableHead>{t("invalidReason")}</TableHead>
           <TableHead>{t("domain")}</TableHead>
           <TableHead>{t("vocabulary")}</TableHead>
         </TableRow>
@@ -151,13 +130,8 @@ const StepTableResults: React.FC<StepTableResultsProps> = ({
                 {concept.concept_id}
               </a>
             </TableCell>
-            <TableCell>{concept.code}</TableCell>
             <TableCell>{concept.name}</TableCell>
-            <TableCell>{concept.class_name}</TableCell>
             <TableCell>{concept.standard_concept}</TableCell>
-            <TableCell>
-              {concept.invalid_reason || t("notApplicable")}
-            </TableCell>
             <TableCell>{concept.domain}</TableCell>
             <TableCell>{concept.vocabulary}</TableCell>
           </TableRow>
