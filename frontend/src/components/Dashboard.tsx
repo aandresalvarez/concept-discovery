@@ -1,5 +1,4 @@
-// Dashboard.tsx
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   BarChart,
   Bar,
@@ -17,7 +16,7 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
-import { format } from "date-fns";
+import { Loader2 } from "lucide-react";
 
 // Define the MetricsData type
 type MetricsData = {
@@ -29,27 +28,46 @@ type MetricsData = {
   most_viewed_concepts: Record<string, number>;
 };
 
-const COLORS = ["#8884d8", "#82ca9d", "#ffc658", "#ff7f50", "#87cefa"];
+const COLORS = [
+  "#8884d8",
+  "#82ca9d",
+  "#ffc658",
+  "#ff7f50",
+  "#87cefa",
+  "#8a2be2",
+  "#a52a2a",
+  "#deb887",
+  "#5f9ea0",
+  "#7fff00",
+];
 
-export default function Dashboard() {
+const Dashboard: React.FC = () => {
   const [metricsData, setMetricsData] = useState<MetricsData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
+  // Fetch data with useEffect and handle errors
   useEffect(() => {
-    // Fetch metrics data
     const fetchData = async () => {
       try {
         const response = await fetch("/api/metrics");
         if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(
-            errorData?.detail || "Failed to retrieve metrics data",
-          );
+          const errorText = await response.text();
+          throw new Error(`Server error: ${response.status} ${errorText}`);
         }
         const data: MetricsData = await response.json();
-        setMetricsData(data);
-      } catch (error: any) {
-        console.error("Error fetching metrics:", error.message);
+        // Set default values if any data is missing
+        setMetricsData({
+          language_distribution: data.language_distribution || {},
+          total_searches: data.total_searches || 0,
+          search_trend: data.search_trend || [],
+          common_search_terms: data.common_search_terms || {},
+          concept_lookup_percentage: data.concept_lookup_percentage || 0,
+          most_viewed_concepts: data.most_viewed_concepts || {},
+        });
+      } catch (error) {
+        console.error("Error fetching metrics:", error);
+        setError((error as Error).message);
       } finally {
         setLoading(false);
       }
@@ -57,11 +75,56 @@ export default function Dashboard() {
     fetchData();
   }, []);
 
+  // Memoize computed data to prevent unnecessary recalculations
+  const languageData = useMemo(() => {
+    return Object.entries(metricsData?.language_distribution || {}).map(
+      ([name, value], index) => ({
+        name,
+        value,
+        color: COLORS[index % COLORS.length],
+      })
+    );
+  }, [metricsData?.language_distribution]);
+
+  const searchTrendData = useMemo(
+    () =>
+      metricsData?.search_trend.map(([date, count]) => ({
+        date,
+        count,
+      })) || [],
+    [metricsData?.search_trend]
+  );
+
+  const commonTermsData = useMemo(
+    () =>
+      Object.entries(metricsData?.common_search_terms || {})
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 10),
+    [metricsData?.common_search_terms]
+  );
+
+  const conceptData = useMemo(
+    () =>
+      Object.entries(metricsData?.most_viewed_concepts || {})
+        .map(([name, value]) => ({ name, value }))
+        .sort((a, b) => b.value - a.value)
+        .slice(0, 10),
+    [metricsData?.most_viewed_concepts]
+  );
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        {/* Replace Loader with a simple div or your own Loader component */}
-        <div className="text-xl">Loading...</div>
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-xl text-destructive">Error: {error}</p>
       </div>
     );
   }
@@ -69,63 +132,32 @@ export default function Dashboard() {
   if (!metricsData) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-xl text-red-500">Failed to load metrics data.</p>
+        <p className="text-xl text-destructive">Failed to load metrics data.</p>
       </div>
     );
   }
 
-  // Prepare data for charts
-  const languageData = Object.entries(metricsData.language_distribution).map(
-    ([name, value], index) => ({
-      name,
-      value,
-      color: COLORS[index % COLORS.length],
-    }),
-  );
-
-  const searchTrendData = metricsData.search_trend.map(
-    ([date, count]: [string, number]) => ({
-      date,
-      count,
-    }),
-  );
-
-  const wordcloudData = Object.entries(metricsData.common_search_terms).map(
-    ([text, value]: [string, number]) => ({ text, value }),
-  );
-
-  const conceptData = Object.entries(metricsData.most_viewed_concepts)
-    .map(([name, value]: [string, number]) => ({ name, value }))
-    .sort((a, b) => b.value - a.value);
-
   return (
     <div className="p-6 space-y-8 bg-background min-h-screen">
-      <h1 className="text-3xl font-bold text-primary-foreground">
+      <h1 className="text-3xl font-bold text-primary">
         Medical Search Dashboard
       </h1>
 
-      {/* Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {/* Total Searches */}
-        <Card className="shadow-lg">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">
-              Total Searches
-            </CardTitle>
+            <CardTitle>Total Searches</CardTitle>
           </CardHeader>
           <CardContent className="flex items-center justify-center h-32">
             <p className="text-5xl font-bold text-primary">
-              {metricsData.total_searches}
+              {metricsData.total_searches.toLocaleString()}
             </p>
           </CardContent>
         </Card>
 
-        {/* Concept Lookup Percentage */}
-        <Card className="shadow-lg">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">
-              Concept Lookup Percentage
-            </CardTitle>
+            <CardTitle>Concept Lookup Percentage</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center h-32">
             <Progress
@@ -138,12 +170,9 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Language Distribution */}
-        <Card className="shadow-lg">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">
-              Language Distribution
-            </CardTitle>
+            <CardTitle>Language Distribution</CardTitle>
           </CardHeader>
           <CardContent className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -156,40 +185,33 @@ export default function Dashboard() {
                   cy="50%"
                   innerRadius={40}
                   outerRadius={80}
-                  label={(entry) => `${entry.name} (${entry.value})`}
+                  labelLine={false}
+                  label={({ percent }) => `${(percent * 100).toFixed(0)}%`}
                 >
                   {languageData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
                 <Tooltip />
+                <Legend verticalAlign="bottom" height={36} />
               </PieChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>
       </div>
 
-      {/* Detailed Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Search Trend */}
-        <Card className="shadow-lg">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">
-              Search Trend
-            </CardTitle>
+            <CardTitle>Search Trend</CardTitle>
           </CardHeader>
           <CardContent className="h-80">
             <ResponsiveContainer width="100%" height="100%">
               <LineChart data={searchTrendData}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis
-                  dataKey="date"
-                  tickFormatter={(tick) => format(new Date(tick), "MMM d")}
-                />
+                <XAxis dataKey="date" />
                 <YAxis />
-                <Tooltip
-                  labelFormatter={(label) => format(new Date(label), "PPP")}
-                />
+                <Tooltip />
                 <Legend />
                 <Line
                   type="monotone"
@@ -203,16 +225,13 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        {/* Most Viewed Concepts */}
-        <Card className="shadow-lg">
+        <Card>
           <CardHeader>
-            <CardTitle className="text-xl font-semibold">
-              Most Viewed Concepts
-            </CardTitle>
+            <CardTitle>Most Viewed Concepts</CardTitle>
           </CardHeader>
           <CardContent className="h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={conceptData.slice(0, 10)} layout="vertical">
+              <BarChart data={conceptData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis type="number" />
                 <YAxis type="category" dataKey="name" width={150} />
@@ -225,32 +244,25 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      {/* Common Search Terms (Word Cloud) */}
-      <Card className="shadow-lg">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-xl font-semibold">
-            Common Search Terms
-          </CardTitle>
+          <CardTitle>Common Search Terms</CardTitle>
         </CardHeader>
         <CardContent className="h-80">
-          <div className="flex flex-wrap justify-center items-center h-full overflow-auto">
-            {wordcloudData.map(
-              (word: { text: string; value: number }, index) => (
-                <span
-                  key={index}
-                  className="m-1 p-1 rounded text-primary-foreground"
-                  style={{
-                    fontSize: `${Math.max(14, word.value * 1.5)}px`,
-                    fontWeight: word.value > 10 ? "bold" : "normal",
-                  }}
-                >
-                  {word.text}
-                </span>
-              ),
-            )}
-          </div>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={commonTermsData} layout="vertical">
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis type="number" />
+              <YAxis type="category" dataKey="name" width={150} />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="value" fill="hsl(var(--primary))" />
+            </BarChart>
+          </ResponsiveContainer>
         </CardContent>
       </Card>
     </div>
   );
-}
+};
+
+export default Dashboard;

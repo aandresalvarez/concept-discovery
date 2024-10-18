@@ -14,7 +14,7 @@ import traceback
 # Import necessary functions from your workflow module
 from workflow import disambiguate, generate_synonyms, concept_lookup
 
-# Import the SQLAlchemyChartData class
+# Import the updated SQLAlchemyChartData class
 from SQLAlchemyChartData import SQLAlchemyChartData
 
 # Initialize logging
@@ -250,9 +250,6 @@ async def get_all_metrics():
         language_distribution = chart_data.get_language_distribution()
         total_searches = chart_data.get_total_searches()
         search_trend = chart_data.get_search_trend()
-        # Use date_ directly if it's already a string
-        # Remove the .strftime() call
-        search_trend = [(date_, count) for date_, count in search_trend]
         common_search_terms = chart_data.get_common_search_terms()
         concept_lookup_percentage = chart_data.get_concept_lookup_percentage()
         most_viewed_concepts = chart_data.get_most_viewed_concepts()
@@ -301,14 +298,8 @@ async def get_metric(metric_type: MetricType):
         function, key = metric_functions[metric_type]
         data = function()
 
-        # Remove .strftime() call since date_ is already a string
-        if metric_type == MetricType.search_trend:
-            data = [(date_, count) for date_, count in data]
-
-        result = {key: data}
-
         logger.info(f"Retrieved data for metric type: {metric_type}")
-        return result
+        return {key: data}
     except Exception as e:
         logger.error(f"Failed to retrieve data for metric {metric_type}: {e}")
         raise HTTPException(
