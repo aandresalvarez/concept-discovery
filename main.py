@@ -1,7 +1,6 @@
-# main.py
 from typing import Union, List, Dict, Tuple
 from datetime import datetime
-from fastapi import FastAPI, Query, HTTPException
+from fastapi import FastAPI, Query, HTTPException, Body
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
@@ -19,7 +18,7 @@ from SQLAlchemyChartData import SQLAlchemyChartData
 
 # Initialize logging
 logging.basicConfig(
-    level=logging.INFO,  # Adjust the logging level as needed
+    level=logging.INFO,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     handlers=[logging.FileHandler("app.log"),
               logging.StreamHandler()])
@@ -52,6 +51,7 @@ class DisambiguationResult(BaseModel):
 
 class SearchResponse(BaseModel):
     results: List[DisambiguationResult]
+    search_id: int = Field(description="The ID of the search record")
 
 
 class SynonymResult(BaseModel):
@@ -100,6 +100,7 @@ class MetricType(str, Enum):
     common_search_terms = "common_search_terms"
     concept_lookup_percentage = "concept_lookup_percentage"
     most_viewed_concepts = "most_viewed_concepts"
+    most_selected_synonyms = "most_selected_synonyms"
 
 
 # Define the response model for metrics data
@@ -110,6 +111,7 @@ class MetricsDataResponse(BaseModel):
     common_search_terms: Dict[str, int] = None
     concept_lookup_percentage: float = None
     most_viewed_concepts: Dict[str, int] = None
+    most_selected_synonyms: Dict[str, int] = None  # New field
 
 
 # API Endpoints
@@ -145,9 +147,9 @@ async def get_concept_table(term: str, context: str, language: str):
         concepts = response.parsed.concepts
 
         # Record the concept lookup in the metrics
-        chart_data.add_search(language=language,
-                              term=term,
-                              led_to_concept_lookup=True)
+        search_id = chart_data.add_search(language=language,
+                                          term=term,
+                                          led_to_concept_lookup=True)
         for concept in concepts:
             chart_data.add_viewed_concept(concept=concept.name)
 
@@ -170,9 +172,11 @@ async def get_synonyms(term: str = Query(..., min_length=1),
         synonym_response = response.parsed
 
         # Record the search in the metrics
-        chart_data.add_search(language=language,
-                              term=term,
-                              led_to_concept_lookup=False)
+        search_id = chart_data.add_search(language=language,
+                                          term=term,
+                                          led_to_concept_lookup=False)
+
+        # The synonyms are returned to the user; selections are recorded via /api/select_synonym
 
         return synonym_response
     except Exception as e:
@@ -217,17 +221,36 @@ async def search(term: str = Query(..., min_length=1),
                     f"Skipping invalid result: {result}, Error: {e}")
 
         # Record the search in the metrics
-        chart_data.add_search(language=language,
-                              term=term,
-                              led_to_concept_lookup=False)
+        search_id = chart_data.add_search(language=language,
+                                          term=term,
+                                          led_to_concept_lookup=False)
 
         logger.info(
             f"Returning {len(disambiguation_results)} disambiguation results")
-        return SearchResponse(results=disambiguation_results)
+        return SearchResponse(results=disambiguation_results,
+                              search_id=search_id)
     except Exception as e:
         logger.error(f"An error occurred during search: {e}")
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
+
+
+@app.post("/api/select_synonym")
+async def select_synonym(selection: Dict = Body(...)):
+    """
+    Endpoint to record that a user has selected a synonym.
+    """
+    try:
+        search_id = selection.get('search_id')
+        synonym = selection.get('synonym')
+        if not search_id or not synonym:
+            raise HTTPException(status_code=400,
+                                detail="search_id and synonym are required")
+        chart_data.add_selected_synonym(search_id=search_id, synonym=synonym)
+        return {"success": True}
+    except Exception as e:
+        logger.error(f"An error occurred during synonym selection: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.get("/api")
@@ -253,6 +276,7 @@ async def get_all_metrics():
         common_search_terms = chart_data.get_common_search_terms()
         concept_lookup_percentage = chart_data.get_concept_lookup_percentage()
         most_viewed_concepts = chart_data.get_most_viewed_concepts()
+        most_selected_synonyms = chart_data.get_most_selected_synonyms()
 
         logger.info("Retrieved all metrics data")
 
@@ -262,7 +286,8 @@ async def get_all_metrics():
             search_trend=search_trend,
             common_search_terms=common_search_terms,
             concept_lookup_percentage=concept_lookup_percentage,
-            most_viewed_concepts=most_viewed_concepts)
+            most_viewed_concepts=most_viewed_concepts,
+            most_selected_synonyms=most_selected_synonyms)
     except Exception as e:
         logger.error(f"Failed to retrieve metrics data: {e}")
         raise HTTPException(status_code=500,
@@ -289,6 +314,8 @@ async def get_metric(metric_type: MetricType):
              "concept_lookup_percentage"),
             MetricType.most_viewed_concepts:
             (chart_data.get_most_viewed_concepts, "most_viewed_concepts"),
+            MetricType.most_selected_synonyms:
+            (chart_data.get_most_selected_synonyms, "most_selected_synonyms"),
         }
 
         if metric_type not in metric_functions:
@@ -305,6 +332,20 @@ async def get_metric(metric_type: MetricType):
         raise HTTPException(
             status_code=500,
             detail=f"Failed to retrieve data for metric {metric_type}")
+
+
+@app.get("/api/search_paths")
+async def get_search_paths():
+    """
+    Endpoint to retrieve the paths of all searches.
+    """
+    try:
+        search_paths = chart_data.get_search_paths()
+        return {"search_paths": search_paths}
+    except Exception as e:
+        logger.error(f"Failed to retrieve search paths: {e}")
+        raise HTTPException(status_code=500,
+                            detail="Failed to retrieve search paths")
 
 
 # Serve React frontend only if the dist directory exists

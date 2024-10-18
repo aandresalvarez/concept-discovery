@@ -5,13 +5,13 @@ from datetime import datetime, timedelta
 from collections import Counter
 
 from sqlalchemy import (create_engine, Column, Integer, String, DateTime,
-                        Boolean, func)
+                        Boolean, func, ForeignKey)
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
 
-import plotly.graph_objects as go
-from wordcloud import STOPWORDS
+from wordcloud import STOPWORDS  # Added missing import
+
 import logging
 
 # Configure logging
@@ -32,13 +32,14 @@ class Search(Base):
     """
     __tablename__ = 'searches'
     id = Column(Integer, primary_key=True)
-    timestamp = Column(DateTime,
-                       default=datetime.utcnow)  # Record creation timestamp
-    language = Column(String, nullable=False)  # Language used in the search
-    term = Column(String, nullable=False)  # Search term entered by the user
-    led_to_concept_lookup = Column(
-        Boolean,
-        default=False)  # Indicates if the search led to a concept lookup
+    timestamp = Column(DateTime, default=datetime.utcnow)
+    language = Column(String, nullable=False)
+    term = Column(String, nullable=False)
+    led_to_concept_lookup = Column(Boolean, default=False)
+
+    # Relationship to SelectedSynonym
+    selected_synonyms = relationship("SelectedSynonym",
+                                     back_populates="search")
 
 
 class ViewedConcept(Base):
@@ -47,14 +48,27 @@ class ViewedConcept(Base):
     """
     __tablename__ = 'viewed_concepts'
     id = Column(Integer, primary_key=True)
-    timestamp = Column(DateTime,
-                       default=datetime.utcnow)  # Record creation timestamp
-    concept = Column(String, nullable=False)  # Name of the concept viewed
+    timestamp = Column(DateTime, default=datetime.utcnow)
+    concept = Column(String, nullable=False)
+
+
+class SelectedSynonym(Base):
+    """
+    ORM model representing a selected synonym by the user.
+    """
+    __tablename__ = 'selected_synonyms'
+    id = Column(Integer, primary_key=True)
+    timestamp = Column(DateTime, default=datetime.utcnow)
+    search_id = Column(Integer, ForeignKey('searches.id'), nullable=False)
+    synonym = Column(String, nullable=False)
+
+    # Relationship to Search
+    search = relationship("Search", back_populates="selected_synonyms")
 
 
 class SQLAlchemyChartData:
     """
-    Data access and analytics class using SQLAlchemy and Plotly.
+    Data access and analytics class using SQLAlchemy.
     Provides methods to add data, retrieve analytics, and generate charts.
     """
 
@@ -72,17 +86,14 @@ class SQLAlchemyChartData:
             db_url = db_url.replace("postgres://", "postgresql://", 1)
 
         # Configure the engine with connection pool settings
-        self.engine = create_engine(
-            db_url,
-            pool_size=5,
-            max_overflow=10,
-            pool_timeout=30,
-            pool_recycle=1800,  # Recycle connections after 30 minutes
-            pool_pre_ping=True  # Test connections before using them
-        )
-        Base.metadata.create_all(
-            self.engine)  # Create tables if they don't exist
-        self.Session = sessionmaker(bind=self.engine)  # Session factory
+        self.engine = create_engine(db_url,
+                                    pool_size=5,
+                                    max_overflow=10,
+                                    pool_timeout=30,
+                                    pool_recycle=1800,
+                                    pool_pre_ping=True)
+        Base.metadata.create_all(self.engine)
+        self.Session = sessionmaker(bind=self.engine)
 
     def _handle_disconnects(func):
         """
@@ -102,9 +113,13 @@ class SQLAlchemyChartData:
                         f"Retrying database operation ({attempt + 1}/{retries}) after {delay} seconds..."
                     )
                     time.sleep(delay)
-                    # Dispose the engine and create a new one
                     self.engine.dispose()
-                    self.engine = self.engine.pool.recreate()
+                    self.engine = create_engine(self.engine.url,
+                                                pool_size=5,
+                                                max_overflow=10,
+                                                pool_timeout=30,
+                                                pool_recycle=1800,
+                                                pool_pre_ping=True)
                     self.Session = sessionmaker(bind=self.engine)
                 except SQLAlchemyError as e:
                     logger.error(f"SQLAlchemyError: {e}")
@@ -122,9 +137,10 @@ class SQLAlchemyChartData:
     def add_search(self,
                    language: str,
                    term: str,
-                   led_to_concept_lookup: bool = False) -> None:
+                   led_to_concept_lookup: bool = False) -> int:
         """
         Adds a new search record to the database.
+        Returns the ID of the new search record.
         """
         with self.Session() as session:
             try:
@@ -136,6 +152,7 @@ class SQLAlchemyChartData:
                 session.commit()
                 logger.info(
                     f"Added new search: '{term}' in language '{language}'")
+                return new_search.id
             except SQLAlchemyError as e:
                 session.rollback()
                 logger.error(f"Failed to add new search: {e}")
@@ -158,6 +175,25 @@ class SQLAlchemyChartData:
                 raise
 
     @_handle_disconnects
+    def add_selected_synonym(self, search_id: int, synonym: str) -> None:
+        """
+        Adds a new selected synonym record to the database.
+        """
+        with self.Session() as session:
+            try:
+                new_selection = SelectedSynonym(search_id=search_id,
+                                                synonym=synonym)
+                session.add(new_selection)
+                session.commit()
+                logger.info(
+                    f"Added selected synonym: '{synonym}' for search ID '{search_id}'"
+                )
+            except SQLAlchemyError as e:
+                session.rollback()
+                logger.error(f"Failed to add selected synonym: {e}")
+                raise
+
+    @_handle_disconnects
     def get_language_distribution(self) -> Dict[str, int]:
         """
         Retrieves the distribution of searches by language.
@@ -166,11 +202,7 @@ class SQLAlchemyChartData:
             try:
                 languages = session.query(Search.language, func.count(
                     Search.id)).group_by(Search.language).all()
-                languages_dict = {
-                    (lang.decode('utf-8') if isinstance(lang, bytes) else lang):
-                    count
-                    for lang, count in languages
-                }
+                languages_dict = {lang: count for lang, count in languages}
                 logger.info("Retrieved language distribution")
                 return languages_dict
             except SQLAlchemyError as e:
@@ -205,9 +237,7 @@ class SQLAlchemyChartData:
                         Search.timestamp >= start_date).group_by(
                             func.date(Search.timestamp)).order_by(
                                 func.date(Search.timestamp)).all()
-                # Convert dates to strings
-                trend_str = [(date_.strftime('%Y-%m-%d') if isinstance(
-                    date_, datetime) else str(date_), count)
+                trend_str = [(date_.strftime('%Y-%m-%d'), count)
                              for date_, count in trend]
                 logger.info(f"Retrieved search trend for the last {days} days")
                 return trend_str
@@ -223,9 +253,7 @@ class SQLAlchemyChartData:
         with self.Session() as session:
             try:
                 terms = session.query(Search.term).all()
-                all_terms = [(term.decode('utf-8')
-                              if isinstance(term, bytes) else term).lower()
-                             for (term, ) in terms]
+                all_terms = [term.lower() for (term, ) in terms]
                 term_counts = Counter(all_terms)
                 filtered_terms = {
                     term: count
@@ -276,159 +304,58 @@ class SQLAlchemyChartData:
                         ViewedConcept.concept).order_by(
                             func.count(
                                 ViewedConcept.id).desc()).limit(limit).all()
-                concepts_dict = {
-                    (concept.decode('utf-8') if isinstance(concept, bytes) else concept):
-                    count
-                    for concept, count in concepts
-                }
+                concepts_dict = {concept: count for concept, count in concepts}
                 logger.info(f"Retrieved top {limit} most viewed concepts")
                 return concepts_dict
             except SQLAlchemyError as e:
                 logger.error(f"Failed to retrieve most viewed concepts: {e}")
                 return {}
 
-    # Chart generation methods
-    def generate_language_distribution_chart(self) -> str:
+    @_handle_disconnects
+    def get_most_selected_synonyms(self, limit: int = 10) -> Dict[str, int]:
         """
-        Generates a pie chart showing the distribution of searches by language.
+        Retrieves the most selected synonyms.
         """
-        try:
-            data = self.get_language_distribution()
-            if not data:
-                logger.warning(
-                    "No data available for language distribution chart")
-                return ""
+        with self.Session() as session:
+            try:
+                synonyms = session.query(
+                    SelectedSynonym.synonym,
+                    func.count(SelectedSynonym.id)).group_by(
+                        SelectedSynonym.synonym).order_by(
+                            func.count(
+                                SelectedSynonym.id).desc()).limit(limit).all()
+                synonyms_dict = {synonym: count for synonym, count in synonyms}
+                logger.info(f"Retrieved top {limit} most selected synonyms")
+                return synonyms_dict
+            except SQLAlchemyError as e:
+                logger.error(f"Failed to retrieve most selected synonyms: {e}")
+                return {}
 
-            labels = list(data.keys())
-            values = list(data.values())
-
-            fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
-            fig.update_layout(title_text='Language Distribution of Searches')
-            json_data = fig.to_json()
-            if json_data is None:
-                logger.warning("Failed to convert figure to JSON")
-                return ""
-            logger.info("Generated language distribution chart")
-            return json_data
-        except Exception as e:
-            logger.exception(
-                f"Failed to generate language distribution chart: {e}")
-            return ""
-
-    def generate_search_trend_chart(self, days: int = 30) -> str:
+    @_handle_disconnects
+    def get_search_paths(self) -> List[Dict]:
         """
-        Generates a line chart showing the search trend over the past specified days.
+        Retrieves all searches and their selected synonyms.
         """
-        try:
-            data = self.get_search_trend(days)
-            if not data:
-                logger.warning("No data available for search trend chart")
-                return ""
-
-            dates = [date_ for date_, _ in data]
-            counts = [count for _, count in data]
-
-            fig = go.Figure(
-                data=[go.Scatter(x=dates, y=counts, mode='lines+markers')])
-            fig.update_layout(title_text=f'Search Trend Over Last {days} Days',
-                              xaxis_title='Date',
-                              yaxis_title='Number of Searches')
-            json_data = fig.to_json()
-            if json_data is None:
-                logger.warning("Failed to convert figure to JSON")
-                return ""
-            logger.info(
-                f"Generated search trend chart for the last {days} days")
-            return json_data
-        except Exception as e:
-            logger.exception(f"Failed to generate search trend chart: {e}")
-            return ""
-
-    def generate_common_search_terms_chart(self, limit: int = 10) -> str:
-        """
-        Generates a bar chart showing the most common search terms.
-        """
-        try:
-            data = self.get_common_search_terms(limit)
-            if not data:
-                logger.warning(
-                    "No data available for common search terms chart")
-                return ""
-
-            terms = list(data.keys())
-            counts = list(data.values())
-
-            fig = go.Figure([go.Bar(x=counts, y=terms, orientation='h')])
-            fig.update_layout(title_text=f'Top {limit} Common Search Terms',
-                              xaxis_title='Number of Occurrences',
-                              yaxis_title='Search Terms',
-                              yaxis={'categoryorder': 'total ascending'})
-            json_data = fig.to_json()
-            if json_data is None:
-                logger.warning("Failed to convert figure to JSON")
-                return ""
-            logger.info(
-                f"Generated common search terms chart with top {limit} terms")
-            return json_data
-        except Exception as e:
-            logger.exception(
-                f"Failed to generate common search terms chart: {e}")
-            return ""
-
-    def generate_concept_lookup_percentage_chart(self) -> str:
-        """
-        Generates a gauge chart showing the percentage of searches leading to concept lookups.
-        """
-        try:
-            percentage = self.get_concept_lookup_percentage()
-
-            fig = go.Figure(
-                go.Indicator(
-                    mode="gauge+number",
-                    value=percentage,
-                    title={'text': "% of Searches Leading to Concept Lookup"},
-                    gauge={'axis': {
-                        'range': [None, 100]
-                    }}))
-            json_data = fig.to_json()
-            if json_data is None:
-                logger.warning("Failed to convert figure to JSON")
-                return ""
-            logger.info("Generated concept lookup percentage chart")
-            return json_data
-        except Exception as e:
-            logger.exception(
-                f"Failed to generate concept lookup percentage chart: {e}")
-            return ""
-
-    def generate_most_viewed_concepts_chart(self, limit: int = 10) -> str:
-        """
-        Generates a bar chart showing the most viewed concepts.
-        """
-        try:
-            data = self.get_most_viewed_concepts(limit)
-            if not data:
-                logger.warning(
-                    "No data available for most viewed concepts chart")
-                return ""
-
-            concepts = list(data.keys())
-            counts = list(data.values())
-
-            fig = go.Figure(go.Bar(x=counts, y=concepts, orientation='h'))
-            fig.update_layout(title_text=f'Top {limit} Most Viewed Concepts',
-                              xaxis_title='Number of Views',
-                              yaxis_title='Concepts',
-                              yaxis={'categoryorder': 'total ascending'})
-            json_data = fig.to_json()
-            if json_data is None:
-                logger.warning("Failed to convert figure to JSON")
-                return ""
-            logger.info(
-                f"Generated most viewed concepts chart with top {limit} concepts"
-            )
-            return json_data
-        except Exception as e:
-            logger.exception(
-                f"Failed to generate most viewed concepts chart: {e}")
-            return ""
+        with self.Session() as session:
+            try:
+                searches = session.query(Search).all()
+                search_paths = []
+                for search in searches:
+                    selected_synonyms = [
+                        syn.synonym for syn in search.selected_synonyms
+                    ]
+                    search_paths.append({
+                        'term':
+                        search.term,
+                        'language':
+                        search.language,
+                        'timestamp':
+                        search.timestamp.isoformat(),
+                        'selected_synonyms':
+                        selected_synonyms
+                    })
+                logger.info("Retrieved search paths")
+                return search_paths
+            except SQLAlchemyError as e:
+                logger.error(f"Failed to retrieve search paths: {e}")
+                return []

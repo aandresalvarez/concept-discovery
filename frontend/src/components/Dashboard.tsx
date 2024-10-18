@@ -26,6 +26,15 @@ type MetricsData = {
   common_search_terms: Record<string, number>;
   concept_lookup_percentage: number;
   most_viewed_concepts: Record<string, number>;
+  most_selected_synonyms: Record<string, number>;
+};
+
+// Define the SearchPath type
+type SearchPath = {
+  term: string;
+  language: string;
+  timestamp: string;
+  selected_synonyms: string[];
 };
 
 const COLORS = [
@@ -43,10 +52,11 @@ const COLORS = [
 
 const Dashboard: React.FC = () => {
   const [metricsData, setMetricsData] = useState<MetricsData | null>(null);
+  const [searchPaths, setSearchPaths] = useState<SearchPath[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch data with useEffect and handle errors
+  // Fetch metrics data
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -56,7 +66,6 @@ const Dashboard: React.FC = () => {
           throw new Error(`Server error: ${response.status} ${errorText}`);
         }
         const data: MetricsData = await response.json();
-        // Set default values if any data is missing
         setMetricsData({
           language_distribution: data.language_distribution || {},
           total_searches: data.total_searches || 0,
@@ -64,6 +73,7 @@ const Dashboard: React.FC = () => {
           common_search_terms: data.common_search_terms || {},
           concept_lookup_percentage: data.concept_lookup_percentage || 0,
           most_viewed_concepts: data.most_viewed_concepts || {},
+          most_selected_synonyms: data.most_selected_synonyms || {},
         });
       } catch (error) {
         console.error("Error fetching metrics:", error);
@@ -75,14 +85,32 @@ const Dashboard: React.FC = () => {
     fetchData();
   }, []);
 
-  // Memoize computed data to prevent unnecessary recalculations
+  // Fetch search paths
+  useEffect(() => {
+    const fetchSearchPaths = async () => {
+      try {
+        const response = await fetch("/api/search_paths");
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Server error: ${response.status} ${errorText}`);
+        }
+        const data = await response.json();
+        setSearchPaths(data.search_paths || []);
+      } catch (error) {
+        console.error("Error fetching search paths:", error);
+      }
+    };
+    fetchSearchPaths();
+  }, []);
+
+  // Memoize computed data
   const languageData = useMemo(() => {
     return Object.entries(metricsData?.language_distribution || {}).map(
       ([name, value], index) => ({
         name,
         value,
         color: COLORS[index % COLORS.length],
-      })
+      }),
     );
   }, [metricsData?.language_distribution]);
 
@@ -92,7 +120,7 @@ const Dashboard: React.FC = () => {
         date,
         count,
       })) || [],
-    [metricsData?.search_trend]
+    [metricsData?.search_trend],
   );
 
   const commonTermsData = useMemo(
@@ -101,16 +129,16 @@ const Dashboard: React.FC = () => {
         .map(([name, value]) => ({ name, value }))
         .sort((a, b) => b.value - a.value)
         .slice(0, 10),
-    [metricsData?.common_search_terms]
+    [metricsData?.common_search_terms],
   );
 
-  const conceptData = useMemo(
+  const synonymData = useMemo(
     () =>
-      Object.entries(metricsData?.most_viewed_concepts || {})
+      Object.entries(metricsData?.most_selected_synonyms || {})
         .map(([name, value]) => ({ name, value }))
         .sort((a, b) => b.value - a.value)
         .slice(0, 10),
-    [metricsData?.most_viewed_concepts]
+    [metricsData?.most_selected_synonyms],
   );
 
   if (loading) {
@@ -227,11 +255,11 @@ const Dashboard: React.FC = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Most Viewed Concepts</CardTitle>
+            <CardTitle>Most Selected Synonyms</CardTitle>
           </CardHeader>
           <CardContent className="h-80">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={conceptData} layout="vertical">
+              <BarChart data={synonymData} layout="vertical">
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis type="number" />
                 <YAxis type="category" dataKey="name" width={150} />
@@ -259,6 +287,50 @@ const Dashboard: React.FC = () => {
               <Bar dataKey="value" fill="hsl(var(--primary))" />
             </BarChart>
           </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Search Paths</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-auto max-h-96">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead>
+                <tr>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Timestamp
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Term
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Language
+                  </th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Selected Synonyms
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {searchPaths.map((path, index) => (
+                  <tr key={index}>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {new Date(path.timestamp).toLocaleString()}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">{path.term}</td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {path.language}
+                    </td>
+                    <td className="px-4 py-2 whitespace-nowrap">
+                      {path.selected_synonyms.join(", ")}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </CardContent>
       </Card>
     </div>

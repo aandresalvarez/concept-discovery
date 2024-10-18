@@ -1,7 +1,10 @@
+// src/components/steps/StepSynonyms.tsx
+
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Card } from "@/components/ui/card";
 import { ChevronRight } from "lucide-react";
+import axios from "axios"; // Added axios import
 
 interface DisambiguationResult {
   term: string;
@@ -15,14 +18,31 @@ interface StepSynonymsProps {
   synonyms: string[];
   onSynonymClick: (synonym: string) => void;
   selectedTerm: DisambiguationResult | null;
+  searchId: number | null; // Added searchId prop
 }
 
 const StepSynonyms: React.FC<StepSynonymsProps> = ({
   synonyms,
   onSynonymClick,
   selectedTerm,
+  searchId,
 }) => {
   const { t } = useTranslation("mainContainer");
+
+  // New function to handle synonym click and record selection
+  const handleSynonymClick = async (synonym: string) => {
+    if (searchId) {
+      try {
+        await axios.post("/api/select_synonym", {
+          search_id: searchId,
+          synonym: synonym,
+        });
+      } catch (error) {
+        console.error("Error recording selected synonym:", error);
+      }
+    }
+    onSynonymClick(synonym);
+  };
 
   return (
     <div className="space-y-6">
@@ -62,7 +82,7 @@ const StepSynonyms: React.FC<StepSynonymsProps> = ({
             <Card
               key={index}
               className="p-4 cursor-pointer hover:shadow-md transition-all duration-300 group"
-              onClick={() => onSynonymClick(synonym)}
+              onClick={() => handleSynonymClick(synonym)} // Updated onClick handler
             >
               <div className="flex justify-between items-center">
                 <h3 className="text-lg font-semibold group-hover:text-primary transition-colors duration-300">

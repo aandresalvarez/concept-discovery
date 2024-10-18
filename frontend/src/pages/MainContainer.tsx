@@ -1,3 +1,5 @@
+// src/MainContainer.tsx
+
 import React, { useState, useCallback, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -52,7 +54,8 @@ const MainContainer: React.FC = () => {
   const [canProceed, setCanProceed] = useState<boolean>(false);
   const [showLanguageSelector, setShowLanguageSelector] =
     useState<boolean>(false);
-  const [showDashboard, setShowDashboard] = useState<boolean>(false); // New state for Dashboard toggle
+  const [showDashboard, setShowDashboard] = useState<boolean>(false);
+  const [searchId, setSearchId] = useState<number | null>(null); // Added searchId state
 
   const isSmallScreen = useMediaQuery("(max-width: 767px)");
   const loadingSize = isSmallScreen ? "sm" : "md";
@@ -73,7 +76,9 @@ const MainContainer: React.FC = () => {
       console.error("API call error:", err);
       if (err.response) {
         setError(
-          `${t("serverError", { ns: "common" })}: ${err.response.data.detail || t("unknownError", { ns: "common" })}`,
+          `${t("serverError", { ns: "common" })}: ${
+            err.response.data.detail || t("unknownError", { ns: "common" })
+          }`,
         );
       } else if (err.request) {
         setError(t("noResponseError", { ns: "common" }));
@@ -95,12 +100,14 @@ const MainContainer: React.FC = () => {
       setConceptTable([]);
       setCurrentStep(0);
       setCanProceed(false);
+      setSearchId(null); // Reset searchId on new search
 
       try {
         const response = await axios.get(`/api/search`, {
           params: { term, language: i18n.language },
         });
         setSearchResults(response.data.results);
+        setSearchId(response.data.search_id); // Store searchId from response
       } catch (err: any) {
         handleError(err);
       } finally {
@@ -233,6 +240,7 @@ const MainContainer: React.FC = () => {
           synonyms={synonyms}
           onSynonymClick={handleSynonymClick}
           selectedTerm={selectedTerm}
+          searchId={searchId} // Pass searchId to StepSynonyms
         />
       ),
     },
