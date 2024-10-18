@@ -11,6 +11,7 @@ import StepTableResults from "@/components/steps/StepTableResults";
 import ForcedLanguageSelector from "@/components/ForcedLanguageSelector";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { Languages } from "lucide-react";
+import Dashboard from "@/components/Dashboard"; // New import for Dashboard
 
 interface DisambiguationResult {
   term: string;
@@ -51,6 +52,7 @@ const MainContainer: React.FC = () => {
   const [canProceed, setCanProceed] = useState<boolean>(false);
   const [showLanguageSelector, setShowLanguageSelector] =
     useState<boolean>(false);
+  const [showDashboard, setShowDashboard] = useState<boolean>(false); // New state for Dashboard toggle
 
   const isSmallScreen = useMediaQuery("(max-width: 767px)");
   const loadingSize = isSmallScreen ? "sm" : "md";
@@ -71,9 +73,7 @@ const MainContainer: React.FC = () => {
       console.error("API call error:", err);
       if (err.response) {
         setError(
-          `${t("serverError", { ns: "common" })}: ${
-            err.response.data.detail || t("unknownError", { ns: "common" })
-          }`,
+          `${t("serverError", { ns: "common" })}: ${err.response.data.detail || t("unknownError", { ns: "common" })}`,
         );
       } else if (err.request) {
         setError(t("noResponseError", { ns: "common" }));
@@ -197,6 +197,10 @@ const MainContainer: React.FC = () => {
     setShowLanguageSelector(false);
   }, []);
 
+  const toggleDashboard = useCallback(() => {
+    setShowDashboard((prev) => !prev);
+  }, []);
+
   const loadingText = useMemo(() => {
     if (!loading) return "";
 
@@ -252,94 +256,98 @@ const MainContainer: React.FC = () => {
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
-      <Header />
+      <Header showDashboard={showDashboard} toggleDashboard={toggleDashboard} />
       <main className="flex flex-col flex-1 container mx-auto px-4 py-6 max-w-4xl">
-        <AnimatePresence mode="wait">
-          {!hasSearched ? (
-            <motion.div
-              key="initial"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex flex-col items-center justify-center flex-grow"
-            >
-              <div className="flex items-center justify-center mb-8">
-                <h1 className="text-4xl font-bold text-foreground text-center mr-2">
-                  {t("title", { ns: "mainContainer" })}
-                </h1>
-                {renderLanguageButton()}
-              </div>
-              <div className="w-full">
-                <SearchBox
-                  onSearch={handleSearch}
-                  placeholder={t("searchPlaceholder", {
-                    ns: "mainContainer",
-                  })}
-                  onLanguageChange={handleLanguageChange}
-                  selectedLanguage={i18n.language}
-                  showLangSelection={false}
-                />
-              </div>
-            </motion.div>
-          ) : (
-            <motion.div
-              key="results"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="flex flex-col flex-grow"
-            >
-              <div className="mb-6">
-                <SearchBox
-                  onSearch={handleSearch}
-                  placeholder={t("searchPlaceholder", {
-                    ns: "mainContainer",
-                  })}
-                  onLanguageChange={handleLanguageChange}
-                  selectedLanguage={i18n.language}
-                  showLangSelection={false}
-                />
-              </div>
-
-              {loading ? (
-                <div className="pt-16">
-                  <LoadingComponent
-                    loadingText={loadingText}
-                    size={loadingSize}
-                    showAdditionalInfo={currentStep === 2}
-                    additionalInfoText={t("loadingAdditionalInfo", {
+        {showDashboard ? (
+          <Dashboard />
+        ) : (
+          <AnimatePresence mode="wait">
+            {!hasSearched ? (
+              <motion.div
+                key="initial"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex flex-col items-center justify-center flex-grow"
+              >
+                <div className="flex items-center justify-center mb-8">
+                  <h1 className="text-4xl font-bold text-foreground text-center mr-2">
+                    {t("title", { ns: "mainContainer" })}
+                  </h1>
+                  {renderLanguageButton()}
+                </div>
+                <div className="w-full">
+                  <SearchBox
+                    onSearch={handleSearch}
+                    placeholder={t("searchPlaceholder", {
                       ns: "mainContainer",
                     })}
-                    primaryColor="primary"
-                    accentColor="accent"
-                    secondaryColor="secondary"
+                    onLanguageChange={handleLanguageChange}
+                    selectedLanguage={i18n.language}
+                    showLangSelection={false}
                   />
                 </div>
-              ) : error ? (
-                <div className="text-center text-destructive">
-                  <p>{error}</p>
-                  <Button onClick={handleRetry} className="mt-4">
-                    {t("retry", { ns: "common" })}
-                  </Button>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="results"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="flex flex-col flex-grow"
+              >
+                <div className="mb-6">
+                  <SearchBox
+                    onSearch={handleSearch}
+                    placeholder={t("searchPlaceholder", {
+                      ns: "mainContainer",
+                    })}
+                    onLanguageChange={handleLanguageChange}
+                    selectedLanguage={i18n.language}
+                    showLangSelection={false}
+                  />
                 </div>
-              ) : searchResults.length > 0 ? (
-                <Stepper
-                  steps={steps}
-                  initialStep={currentStep}
-                  onStepChange={handleStepChange}
-                  onFinish={handleStepperFinish}
-                  activeColor="bg-primary"
-                  inactiveColor="bg-secondary"
-                  canProceed={canProceed}
-                />
-              ) : (
-                <div className="text-center text-muted-foreground">
-                  {t("noResults", { ns: "mainContainer" })}
-                </div>
-              )}
-            </motion.div>
-          )}
-        </AnimatePresence>
+
+                {loading ? (
+                  <div className="pt-16">
+                    <LoadingComponent
+                      loadingText={loadingText}
+                      size={loadingSize}
+                      showAdditionalInfo={currentStep === 2}
+                      additionalInfoText={t("loadingAdditionalInfo", {
+                        ns: "mainContainer",
+                      })}
+                      primaryColor="primary"
+                      accentColor="accent"
+                      secondaryColor="secondary"
+                    />
+                  </div>
+                ) : error ? (
+                  <div className="text-center text-destructive">
+                    <p>{error}</p>
+                    <Button onClick={handleRetry} className="mt-4">
+                      {t("retry", { ns: "common" })}
+                    </Button>
+                  </div>
+                ) : searchResults.length > 0 ? (
+                  <Stepper
+                    steps={steps}
+                    initialStep={currentStep}
+                    onStepChange={handleStepChange}
+                    onFinish={handleStepperFinish}
+                    activeColor="bg-primary"
+                    inactiveColor="bg-secondary"
+                    canProceed={canProceed}
+                  />
+                ) : (
+                  <div className="text-center text-muted-foreground">
+                    {t("noResults", { ns: "mainContainer" })}
+                  </div>
+                )}
+              </motion.div>
+            )}
+          </AnimatePresence>
+        )}
       </main>
 
       {(showLanguageSelector || !languageSelected) && (
