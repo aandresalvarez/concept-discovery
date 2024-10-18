@@ -1,30 +1,45 @@
 # main.py
-from decimal import Context
-import os
-from typing import Union, List
+from typing import Union, List, Dict, Tuple
+from datetime import datetime
 from fastapi import FastAPI, Query, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
-from workflow import disambiguate, generate_synonyms, concept_lookup
-import logging, json
+from enum import Enum
+import logging
+import os
+import json
 import traceback
 
+# Import necessary functions from your workflow module
+from workflow import disambiguate, generate_synonyms, concept_lookup
+
+# Import the SQLAlchemyChartData class
+from SQLAlchemyChartData import SQLAlchemyChartData
+
+# Initialize logging
 logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    level=logging.INFO,  # Adjust the logging level as needed
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[logging.FileHandler("app.log"),
+              logging.StreamHandler()])
 logger = logging.getLogger(__name__)
+
+# Initialize SQLAlchemyChartData
+chart_data = SQLAlchemyChartData()
 
 app = FastAPI()
 
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5174"],  # Vite dev server
+    allow_origins=["http://localhost:5174"],  # Adjust as needed
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Define Pydantic models for requests and responses
 
 
 class DisambiguationResult(BaseModel):
@@ -77,38 +92,68 @@ class CreateLanguageResponse(BaseModel):
     message: str
 
 
+# Define an enumeration for metric types
+class MetricType(str, Enum):
+    language_distribution = "language_distribution"
+    total_searches = "total_searches"
+    search_trend = "search_trend"
+    common_search_terms = "common_search_terms"
+    concept_lookup_percentage = "concept_lookup_percentage"
+    most_viewed_concepts = "most_viewed_concepts"
+
+
+# Define the response model for metrics data
+class MetricsDataResponse(BaseModel):
+    language_distribution: Dict[str, int] = None
+    total_searches: int = None
+    search_trend: List[Tuple[str, int]] = None  # Dates as strings
+    common_search_terms: Dict[str, int] = None
+    concept_lookup_percentage: float = None
+    most_viewed_concepts: Dict[str, int] = None
+
+
+# API Endpoints
+
+
 @app.post("/api/create_language", response_model=CreateLanguageResponse)
 async def create_language(request: CreateLanguageRequest):
+    """
+    Endpoint to create a new language.
+    """
     try:
-        # Here you would typically interact with your database or language service
-        # to create the new language. For this example, we'll just log the attempt.
         logger.info(
             f"Attempting to create new language: {request.name} ({request.code})"
         )
-
-        # Simulate language creation
-        # In a real application, you'd add the language to your database or language service
+        # Simulate language creation logic
         success = True
         message = f"Successfully created language: {request.name} ({request.code})"
-
-        # Log the successful creation
         logger.info(message)
-
         return CreateLanguageResponse(success=success, message=message)
     except Exception as e:
-        logger.error(f"Failed to create language: {str(e)}")
+        logger.error(f"Failed to create language: {e}")
         raise HTTPException(status_code=500,
-                            detail=f"Failed to create language: {str(e)}")
+                            detail=f"Failed to create language: {e}")
 
 
 @app.get("/api/concept_lookup")
 async def get_concept_table(term: str, context: str, language: str):
+    """
+    Endpoint to perform concept lookup.
+    """
     try:
         response = concept_lookup(term, context, language)
         concepts = response.parsed.concepts
-        return {"concepts": [concept.model_dump() for concept in concepts]}
+
+        # Record the concept lookup in the metrics
+        chart_data.add_search(language=language,
+                              term=term,
+                              led_to_concept_lookup=True)
+        for concept in concepts:
+            chart_data.add_viewed_concept(concept=concept.name)
+
+        return {"concepts": [concept.dict() for concept in concepts]}
     except Exception as e:
-        logger.error(f"An error occurred during concept lookup: {str(e)}")
+        logger.error(f"An error occurred during concept lookup: {e}")
         logger.error(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -117,18 +162,31 @@ async def get_concept_table(term: str, context: str, language: str):
 async def get_synonyms(term: str = Query(..., min_length=1),
                        language: str = Query("en"),
                        context: str = Query(...)):
+    """
+    Endpoint to get synonyms for a given term.
+    """
     try:
         response = generate_synonyms(term, language, context)
         synonym_response = response.parsed
+
+        # Record the search in the metrics
+        chart_data.add_search(language=language,
+                              term=term,
+                              led_to_concept_lookup=False)
+
         return synonym_response
     except Exception as e:
-        raise HTTPException(status_code=500,
-                            detail=f"An error occurred: {str(e)}")
+        logger.error(f"An error occurred during synonym generation: {e}")
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
 
 
 @app.get("/api/search", response_model=SearchResponse)
 async def search(term: str = Query(..., min_length=1),
                  language: str = Query("en")):
+    """
+    Endpoint to perform a search and disambiguation.
+    """
     logger.info(
         f"Received search request for term: {term}, language: {language}")
     try:
@@ -137,17 +195,12 @@ async def search(term: str = Query(..., min_length=1),
 
         logger.debug(f"Disambiguate function returned: {response}")
 
-        # Since disambiguate returns a list of Messages
-        # and the last message should contain the JSON response
-        response_message = response.text
-        response_message = response_message.strip().replace('```json',
-                                                            '').replace(
-                                                                '```', '')
-        # Attempt to parse the response, handle potential errors
+        # Extract and parse the response
+        response_message = response.text.strip().replace('```json',
+                                                         '').replace(
+                                                             '```', '')
         try:
-            # Access the text content of the response message
             results = json.loads(response_message)
-
         except json.JSONDecodeError as e:
             logger.error(f"Failed to parse JSON response: {e}")
             logger.error(f"Raw response: {response_message}")
@@ -163,19 +216,104 @@ async def search(term: str = Query(..., min_length=1),
                 logger.warning(
                     f"Skipping invalid result: {result}, Error: {e}")
 
+        # Record the search in the metrics
+        chart_data.add_search(language=language,
+                              term=term,
+                              led_to_concept_lookup=False)
+
         logger.info(
             f"Returning {len(disambiguation_results)} disambiguation results")
         return SearchResponse(results=disambiguation_results)
     except Exception as e:
-        logger.error(f"An error occurred: {str(e)}")
+        logger.error(f"An error occurred during search: {e}")
         logger.error(traceback.format_exc())
-        raise HTTPException(status_code=500,
-                            detail=f"An error occurred: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
 
 
 @app.get("/api")
 def read_root():
+    """
+    Root endpoint for health check.
+    """
     return {"Hello": "World"}
+
+
+# Metrics Endpoints
+
+
+@app.get("/api/metrics", response_model=MetricsDataResponse)
+async def get_all_metrics():
+    """
+     Endpoint to retrieve all metrics data.
+     """
+    try:
+        language_distribution = chart_data.get_language_distribution()
+        total_searches = chart_data.get_total_searches()
+        search_trend = chart_data.get_search_trend()
+        # Use date_ directly if it's already a string
+        # Remove the .strftime() call
+        search_trend = [(date_, count) for date_, count in search_trend]
+        common_search_terms = chart_data.get_common_search_terms()
+        concept_lookup_percentage = chart_data.get_concept_lookup_percentage()
+        most_viewed_concepts = chart_data.get_most_viewed_concepts()
+
+        logger.info("Retrieved all metrics data")
+
+        return MetricsDataResponse(
+            language_distribution=language_distribution,
+            total_searches=total_searches,
+            search_trend=search_trend,
+            common_search_terms=common_search_terms,
+            concept_lookup_percentage=concept_lookup_percentage,
+            most_viewed_concepts=most_viewed_concepts)
+    except Exception as e:
+        logger.error(f"Failed to retrieve metrics data: {e}")
+        raise HTTPException(status_code=500,
+                            detail="Failed to retrieve metrics data")
+
+
+@app.get("/api/metrics/{metric_type}")
+async def get_metric(metric_type: MetricType):
+    """
+    Endpoint to retrieve specific metric data.
+    """
+    try:
+        metric_functions = {
+            MetricType.language_distribution:
+            (chart_data.get_language_distribution, "language_distribution"),
+            MetricType.total_searches: (chart_data.get_total_searches,
+                                        "total_searches"),
+            MetricType.search_trend: (chart_data.get_search_trend,
+                                      "search_trend"),
+            MetricType.common_search_terms:
+            (chart_data.get_common_search_terms, "common_search_terms"),
+            MetricType.concept_lookup_percentage:
+            (chart_data.get_concept_lookup_percentage,
+             "concept_lookup_percentage"),
+            MetricType.most_viewed_concepts:
+            (chart_data.get_most_viewed_concepts, "most_viewed_concepts"),
+        }
+
+        if metric_type not in metric_functions:
+            logger.warning(f"Invalid metric type requested: {metric_type}")
+            raise HTTPException(status_code=400, detail="Invalid metric type")
+
+        function, key = metric_functions[metric_type]
+        data = function()
+
+        # Remove .strftime() call since date_ is already a string
+        if metric_type == MetricType.search_trend:
+            data = [(date_, count) for date_, count in data]
+
+        result = {key: data}
+
+        logger.info(f"Retrieved data for metric type: {metric_type}")
+        return result
+    except Exception as e:
+        logger.error(f"Failed to retrieve data for metric {metric_type}: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to retrieve data for metric {metric_type}")
 
 
 # Serve React frontend only if the dist directory exists
