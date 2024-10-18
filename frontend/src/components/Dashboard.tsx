@@ -1,3 +1,5 @@
+// src/components/Dashboard.tsx
+
 import React, { useEffect, useState, useMemo } from "react";
 import {
   BarChart,
@@ -17,6 +19,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Loader2 } from "lucide-react";
+import { useTranslation } from "react-i18next"; // Import useTranslation
 
 // Define the MetricsData type
 type MetricsData = {
@@ -51,6 +54,7 @@ const COLORS = [
 ];
 
 const Dashboard: React.FC = () => {
+  const { t, i18n } = useTranslation(["common"]); // Initialize translation
   const [metricsData, setMetricsData] = useState<MetricsData | null>(null);
   const [searchPaths, setSearchPaths] = useState<SearchPath[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -63,7 +67,9 @@ const Dashboard: React.FC = () => {
         const response = await fetch("/api/metrics");
         if (!response.ok) {
           const errorText = await response.text();
-          throw new Error(`Server error: ${response.status} ${errorText}`);
+          throw new Error(
+            `${t("serverError")}: ${response.status} ${errorText}`,
+          );
         }
         const data: MetricsData = await response.json();
         setMetricsData({
@@ -83,7 +89,7 @@ const Dashboard: React.FC = () => {
       }
     };
     fetchData();
-  }, []);
+  }, [t]);
 
   // Fetch search paths
   useEffect(() => {
@@ -92,7 +98,9 @@ const Dashboard: React.FC = () => {
         const response = await fetch("/api/search_paths");
         if (!response.ok) {
           const errorText = await response.text();
-          throw new Error(`Server error: ${response.status} ${errorText}`);
+          throw new Error(
+            `${t("serverError")}: ${response.status} ${errorText}`,
+          );
         }
         const data = await response.json();
         setSearchPaths(data.search_paths || []);
@@ -101,7 +109,7 @@ const Dashboard: React.FC = () => {
       }
     };
     fetchSearchPaths();
-  }, []);
+  }, [t]);
 
   // Memoize computed data
   const languageData = useMemo(() => {
@@ -144,7 +152,11 @@ const Dashboard: React.FC = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        {/* Optionally add loading text */}
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
+          <p className="mt-2">{t("loading")}</p>
+        </div>
       </div>
     );
   }
@@ -152,7 +164,9 @@ const Dashboard: React.FC = () => {
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-xl text-destructive">Error: {error}</p>
+        <p className="text-xl text-destructive">
+          {t("error")}: {error}
+        </p>
       </div>
     );
   }
@@ -160,21 +174,21 @@ const Dashboard: React.FC = () => {
   if (!metricsData) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-xl text-destructive">Failed to load metrics data.</p>
+        <p className="text-xl text-destructive">
+          {t("failedToLoadMetricsData")}
+        </p>
       </div>
     );
   }
 
   return (
     <div className="p-6 space-y-8 bg-background min-h-screen">
-      <h1 className="text-3xl font-bold text-primary">
-        Medical Search Dashboard
-      </h1>
+      <h1 className="text-3xl font-bold text-primary">{t("dashboardTitle")}</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Total Searches</CardTitle>
+            <CardTitle>{t("totalSearches")}</CardTitle>
           </CardHeader>
           <CardContent className="flex items-center justify-center h-32">
             <p className="text-5xl font-bold text-primary">
@@ -185,7 +199,7 @@ const Dashboard: React.FC = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Concept Lookup Percentage</CardTitle>
+            <CardTitle>{t("conceptLookupPercentage")}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center h-32">
             <Progress
@@ -200,7 +214,7 @@ const Dashboard: React.FC = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Language Distribution</CardTitle>
+            <CardTitle>{t("languageDistribution")}</CardTitle>
           </CardHeader>
           <CardContent className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -231,7 +245,7 @@ const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle>Search Trend</CardTitle>
+            <CardTitle>{t("searchTrend")}</CardTitle>
           </CardHeader>
           <CardContent className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -255,7 +269,7 @@ const Dashboard: React.FC = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Most Selected Synonyms</CardTitle>
+            <CardTitle>{t("mostSelectedSynonyms")}</CardTitle>
           </CardHeader>
           <CardContent className="h-80">
             <ResponsiveContainer width="100%" height="100%">
@@ -274,7 +288,7 @@ const Dashboard: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Common Search Terms</CardTitle>
+          <CardTitle>{t("commonSearchTerms")}</CardTitle>
         </CardHeader>
         <CardContent className="h-80">
           <ResponsiveContainer width="100%" height="100%">
@@ -292,7 +306,7 @@ const Dashboard: React.FC = () => {
 
       <Card>
         <CardHeader>
-          <CardTitle>Search Paths</CardTitle>
+          <CardTitle>{t("searchPaths")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="overflow-auto max-h-96">
@@ -300,16 +314,16 @@ const Dashboard: React.FC = () => {
               <thead>
                 <tr>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Timestamp
+                    {t("timestamp")}
                   </th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Term
+                    {t("term")}
                   </th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Language
+                    {t("language")}
                   </th>
                   <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Selected Synonyms
+                    {t("selectedSynonyms")}
                   </th>
                 </tr>
               </thead>
@@ -317,7 +331,7 @@ const Dashboard: React.FC = () => {
                 {searchPaths.map((path, index) => (
                   <tr key={index}>
                     <td className="px-4 py-2 whitespace-nowrap">
-                      {new Date(path.timestamp).toLocaleString()}
+                      {new Date(path.timestamp).toLocaleString(i18n.language)}
                     </td>
                     <td className="px-4 py-2 whitespace-nowrap">{path.term}</td>
                     <td className="px-4 py-2 whitespace-nowrap">
