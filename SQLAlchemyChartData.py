@@ -1,6 +1,8 @@
+# SQLAlchemyChartData.py
+
 import os
 import time
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Union
 from datetime import datetime, timedelta
 from collections import Counter
 
@@ -10,7 +12,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
 
-from wordcloud import STOPWORDS  # Added missing import
+from wordcloud import STOPWORDS  # Import STOPWORDS to filter common terms
 
 import logging
 
@@ -24,6 +26,92 @@ logger = logging.getLogger(__name__)
 
 # Create a base class for declarative class definitions
 Base = declarative_base()
+
+# Define the initial languages
+INITIAL_LANGUAGES = [
+    {
+        'code': 'en',
+        'name': 'English',
+        'native_name': 'English'
+    },
+    {
+        'code': 'es',
+        'name': 'Spanish',
+        'native_name': 'Español'
+    },
+    {
+        'code': 'fr',
+        'name': 'French',
+        'native_name': 'Français'
+    },
+    {
+        'code': 'de',
+        'name': 'German',
+        'native_name': 'Deutsch'
+    },
+    {
+        'code': 'it',
+        'name': 'Italian',
+        'native_name': 'Italiano'
+    },
+    {
+        'code': 'pt',
+        'name': 'Portuguese',
+        'native_name': 'Português'
+    },
+    {
+        'code': 'ru',
+        'name': 'Russian',
+        'native_name': 'Русский'
+    },
+    {
+        'code': 'zh',
+        'name': 'Chinese',
+        'native_name': '中文'
+    },
+    {
+        'code': 'ja',
+        'name': 'Japanese',
+        'native_name': '日本語'
+    },
+    {
+        'code': 'ko',
+        'name': 'Korean',
+        'native_name': '한국어'
+    },
+    {
+        'code': 'ar',
+        'name': 'Arabic',
+        'native_name': 'العربية'
+    },
+    {
+        'code': 'hi',
+        'name': 'Hindi',
+        'native_name': 'हिन्दी'
+    },
+    {
+        'code': 'pl',
+        'name': 'Polish',
+        'native_name': 'Polski'
+    },
+    {
+        'code': 'tr',
+        'name': 'Turkish',
+        'native_name': 'Türkçe'
+    },
+]
+
+
+class Language(Base):
+    """
+    ORM model representing a language.
+    """
+    __tablename__ = 'languages'
+    id = Column(Integer, primary_key=True)
+    code = Column(String(2), unique=True, nullable=False)  # ISO 639-1 code
+    name = Column(String, nullable=False)
+    native_name = Column(String, nullable=False)
+    timestamp = Column(DateTime, default=datetime.utcnow)
 
 
 class Search(Base):
@@ -95,6 +183,9 @@ class SQLAlchemyChartData:
         Base.metadata.create_all(self.engine)
         self.Session = sessionmaker(bind=self.engine)
 
+        # Seed initial languages
+        self.seed_initial_languages()
+
     def _handle_disconnects(func):
         """
         Decorator to handle database disconnections.
@@ -132,6 +223,37 @@ class SQLAlchemyChartData:
                 "Failed to reconnect to the database after multiple attempts")
 
         return wrapper
+
+    @_handle_disconnects
+    def seed_initial_languages(self):
+        """
+        Seeds the database with initial languages if they don't already exist.
+        """
+        with self.Session() as session:
+            try:
+                existing_codes = {
+                    lang.code
+                    for lang in session.query(Language.code).all()
+                }
+                new_languages = [
+                    Language(name=lang['name'],
+                             code=lang['code'],
+                             native_name=lang['native_name'])
+                    for lang in INITIAL_LANGUAGES
+                    if lang['code'] not in existing_codes
+                ]
+                if new_languages:
+                    session.add_all(new_languages)
+                    session.commit()
+                    logger.info(
+                        f"Seeded initial languages: {[lang.code for lang in new_languages]}"
+                    )
+                else:
+                    logger.info("Initial languages already seeded.")
+            except SQLAlchemyError as e:
+                session.rollback()
+                logger.error(f"Failed to seed initial languages: {e}")
+                raise
 
     @_handle_disconnects
     def add_search(self,
@@ -248,7 +370,7 @@ class SQLAlchemyChartData:
     @_handle_disconnects
     def get_common_search_terms(self, limit: int = 50) -> Dict[str, int]:
         """
-        Retrieves the most common search terms.
+        Retrieves the most common search terms, excluding stopwords.
         """
         with self.Session() as session:
             try:
@@ -358,4 +480,55 @@ class SQLAlchemyChartData:
                 return search_paths
             except SQLAlchemyError as e:
                 logger.error(f"Failed to retrieve search paths: {e}")
+                return []
+
+    @_handle_disconnects
+    def add_language(self, name: str, code: str, native_name: str) -> None:
+        """
+        Adds a new language to the database.
+        """
+        with self.Session() as session:
+            try:
+                new_language = Language(name=name,
+                                        code=code.lower(),
+                                        native_name=native_name)
+                session.add(new_language)
+                session.commit()
+                logger.info(f"Added new language: {name} ({code})")
+            except SQLAlchemyError as e:
+                session.rollback()
+                logger.error(f"Failed to add new language: {e}")
+                raise
+
+    @_handle_disconnects
+    def get_language_by_code(self, code: str) -> Union[Language, None]:
+        """
+        Retrieves a language by its code.
+        """
+        with self.Session() as session:
+            try:
+                language = session.query(Language).filter_by(
+                    code=code.lower()).first()
+                return language
+            except SQLAlchemyError as e:
+                logger.error(f"Failed to retrieve language: {e}")
+                return None
+
+    @_handle_disconnects
+    def get_all_languages(self) -> List[Dict]:
+        """
+        Retrieves all languages.
+        """
+        with self.Session() as session:
+            try:
+                languages = session.query(Language).all()
+                language_list = [{
+                    "value": lang.code,
+                    "label": lang.name,
+                    "nativeName": lang.native_name
+                } for lang in languages]
+                logger.info("Retrieved all languages")
+                return language_list
+            except SQLAlchemyError as e:
+                logger.error(f"Failed to retrieve languages: {e}")
                 return []

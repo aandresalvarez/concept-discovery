@@ -1,3 +1,5 @@
+# main.py
+
 from typing import Union, List, Dict, Tuple
 from datetime import datetime
 from fastapi import FastAPI, Query, HTTPException, Body
@@ -24,7 +26,7 @@ logging.basicConfig(
               logging.StreamHandler()])
 logger = logging.getLogger(__name__)
 
-# Initialize SQLAlchemyChartData
+# Initialize SQLAlchemyChartData and seed initial languages
 chart_data = SQLAlchemyChartData()
 
 app = FastAPI()
@@ -32,7 +34,7 @@ app = FastAPI()
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5174"],  # Adjust as needed
+    allow_origins=["http://localhost:5173"],  # Adjust as needed
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -111,7 +113,7 @@ class MetricsDataResponse(BaseModel):
     common_search_terms: Dict[str, int] = None
     concept_lookup_percentage: float = None
     most_viewed_concepts: Dict[str, int] = None
-    most_selected_synonyms: Dict[str, int] = None  # New field
+    most_selected_synonyms: Dict[str, int] = None
 
 
 # API Endpoints
@@ -126,15 +128,52 @@ async def create_language(request: CreateLanguageRequest):
         logger.info(
             f"Attempting to create new language: {request.name} ({request.code})"
         )
-        # Simulate language creation logic
-        success = True
-        message = f"Successfully created language: {request.name} ({request.code})"
+
+        # Validate language code
+        if len(request.code) != 2:
+            raise HTTPException(
+                status_code=400,
+                detail="Invalid language code. Please use a 2-letter ISO code."
+            )
+
+        # Check if language already exists
+        existing_language = chart_data.get_language_by_code(request.code)
+        if existing_language:
+            return CreateLanguageResponse(
+                success=False,
+                message="A language with this code already exists.")
+
+        # Add the new language
+        chart_data.add_language(name=request.name,
+                                code=request.code,
+                                native_name=request.native_name)
+
+        message = "Language created successfully!"
         logger.info(message)
-        return CreateLanguageResponse(success=success, message=message)
+        return CreateLanguageResponse(success=True, message=message)
+    except HTTPException as e:
+        logger.error(f"Failed to create language: {e.detail}")
+        raise e
     except Exception as e:
         logger.error(f"Failed to create language: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail=
+            "An error occurred while creating the language. Please try again.")
+
+
+@app.get("/api/languages")
+async def get_languages():
+    """
+    Endpoint to retrieve all available languages.
+    """
+    try:
+        languages = chart_data.get_all_languages()
+        return {"languages": languages}
+    except Exception as e:
+        logger.error(f"Failed to retrieve languages: {e}")
         raise HTTPException(status_code=500,
-                            detail=f"Failed to create language: {e}")
+                            detail="Failed to retrieve languages")
 
 
 @app.get("/api/concept_lookup")

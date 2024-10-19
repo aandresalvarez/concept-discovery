@@ -2,7 +2,7 @@
     "title": "Descubrimiento de Conceptos Médicos",
     "searchPlaceholder": "Ingresa un término médico, por ejemplo, 'aspirina'",
     "loadingInitial": "Buscando...",
-    "loadingSynonyms": "Buscando sinónimos...",
+    "loadingSynonyms": "Obteniendo sinónimos...",
     "loadingConcepts": "Recuperando conceptos...",
     "loadingAdditionalInfo": "Esto podría tardar unos segundos...",
     "noResults": "No se encontraron resultados. Prueba con otro término de búsqueda.",
@@ -20,8 +20,8 @@
     "noSynonymsFound": "No se encontraron sinónimos para el término seleccionado.",
     "category": "Categoría",
     "noConceptsFound": "No se encontraron conceptos para el sinónimo seleccionado.",
-    "conceptTable": "Tabla de Conceptos",
-    "backToResults": "Volver a los resultados",
+    "conceptTable": "Tabla de conceptos",
+    "backToResults": "Volver a Resultados",
     "conceptId": "ID de concepto",
     "code": "Código",
     "name": "Nombre",
@@ -32,5 +32,5 @@
     "invalidReason": "Razón inválida",
     "notApplicable": "N/A",
     "seeMoreDetails": "Ver más detalles",
-    "seeInAthena": "Ver en Atenea"
+    "seeInAthena": "Ver en Athena"
 }

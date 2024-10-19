@@ -4,8 +4,8 @@
     "loadingInitial": "Buscando...",
     "loadingSynonyms": "Buscando sinônimos...",
     "loadingConcepts": "Recuperando conceitos...",
-    "loadingAdditionalInfo": "Isto pode levar alguns segundos...",
-    "noResults": "Nenhum resultado encontrado. Tente outro termo de pesquisa.",
+    "loadingAdditionalInfo": "Isso pode levar alguns segundos...",
+    "noResults": "Nenhum resultado encontrado. Tente outro termo de busca.",
     "disambiguationStep": "Desambiguação",
     "synonymsStep": "Sinônimos",
     "resultsStep": "Resultados",
@@ -15,7 +15,7 @@
     "usage": "Uso",
     "context": "Contexto",
     "close": "Fechar",
-    "synonymsFor": "Alternativas para a palavra '{{term}}'. Toque em qualquer termo para explorar seu significado médico e buscar seus possíveis códigos no Athena, o Repositório de Vocabulários OHDSI.",
+    "synonymsFor": "Alternativas para a palavra '{{term}}'. Toque em qualquer termo para explorar seu significado médico e procurar seus possíveis códigos na Athena, o Repositório de Vocabulários OHDSI.",
     "selectedTerm": "termo selecionado",
     "noSynonymsFound": "Nenhum sinônimo encontrado para o termo selecionado.",
     "category": "Categoria",
@@ -31,6 +31,6 @@
     "standardConcept": "Conceito Padrão",
     "invalidReason": "Razão inválida",
     "notApplicable": "N/A",
-    "seeMoreDetails": "Ver Mais Detalhes",
+    "seeMoreDetails": "Veja Mais Detalhes",
     "seeInAthena": "Veja em Atena"
 }

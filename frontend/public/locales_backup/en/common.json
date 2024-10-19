@@ -29,5 +29,20 @@
   "languageAlreadyExists": "A language with this code already exists.",
   "confirmLanguageCreation": "Are you sure you want to create this language?",
   "yes": "Yes",
-  "no": "No"
+  "no": "No",
+  "dashboardTitle": "Medical Search Dashboard",
+  "totalSearches": "Total Searches",
+  "conceptLookupPercentage": "Concept Lookup Percentage",
+  "languageDistribution": "Language Distribution",
+  "searchTrend": "Search Trend",
+  "mostSelectedSynonyms": "Most Selected Synonyms",
+  "commonSearchTerms": "Common Search Terms",
+  "searchPaths": "Search Paths",
+  "timestamp": "Timestamp",
+  "term": "Term",
+  "language": "Language",
+  "selectedSynonyms": "Selected Synonyms",
+  "error": "Error",
+  "failedToLoadMetricsData": "Failed to load metrics data.",
+  "changeLanguage": "Change Language"
 }

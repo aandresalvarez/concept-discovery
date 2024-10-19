@@ -1,5 +1,5 @@
 {
-    "title": "Découverte de Concepts Médicaux",
+    "title": "Découverte de concepts médicaux",
     "searchPlaceholder": "Entrez un terme médical, par exemple, 'aspirine'",
     "loadingInitial": "Recherche...",
     "loadingSynonyms": "Recherche de synonymes...",
@@ -20,9 +20,9 @@
     "noSynonymsFound": "Aucun synonyme trouvé pour le terme sélectionné.",
     "category": "Catégorie",
     "noConceptsFound": "Aucun concept trouvé pour le synonyme sélectionné.",
-    "conceptTable": "Tableau de concepts",
+    "conceptTable": "Table des concepts",
     "backToResults": "Retour aux résultats",
-    "conceptId": "ID de concept",
+    "conceptId": "Identifiant de concept",
     "code": "Code",
     "name": "Nom",
     "class": "Classe",

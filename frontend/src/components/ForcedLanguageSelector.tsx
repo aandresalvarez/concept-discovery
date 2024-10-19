@@ -1,3 +1,5 @@
+// src/components/ForcedLanguageSelector.tsx
+
 import React, { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -36,7 +38,7 @@ const initialLanguageOptions: Language[] = [
   { value: "ko", label: "Korean", nativeName: "한국어" },
   { value: "ar", label: "Arabic", nativeName: "العربية" },
   { value: "hi", label: "Hindi", nativeName: "हिन्दी" },
-  { value: "po", label: "Polish", nativeName: "Polski" },
+  { value: "pl", label: "Polish", nativeName: "Polski" },
   { value: "tr", label: "Turkish", nativeName: "Türkçe" },
 ];
 
@@ -47,10 +49,8 @@ const ForcedLanguageSelector: React.FC<ForcedLanguageSelectorProps> = ({
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [languageOptions, setLanguageOptions] = useState(
-    initialLanguageOptions,
-  );
-  const [filteredLanguages, setFilteredLanguages] = useState(languageOptions);
+  const [languageOptions, setLanguageOptions] = useState<Language[]>([]);
+  const [filteredLanguages, setFilteredLanguages] = useState<Language[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [isCreatingLanguage, setIsCreatingLanguage] = useState(false);
   const [newLanguage, setNewLanguage] = useState({
@@ -59,6 +59,30 @@ const ForcedLanguageSelector: React.FC<ForcedLanguageSelectorProps> = ({
     nativeName: "",
   });
   const [error, setError] = useState<string | null>(null);
+
+  const fetchLanguages = useCallback(async () => {
+    try {
+      const response = await axios.get("/api/languages");
+      let languages = response.data.languages;
+
+      // If the backend returns an empty list, use initialLanguageOptions
+      if (languages.length === 0) {
+        languages = initialLanguageOptions;
+      }
+
+      setLanguageOptions(languages);
+      setFilteredLanguages(languages);
+    } catch (error) {
+      console.error("Error fetching languages:", error);
+      // In case of error, use initialLanguageOptions
+      setLanguageOptions(initialLanguageOptions);
+      setFilteredLanguages(initialLanguageOptions);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchLanguages();
+  }, [fetchLanguages]);
 
   const filterLanguages = useCallback(() => {
     const filtered = languageOptions.filter(
@@ -92,6 +116,11 @@ const ForcedLanguageSelector: React.FC<ForcedLanguageSelectorProps> = ({
         return;
       }
 
+      if (newLanguage.code.length !== 2) {
+        setError(t("invalidLanguageCode"));
+        return;
+      }
+
       const response = await axios.post("/api/create_language", {
         name: newLanguage.name,
         code: newLanguage.code,
@@ -99,21 +128,17 @@ const ForcedLanguageSelector: React.FC<ForcedLanguageSelectorProps> = ({
       });
 
       if (response.data.success) {
-        const newLangOption = {
-          value: newLanguage.code,
-          label: newLanguage.name,
-          nativeName: newLanguage.nativeName,
-        };
-        setLanguageOptions([...languageOptions, newLangOption]);
         setIsCreatingLanguage(false);
         setNewLanguage({ name: "", code: "", nativeName: "" });
         setError(null);
+
+        await fetchLanguages();
       } else {
         setError(response.data.message || t("failedToCreateLanguage"));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating language:", error);
-      setError(t("errorCreatingLanguage"));
+      setError(error.response?.data?.detail || t("errorCreatingLanguage"));
     }
   };
 
@@ -182,10 +207,14 @@ const ForcedLanguageSelector: React.FC<ForcedLanguageSelectorProps> = ({
   return (
     <Dialog open={true} onOpenChange={() => {}}>
       <DialogContent
-        className={`sm:max-w-[425px] md:max-w-[600px] lg:max-w-[800px] ${!isDesktop ? "h-[100vh] max-h-[100vh] p-0" : ""}`}
+        className={`sm:max-w-[425px] md:max-w-[600px] lg:max-w-[800px] ${
+          !isDesktop ? "h-[100vh] max-h-[100vh] p-0" : ""
+        }`}
       >
         <DialogHeader
-          className={`flex items-center mb-4 ${!isDesktop ? "px-4 py-2 border-b" : ""}`}
+          className={`flex items-center mb-4 ${
+            !isDesktop ? "px-4 py-2 border-b" : ""
+          }`}
         >
           <Languages className="mr-2 h-6 w-6" />
           <DialogTitle>{t("selectYourLanguage")}</DialogTitle>

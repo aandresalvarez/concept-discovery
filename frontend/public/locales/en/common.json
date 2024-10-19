@@ -43,5 +43,6 @@
   "language": "Language",
   "selectedSynonyms": "Selected Synonyms",
   "error": "Error",
-  "failedToLoadMetricsData": "Failed to load metrics data."
+  "failedToLoadMetricsData": "Failed to load metrics data.",
+  "changeLanguage": "Change Language"
 }
