@@ -1,5 +1,3 @@
-// src/MainContainer.tsx
-
 import React, { useState, useCallback, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
@@ -13,7 +11,7 @@ import StepTableResults from "@/components/steps/StepTableResults";
 import ForcedLanguageSelector from "@/components/ForcedLanguageSelector";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 import { Languages } from "lucide-react";
-import Dashboard from "@/components/Dashboard"; // New import for Dashboard
+import Dashboard from "@/components/Dashboard";
 
 interface DisambiguationResult {
   term: string;
@@ -49,13 +47,12 @@ const MainContainer: React.FC = () => {
     null,
   );
   const [lastSearchTerm, setLastSearchTerm] = useState<string>("");
-  const [languageSelected, setLanguageSelected] = useState<boolean>(false);
   const [currentStep, setCurrentStep] = useState<number>(0);
   const [canProceed, setCanProceed] = useState<boolean>(false);
   const [showLanguageSelector, setShowLanguageSelector] =
-    useState<boolean>(false);
+    useState<boolean>(true);
   const [showDashboard, setShowDashboard] = useState<boolean>(false);
-  const [searchId, setSearchId] = useState<number | null>(null); // Added searchId state
+  const [searchId, setSearchId] = useState<number | null>(null);
 
   const isSmallScreen = useMediaQuery("(max-width: 767px)");
   const loadingSize = isSmallScreen ? "sm" : "md";
@@ -76,9 +73,7 @@ const MainContainer: React.FC = () => {
       console.error("API call error:", err);
       if (err.response) {
         setError(
-          `${t("serverError", { ns: "common" })}: ${
-            err.response.data.detail || t("unknownError", { ns: "common" })
-          }`,
+          `${t("serverError", { ns: "common" })}: ${err.response.data.detail || t("unknownError", { ns: "common" })}`,
         );
       } else if (err.request) {
         setError(t("noResponseError", { ns: "common" }));
@@ -100,14 +95,14 @@ const MainContainer: React.FC = () => {
       setConceptTable([]);
       setCurrentStep(0);
       setCanProceed(false);
-      setSearchId(null); // Reset searchId on new search
+      setSearchId(null);
 
       try {
         const response = await axios.get(`/api/search`, {
           params: { term, language: i18n.language },
         });
         setSearchResults(response.data.results);
-        setSearchId(response.data.search_id); // Store searchId from response
+        setSearchId(response.data.search_id);
       } catch (err: any) {
         handleError(err);
       } finally {
@@ -190,7 +185,6 @@ const MainContainer: React.FC = () => {
 
   const handleStepperFinish = useCallback(() => {
     console.log("Stepper finished");
-    // Implement any final step logic here
   }, []);
 
   const handleRetry = useCallback(() => {
@@ -200,7 +194,6 @@ const MainContainer: React.FC = () => {
   }, [lastSearchTerm, handleSearch]);
 
   const handleLanguageSelected = useCallback(() => {
-    setLanguageSelected(true);
     setShowLanguageSelector(false);
   }, []);
 
@@ -240,7 +233,7 @@ const MainContainer: React.FC = () => {
           synonyms={synonyms}
           onSynonymClick={handleSynonymClick}
           selectedTerm={selectedTerm}
-          searchId={searchId} // Pass searchId to StepSynonyms
+          searchId={searchId}
         />
       ),
     },
@@ -268,6 +261,18 @@ const MainContainer: React.FC = () => {
       <main className="flex flex-col flex-1 container mx-auto px-4 py-6 max-w-4xl">
         {showDashboard ? (
           <Dashboard />
+        ) : showLanguageSelector ? (
+          <motion.div
+            key="language-selection"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex flex-col items-center justify-center flex-grow"
+          >
+            <ForcedLanguageSelector
+              onLanguageSelected={handleLanguageSelected}
+            />
+          </motion.div>
         ) : (
           <AnimatePresence mode="wait">
             {!hasSearched ? (
@@ -357,10 +362,6 @@ const MainContainer: React.FC = () => {
           </AnimatePresence>
         )}
       </main>
-
-      {(showLanguageSelector || !languageSelected) && (
-        <ForcedLanguageSelector onLanguageSelected={handleLanguageSelected} />
-      )}
     </div>
   );
 };
