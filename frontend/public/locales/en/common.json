@@ -44,5 +44,15 @@
   "selectedSynonyms": "Selected Synonyms",
   "error": "Error",
   "failedToLoadMetricsData": "Failed to load metrics data.",
-  "changeLanguage": "Change Language"
+  "changeLanguage": "Change Language",
+  "languageNameError": "Language name must be at least 2 characters long",
+  "languageCodeError": "Language code must be exactly 2 characters",
+  "nativeNameError": "Native name must be at least 2 characters long",
+  "createLanguageDescription": "Add a new language to the system.",
+  "languageNamePlaceholder": "e.g., French",
+  "languageNameDescription": "The full name of the language in English.",
+  "languageCodePlaceholder": "e.g., fr",
+  "languageCodeDescription": "The two-letter ISO 639-1 code for the language.",
+  "nativeNamePlaceholder": "e.g., Français",
+  "nativeNameDescription": "The name of the language in its native form."
 }

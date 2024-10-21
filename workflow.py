@@ -13,6 +13,12 @@ logging.basicConfig(level=logging.ERROR)
 logger = logging.getLogger(__name__)
 
 
+class LanguageInfo(BaseModel):
+    name: str = Field(description="The English name of the language")
+    code: str = Field(description="The ISO 639-1 code of the language")
+    nativeName: str = Field(description="The native name of the language")
+
+
 # Data models for structured outputs
 class Concept(BaseModel):
     concept_id: int
@@ -139,11 +145,9 @@ def disambiguate(term: str, language: str = "en") -> str:
             ]
             ```
 
-            """
-        ),
+            """),
         ell.user(
-            f"Disambiguate the following medical term in {language}: {term}"
-        )
+            f"Disambiguate the following medical term in {language}: {term}")
     ]
 
 
@@ -281,3 +285,46 @@ def concept_lookup(term: str,
             ),
             ell.user(concepts_json)
         ]
+
+
+@ell.complex(model="gpt-4o-mini",
+             temperature=0.0,
+             response_format=LanguageInfo)
+def get_language_info(input_text: str) -> List[Message]:
+    return [
+        ell.system("""
+        You are a language information expert. Given an input text that could be a language name,
+        ISO code, or native name of a language, provide the language's information.
+
+        The input could be in any of these formats:
+        - English name (e.g., "Arabic")
+        - Native name (e.g., "العربية")
+        - ISO 639-1 code (e.g., "ar")
+        - Or any other recognizable form of the language name
+
+        Return the information as a LanguageInfo object with the following fields:
+        - name: The English name of the language
+        - code: The ISO 639-1 code of the language
+        - nativeName: The native name of the language
+
+        Example of the resulting structure:
+        {
+            "name": "Arabic",
+            "code": "ar",
+            "nativeName": "العربية"
+        }
+
+        Ensure all fields are filled with accurate information.
+        If you're unsure about any information, provide your best estimate.
+        If the input is not recognizable as a language, return information for English as a default.
+        """),
+        ell.user(f"Provide language information for the input: {input_text}")
+    ]
+
+
+# Example usage:
+result = get_language_info("Ruso")
+language_info = result.parsed
+print(
+    f"Name: {language_info.name}, Code: {language_info.code}, Native Name: {language_info.nativeName}"
+)
