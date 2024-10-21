@@ -4,15 +4,8 @@ import React, { useState } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { SearchBoxProps } from "@/types";
-import LanguageSelector from "./LanguageSelector";
 
-const SearchBox: React.FC<SearchBoxProps> = ({
-  onSearch,
-  placeholder,
-  onLanguageChange,
-  selectedLanguage,
-  showLangSelection = true, // Default to true if not provided
-}) => {
+const SearchBox: React.FC<SearchBoxProps> = ({ onSearch, placeholder }) => {
   const [searchTerm, setSearchTerm] = useState<string>("");
 
   const handleSearch = () => {
@@ -38,14 +31,6 @@ const SearchBox: React.FC<SearchBoxProps> = ({
           onClick={handleSearch}
         />
       </div>
-      {showLangSelection && (
-        <div className="ml-2">
-          <LanguageSelector
-            onLanguageChange={onLanguageChange}
-            selectedLanguage={selectedLanguage}
-          />
-        </div>
-      )}
     </div>
   );
 };

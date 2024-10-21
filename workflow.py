@@ -322,9 +322,9 @@ def get_language_info(input_text: str) -> List[Message]:
     ]
 
 
-# Example usage:
-result = get_language_info("Ruso")
-language_info = result.parsed
-print(
-    f"Name: {language_info.name}, Code: {language_info.code}, Native Name: {language_info.nativeName}"
-)
+# # Example usage:
+# result = get_language_info("Ruso")
+# language_info = result.parsed
+# print(
+#     f"Name: {language_info.name}, Code: {language_info.code}, Native Name: {language_info.nativeName}"
+# )

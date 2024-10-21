@@ -13,7 +13,7 @@ import json
 import traceback
 
 # Import necessary functions from your workflow module
-from workflow import disambiguate, generate_synonyms, concept_lookup
+from workflow import disambiguate, generate_synonyms, concept_lookup, get_language_info
 
 # Import the updated SQLAlchemyChartData class
 from SQLAlchemyChartData import SQLAlchemyChartData
@@ -174,6 +174,32 @@ async def get_languages():
         logger.error(f"Failed to retrieve languages: {e}")
         raise HTTPException(status_code=500,
                             detail="Failed to retrieve languages")
+
+
+@app.get("/api/language_info", response_model=dict)
+async def language_info(input_text: str = Query(
+    ..., description="Language name, code, or native name")):
+    """
+    Endpoint to get language information based on input text.
+    """
+    try:
+        result = get_language_info(input_text)
+        language_info = result.parsed
+
+        # Record the language info request in the metrics
+        chart_data.add_search(language=language_info.code,
+                              term=input_text,
+                              led_to_concept_lookup=False)
+
+        return {
+            "name": language_info.name,
+            "code": language_info.code,
+            "nativeName": language_info.nativeName
+        }
+    except Exception as e:
+        logger.error(f"An error occurred during language info retrieval: {e}")
+        logger.error(traceback.format_exc())
+        raise HTTPException(status_code=500, detail=f"An error occurred: {e}")
 
 
 @app.get("/api/concept_lookup")
