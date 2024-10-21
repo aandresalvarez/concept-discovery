@@ -1,5 +1,3 @@
-// src/components/ForcedLanguageSelector.tsx
-
 import React, { useState, useEffect, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -49,8 +47,12 @@ const ForcedLanguageSelector: React.FC<ForcedLanguageSelectorProps> = ({
   const isDesktop = useMediaQuery("(min-width: 768px)");
 
   const [searchQuery, setSearchQuery] = useState("");
-  const [languageOptions, setLanguageOptions] = useState<Language[]>([]);
-  const [filteredLanguages, setFilteredLanguages] = useState<Language[]>([]);
+  const [languageOptions, setLanguageOptions] = useState<Language[]>(
+    initialLanguageOptions,
+  );
+  const [filteredLanguages, setFilteredLanguages] = useState<Language[]>(
+    initialLanguageOptions,
+  );
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [isCreatingLanguage, setIsCreatingLanguage] = useState(false);
   const [newLanguage, setNewLanguage] = useState({
@@ -65,7 +67,6 @@ const ForcedLanguageSelector: React.FC<ForcedLanguageSelectorProps> = ({
       const response = await axios.get("/api/languages");
       let languages = response.data.languages;
 
-      // If the backend returns an empty list, use initialLanguageOptions
       if (languages.length === 0) {
         languages = initialLanguageOptions;
       }
@@ -74,7 +75,6 @@ const ForcedLanguageSelector: React.FC<ForcedLanguageSelectorProps> = ({
       setFilteredLanguages(languages);
     } catch (error) {
       console.error("Error fetching languages:", error);
-      // In case of error, use initialLanguageOptions
       setLanguageOptions(initialLanguageOptions);
       setFilteredLanguages(initialLanguageOptions);
     }
