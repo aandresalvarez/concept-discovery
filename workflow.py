@@ -67,7 +67,7 @@ class SynonymResponse(BaseModel):
 @ell.complex(model="gpt-4o-mini",
              temperature=0.7,
              response_format=SynonymResponse)
-def generate_synonyms(term: str, language: str, context: str) -> List[Message]:
+def generate_synonyms_old(term: str, language: str, context: str) -> List[Message]:
     """
     Generate contextually relevant and medically accurate synonyms for a given medical term in the specified language.
     Each synonym will include a relevance score from 0 to 1, where 1 represents the highest relevance.
@@ -97,58 +97,137 @@ def disambiguate(term: str, language: str = "en") -> str:
     Return a list of possible meanings of a medical term, formatted as a JSON structure.
     Each meaning includes definition, usage, and medical context.
     The results will be in the specified language, defaulting to English if not specified.
-    Only medical meanings are considered. If there is only one meaning or very similar meanings, return a single result.
+    Returns all valid medical interpretations of the exact term, regardless of number.
     """
     return [
         ell.system(
             f"""You will be asked to explain a potentially ambiguous medical term in a specified language, either provided by the user or chosen by the assistant.
 
             Follow these steps:
-            1. Identify the medical term from the user input.
-            2. Provide only medical-related meanings or interpretations of the term in that language.
-            3. If the term has multiple distinct medical meanings, provide each one clearly, ensuring that the definitions are not redundant.
-            4. If the term has only one possible medical meaning, still return it within a JSON array.
-            5. Do not include disambiguation options for non-medical uses of the term.
+            1. Identify ALL distinct medical meanings of the exact term provided.
+            2. Include every valid medical interpretation, whether there are 2, 3, or more meanings.
+            3. Keep the term exactly the same across all interpretations.
+            4. Do not break down composite terms into components.
+            5. Do not create entries for related terms or components.
+            6. Only include medical-related meanings of the exact term.
 
-            Examples:
-            Polish: "Zawał" can mean either myocardial infarction (heart attack) or cerebral infarction (stroke), depending on the affected organ.
-            Spanish: "Constipado" can refer to both a cold (nasal congestion) or constipation, leading to confusion between respiratory and digestive symptoms.
-            German: "Schlaganfall" is generally used for a stroke, but in older or colloquial usage, it can also imply a sudden fainting or seizure-like episode.
-            Russian: "Инфаркт" (infarkt) is commonly used for a heart attack (myocardial infarction) but can also refer to any type of infarction (e.g., pulmonary infarction, brain infarction).
-            Italian: "Colpo" in medical terms can mean colpo di calore (heatstroke) or colpo di frusta (whiplash). The word "colpo" generally means a blow or strike, which can be used in different contexts within medicine.
-            French: "Crise" can refer to a seizure (crise d'épilepsie), an attack (crise cardiaque for a heart attack), or a crisis (such as a psychological crisis or anxiety attack).
-            Portuguese: "Infarto" can mean both myocardial infarction (heart attack) or infarction in other organs (such as a pulmonary or cerebral infarction), depending on the context.
-            Spanish: "Derrame" can mean a cerebral hemorrhage (brain bleed or stroke) or pleural effusion (fluid around the lungs), affecting different organs but sharing the concept of fluid leakage.
-            German: "Schock" can refer to both cardiogenic shock (a severe condition due to heart failure) and psychological shock (an acute stress response).
-            English/Spanish: The word "stroke" in English primarily refers to a cerebrovascular accident (CVA), while the Spanish word "golpe" (literal translation for stroke) can mean a blow or trauma, implying injury in various body parts depending on context.
-            French: "Infarctus" can refer to a heart attack (myocardial infarction) or a broader infarction (tissue death due to lack of blood flow), applicable to different organs like the brain or lungs.
-            Italian: "Crisi" can mean an epileptic seizure (crisi epilettica), a cardiac crisis (crisi cardiaca), or a psychological crisis, making it a multi-context medical term.
-            Dutch: "Infarct" is a general term for tissue death due to lack of blood supply and can refer to heart, brain, or other organ infarctions.
-            Russian: "Остановка" (ostanovka) can refer to the stopping of any organ’s function, like cardiac arrest or respiratory arrest, but also general cessation, such as halting a process.
-            Spanish: "Paro" can mean cardiac arrest (paro cardíaco) or respiratory arrest (paro respiratorio); "paro" simply means stopping.
-            Portuguese: "Crise" can refer to a seizure, an asthma attack (crise asmática), or a cardiac crisis, making it applicable in various contexts.
-            Japanese: "ショック" (Shokku) can mean either cardiogenic shock or psychological shock, depending on the medical context.
-            Chinese (Simplified): "中风" (Zhōngfēng) can refer to a cerebrovascular accident (stroke) or apoplexy, based on historical and contextual usage.
-            Arabic: "أزمة" (Azmah) can denote either an asthma attack or a psychological crisis within medical discussions.
+            Examples of proper disambiguation with multiple meanings:
 
-            Your output should be formatted as a JSON array of objects, with each object representing a unique medical meaning of the term.
+            French "Crise":
+            [
+              {{
+                "term": "Crise",
+                "definition": "Episode d'activité cérébrale anormale (crise d'épilepsie)",
+                "usage": "Utilisé pour décrire une manifestation soudaine de l'épilepsie",
+                "context": "Neurologie, où l'on traite les troubles neurologiques",
+                "category": "Episode aigu"
+              }},
+              {{
+                "term": "Crise",
+                "definition": "Episode aigu d'anxiété ou de panique (crise d'angoisse)",
+                "usage": "Utilisé pour décrire un épisode intense d'anxiété",
+                "context": "Psychiatrie, où l'on traite les troubles mentaux",
+                "category": "Episode aigu"
+              }},
+              {{
+                "term": "Crise",
+                "definition": "Attaque cardiaque soudaine (crise cardiaque)",
+                "usage": "Utilisé pour décrire un événement cardiovasculaire aigu",
+                "context": "Cardiologie, où l'on traite les maladies du cœur",
+                "category": "Episode aigu"
+              }},
+              {{
+                "term": "Crise",
+                "definition": "Episode aigu d'asthme (crise d'asthme)",
+                "usage": "Utilisé pour décrire une difficulté respiratoire aiguë",
+                "context": "Pneumologie, où l'on traite les maladies respiratoires",
+                "category": "Episode aigu"
+              }}
+            ]
+
+            Spanish "Ataque":
+            [
+              {{
+                "term": "Ataque",
+                "definition": "Episodio agudo de origen cardíaco (ataque cardíaco)",
+                "usage": "Se utiliza para describir un infarto de miocardio",
+                "context": "Cardiología, donde se tratan enfermedades del corazón",
+                "category": "Emergencia médica"
+              }},
+              {{
+                "term": "Ataque",
+                "definition": "Episodio convulsivo (ataque epiléptico)",
+                "usage": "Se utiliza para describir una crisis epiléptica",
+                "context": "Neurología, donde se tratan trastornos neurológicos",
+                "category": "Episodio agudo"
+              }},
+              {{
+                "term": "Ataque",
+                "definition": "Episodio agudo de ansiedad (ataque de pánico)",
+                "usage": "Se utiliza para describir una crisis de ansiedad severa",
+                "context": "Psiquiatría, donde se tratan trastornos mentales",
+                "category": "Episodio agudo"
+              }}
+            ]
+
+            German "Schock":
+            [
+              {{
+                "term": "Schock",
+                "definition": "Akutes Kreislaufversagen (kardiogener Schock)",
+                "usage": "Beschreibt einen lebensbedrohlichen Zustand mit Herzversagen",
+                "context": "Kardiologie und Notfallmedizin",
+                "category": "Akutzustand"
+              }},
+              {{
+                "term": "Schock",
+                "definition": "Psychische Reaktion auf ein Trauma (psychischer Schock)",
+                "usage": "Beschreibt eine akute Stressreaktion",
+                "context": "Psychiatrie und Psychologie",
+                "category": "Psychischer Zustand"
+              }},
+              {{
+                "term": "Schock",
+                "definition": "Allergische Reaktion (anaphylaktischer Schock)",
+                "usage": "Beschreibt eine schwere allergische Reaktion",
+                "context": "Allergologie und Notfallmedizin",
+                "category": "Akutzustand"
+              }}
+            ]
+
+            Your output should be formatted as a JSON array of objects, with each object representing a distinct meaning of the exact same term:
 
             ```json
             [
               {{
-                "term": "<The medical term>",
-                "definition": "<Definition of the medical term in {language}>",
-                "usage": "<How the medical term is used in {language}>",
-                "context": "<Medical context or specialty where the term is commonly used in {language}>",
-                "category": "<Category of the medical term, e.g., disease, condition, etc., in {language}>"
+                "term": "<The exact medical term>",
+                "definition": "<First meaning of the term in {language}>",
+                "usage": "<How the term is used in this meaning in {language}>",
+                "context": "<Medical context for this meaning in {language}>",
+                "category": "<Category for this meaning in {language}>"
+              }},
+              {{
+                "term": "<The exact same medical term>",
+                "definition": "<Second meaning of the term in {language}>",
+                "usage": "<How the term is used in this meaning in {language}>",
+                "context": "<Medical context for this meaning in {language}>",
+                "category": "<Category for this meaning in {language}>"
+              }},
+              {{
+                "term": "<The exact same medical term>",
+                "definition": "<Third meaning of the term in {language}>",
+                "usage": "<How the term is used in this meaning in {language}>",
+                "context": "<Medical context for this meaning in {language}>",
+                "category": "<Category for this meaning in {language}>"
               }}
+              ... additional meanings as needed ...
             ]
             ```
-
             """),
         ell.user(
             f"Disambiguate the following medical term in {language}: {term}")
     ]
+
 
 
 # Main function for finding OMOP concept (not an LMP)
@@ -322,9 +401,76 @@ def get_language_info(input_text: str) -> List[Message]:
     ]
 
 
-# # Example usage:
-# result = get_language_info("Ruso")
-# language_info = result.parsed
-# print(
-#     f"Name: {language_info.name}, Code: {language_info.code}, Native Name: {language_info.nativeName}"
-# )
+@ell.complex(model="gpt-4o-mini",
+     temperature=0.7,
+     response_format=SynonymResponse)
+def generate_synonyms(term: str, language: str, context: str) -> List[Message]:
+    """
+    Generate contextually relevant and medically accurate synonyms for a given medical term in the specified language.
+    The original term is always included as one of the synonyms with relevance 1.0.
+    Only includes closely related medical synonyms specific to the provided context.
+    Each synonym includes a relevance score from 0 to 1, where 1 represents the highest relevance.
+    """
+    return [
+    ell.system(
+        f"""You are a medical language expert tasked with generating synonyms for a medical term.
+        Follow these strict guidelines:
+    
+        1. ALWAYS include the exact term '{term}' as the first synonym with a relevance score of 1.0.
+    
+        2. Generate ONLY synonyms that are:
+           - Strictly medical in nature
+           - Specific to the provided context '{context}'
+           - Commonly used in the specified language '{language}'
+           - Very closely related in meaning
+    
+        3. Limit additional synonyms to a maximum of 4 (plus the original term).
+    
+        4. Score relevance based on these criteria:
+           - 1.0: Exact term or perfect synonyms (identical meaning)
+           - 0.9-0.99: Very close synonyms (nearly identical meaning)
+           - 0.8-0.89: Close synonyms with slight variation in usage
+           - Below 0.8: Do not include as not close enough
+    
+        5. Do NOT include:
+           - Terms with different medical meanings
+           - General language synonyms not specific to medical usage
+           - Related terms that aren't true synonyms
+           - Terms from other medical contexts
+    
+        Examples:
+    
+        Input: term="acute respiratory infection", language="en", context="respiratory disease"
+        {{
+          "synonyms": [
+            {{"synonym": "acute respiratory infection", "relevance": 1.0}},
+            {{"synonym": "acute respiratory tract infection", "relevance": 0.95}},
+            {{"synonym": "acute respiratory illness", "relevance": 0.90}}
+          ]
+        }}
+    
+        Input: term="hipertensión", language="es", context="cardiología"
+        {{
+          "synonyms": [
+            {{"synonym": "hipertensión", "relevance": 1.0}},
+            {{"synonym": "hipertensión arterial", "relevance": 0.95}},
+            {{"synonym": "presión arterial alta", "relevance": 0.90}},
+            {{"synonym": "HTA", "relevance": 0.85}}
+          ]
+        }}
+    
+        Input: term="migräne", language="de", context="neurologie"
+        {{
+          "synonyms": [
+            {{"synonym": "migräne", "relevance": 1.0}},
+            {{"synonym": "migränekopfschmerz", "relevance": 0.95}},
+            {{"synonym": "hemikranie", "relevance": 0.85}}
+          ]
+        }}
+    
+        Consider only the provided term, language, and context when generating synonyms. Ensure all synonyms are valid medical terms that preserve the exact medical meaning specified in the context."""
+    ),
+    ell.user(
+        f"Generate medical synonyms for the term '{term}' in the context of '{context}' and the language '{language}', ensuring to include the exact term and only closely related medical synonyms specific to this context."
+    )
+    ]
