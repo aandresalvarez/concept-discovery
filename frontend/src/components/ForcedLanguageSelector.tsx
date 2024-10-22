@@ -13,7 +13,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Search, X, Globe, Plus, Check, AlertCircle } from "lucide-react";
+import { Search, X, Globe, Plus, AlertCircle, Loader2 } from "lucide-react";
 
 interface Language {
   value: string;
@@ -28,134 +28,38 @@ interface LanguageSelectorProps {
 const CreateLanguageDialog: React.FC<{
   isOpen: boolean;
   onClose: () => void;
-  onSave: (language: {
-    name: string;
-    code: string;
-    nativeName: string;
-  }) => void;
+  onSave: (languageName: string) => Promise<void>;
   t: (key: string) => string;
 }> = ({ isOpen, onClose, onSave, t }) => {
-  const [step, setStep] = useState(1);
-  const [newLanguage, setNewLanguage] = useState({
-    name: "",
-    code: "",
-    nativeName: "",
-  });
-  const [errors, setErrors] = useState({ name: "", code: "", nativeName: "" });
+  const [newLanguageName, setNewLanguageName] = useState("");
+  const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
 
-  const validateField = (field: string, value: string) => {
-    switch (field) {
-      case "name":
-        return value.length < 2 ? t("languageNameError") : "";
-      case "code":
-        return value.length !== 2 ? t("languageCodeError") : "";
-      case "nativeName":
-        return value.length < 2 ? t("nativeNameError") : "";
-      default:
-        return "";
-    }
+  const handleChange = (value: string) => {
+    setNewLanguageName(value);
+    setError(value.length < 2 ? t("languageNameError") : "");
   };
 
-  const handleChange = (field: string, value: string) => {
-    setNewLanguage((prev) => ({ ...prev, [field]: value }));
-    setErrors((prev) => ({ ...prev, [field]: validateField(field, value) }));
-  };
-
-  const isStepValid = () => {
-    switch (step) {
-      case 1:
-        return newLanguage.name.length > 1 && !errors.name;
-      case 2:
-        return newLanguage.code.length === 2 && !errors.code;
-      case 3:
-        return newLanguage.nativeName.length > 1 && !errors.nativeName;
-      default:
-        return false;
-    }
-  };
-
-  const handleNext = () => {
-    if (step < 3) setStep((prev) => prev + 1);
-    else onSave(newLanguage);
-  };
-
-  const renderStep = () => {
-    switch (step) {
-      case 1:
-        return (
-          <div className="space-y-4">
-            <Label htmlFor="languageName" className="text-lg font-semibold">
-              {t("languageName")}
-            </Label>
-            <Input
-              id="languageName"
-              value={newLanguage.name}
-              onChange={(e) => handleChange("name", e.target.value)}
-              placeholder={t("languageNamePlaceholder")}
-              className="text-lg p-6"
-            />
-            <p className="text-sm text-muted-foreground">
-              {t("languageNameDescription")}
-            </p>
-            {errors.name && (
-              <p className="text-sm text-destructive flex items-center">
-                <AlertCircle className="w-4 h-4 mr-2" />
-                {errors.name}
-              </p>
-            )}
-          </div>
-        );
-      case 2:
-        return (
-          <div className="space-y-4">
-            <Label htmlFor="languageCode" className="text-lg font-semibold">
-              {t("languageCode")}
-            </Label>
-            <Input
-              id="languageCode"
-              value={newLanguage.code}
-              onChange={(e) =>
-                handleChange("code", e.target.value.toLowerCase())
-              }
-              placeholder={t("languageCodePlaceholder")}
-              className="text-lg p-6 uppercase"
-              maxLength={2}
-            />
-            <p className="text-sm text-muted-foreground">
-              {t("languageCodeDescription")}
-            </p>
-            {errors.code && (
-              <p className="text-sm text-destructive flex items-center">
-                <AlertCircle className="w-4 h-4 mr-2" />
-                {errors.code}
-              </p>
-            )}
-          </div>
-        );
-      case 3:
-        return (
-          <div className="space-y-4">
-            <Label htmlFor="nativeName" className="text-lg font-semibold">
-              {t("nativeName")}
-            </Label>
-            <Input
-              id="nativeName"
-              value={newLanguage.nativeName}
-              onChange={(e) => handleChange("nativeName", e.target.value)}
-              placeholder={t("nativeNamePlaceholder")}
-              className="text-lg p-6"
-            />
-            <p className="text-sm text-muted-foreground">
-              {t("nativeNameDescription")}
-            </p>
-            {errors.nativeName && (
-              <p className="text-sm text-destructive flex items-center">
-                <AlertCircle className="w-4 h-4 mr-2" />
-                {errors.nativeName}
-              </p>
-            )}
-          </div>
-        );
+  const handleSave = async () => {
+    if (newLanguageName.length >= 2) {
+      setIsLoading(true);
+      setError("");
+      try {
+        await onSave(newLanguageName);
+        setIsSuccess(true);
+        setNewLanguageName("");
+        setTimeout(() => {
+          setIsSuccess(false);
+          window.location.reload(); // Refresh the page after successful creation
+        }, 2000);
+      } catch (err) {
+        setError(t("errorCreatingLanguage"));
+      } finally {
+        setIsLoading(false);
+      }
+    } else {
+      setError(t("languageNameError"));
     }
   };
 
@@ -171,31 +75,49 @@ const CreateLanguageDialog: React.FC<{
             {t("createLanguageDescription")}
           </DialogDescription>
         </DialogHeader>
-        <div className="mt-6">
-          <div className="flex justify-between mb-6">
-            {[1, 2, 3].map((s) => (
-              <div
-                key={s}
-                className={`w-10 h-10 rounded-full flex items-center justify-center ${
-                  s === step
-                    ? "bg-primary text-primary-foreground"
-                    : s < step
-                      ? "bg-primary/20 text-primary"
-                      : "bg-secondary text-secondary-foreground"
-                }`}
-              >
-                {s < step ? <Check className="w-5 h-5" /> : s}
-              </div>
-            ))}
-          </div>
-          {renderStep()}
+        <div className="mt-6 space-y-4">
+          <Label htmlFor="languageName" className="text-lg font-semibold">
+            {t("languageName")}
+          </Label>
+          <Input
+            id="languageName"
+            value={newLanguageName}
+            onChange={(e) => handleChange(e.target.value)}
+            placeholder={t("languageNamePlaceholder")}
+            className="text-lg p-6"
+            disabled={isLoading || isSuccess}
+          />
+          {error && (
+            <p className="text-sm text-destructive flex items-center">
+              <AlertCircle className="w-4 h-4 mr-2" />
+              {error}
+            </p>
+          )}
+          {isLoading && (
+            <p className="text-sm text-muted-foreground flex items-center">
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              {t("creatingLanguage")}
+            </p>
+          )}
+          {isSuccess && (
+            <p className="text-sm text-green-600 flex items-center">
+              <Globe className="w-4 h-4 mr-2" />
+              {t("languageCreatedSuccess")}
+            </p>
+          )}
         </div>
         <DialogFooter className="flex justify-between items-center mt-6">
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" onClick={onClose} disabled={isLoading}>
             {t("cancel")}
           </Button>
-          <Button onClick={handleNext} disabled={!isStepValid()}>
-            {step === 3 ? t("save") : t("next")}
+          <Button
+            onClick={handleSave}
+            disabled={newLanguageName.length < 2 || isLoading || isSuccess}
+          >
+            {isLoading ? (
+              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+            ) : null}
+            {t("save")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -255,30 +177,30 @@ const LanguageSelector: React.FC<LanguageSelectorProps> = ({
     setError(null);
   };
 
-  const handleSaveNewLanguage = async (newLanguage: {
-    name: string;
-    code: string;
-    nativeName: string;
-  }) => {
+  const handleSaveNewLanguage = async (languageName: string) => {
     try {
-      const { name, code, nativeName } = newLanguage;
+      const response = await axios.get(
+        `/api/language_info?input_text=${encodeURIComponent(languageName)}`,
+      );
+      const languageInfo = response.data;
 
-      const response = await axios.post("/api/create_language", {
-        name,
-        code,
-        native_name: nativeName,
+      const createResponse = await axios.post("/api/create_language", {
+        name: languageInfo.name,
+        code: languageInfo.code,
+        native_name: languageInfo.nativeName,
       });
 
-      if (response.data.success) {
-        setIsCreatingLanguage(false);
+      if (createResponse.data.success) {
         setError(null);
         await fetchLanguages();
       } else {
-        setError(response.data.message || t("failedToCreateLanguage"));
+        throw new Error(
+          createResponse.data.message || t("failedToCreateLanguage"),
+        );
       }
     } catch (err: any) {
       console.error("Error creating language:", err);
-      setError(err.response?.data?.detail || t("errorCreatingLanguage"));
+      throw err;
     }
   };
 

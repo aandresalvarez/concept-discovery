@@ -85,8 +85,6 @@ class ConceptTableResponse(BaseModel):
 
 class CreateLanguageRequest(BaseModel):
     name: str
-    code: str
-    native_name: str
 
 
 class CreateLanguageResponse(BaseModel):
@@ -125,35 +123,27 @@ async def create_language(request: CreateLanguageRequest):
     Endpoint to create a new language.
     """
     try:
-        logger.info(
-            f"Attempting to create new language: {request.name} ({request.code})"
-        )
+        logger.info(f"Attempting to create new language: {request.name}")
 
-        # Validate language code
-        if len(request.code) != 2:
-            raise HTTPException(
-                status_code=400,
-                detail="Invalid language code. Please use a 2-letter ISO code."
-            )
+        # Use get_language_info to get the language details
+        result = get_language_info(request.name)
+        language_info = result.parsed
 
         # Check if language already exists
-        existing_language = chart_data.get_language_by_code(request.code)
+        existing_language = chart_data.get_language_by_code(language_info.code)
         if existing_language:
             return CreateLanguageResponse(
                 success=False,
                 message="A language with this code already exists.")
 
         # Add the new language
-        chart_data.add_language(name=request.name,
-                                code=request.code,
-                                native_name=request.native_name)
+        chart_data.add_language(name=language_info.name,
+                                code=language_info.code,
+                                native_name=language_info.nativeName)
 
         message = "Language created successfully!"
         logger.info(message)
         return CreateLanguageResponse(success=True, message=message)
-    except HTTPException as e:
-        logger.error(f"Failed to create language: {e.detail}")
-        raise e
     except Exception as e:
         logger.error(f"Failed to create language: {e}")
         raise HTTPException(

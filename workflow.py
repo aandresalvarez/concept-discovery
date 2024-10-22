@@ -305,7 +305,7 @@ def get_language_info(input_text: str) -> List[Message]:
         Return the information as a LanguageInfo object with the following fields:
         - name: The English name of the language
         - code: The ISO 639-1 code of the language
-        - nativeName: The native name of the language
+        - nativeName: The native name of the language, Capitalized the first letter
 
         Example of the resulting structure:
         {
